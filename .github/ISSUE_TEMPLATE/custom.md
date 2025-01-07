@@ -1,3 +1,12 @@
+---
+name: Custom issue template
+about: Describe this issue template's purpose here.
+title: ''
+labels: ''
+assignees: ''
+
+---
+
 ## 🛠️ Issue Overview
 - **이슈 개요**: 이슈가 무엇인지 간단히 설명하세요. 해당 기능 또는 개선 사항이 필요한 이유와 이로 인해 해결될 문제를 요약하세요.
 
