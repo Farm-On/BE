@@ -57,7 +57,7 @@ public class ChatRoomController {
             @Parameter(name = "name", description = "검색할 채팅 상대방의 이름입니다.", example = "김팜온", required = true),
             @Parameter(name = "page", description = "페이지 번호, 1부터 시작입니다.", example = "1", required = true)
     })
-    @GetMapping("/rooms/expert")
+    @GetMapping("/rooms/name")
     public ApiResponse<ChatResponse.ChatRoomListDTO> getChatRoomPageByExpertName (@RequestParam(name = "userId") Long userId,
                                                                                   @RequestParam(name = "read") String read,
                                                                                   @RequestParam(name = "expertName") String expertName,
