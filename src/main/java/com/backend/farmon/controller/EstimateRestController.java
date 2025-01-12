@@ -23,9 +23,9 @@ public class EstimateRestController {
      * 1) 농사견적서 작성
      */
     @Operation(
-            summary = "카테고리별 농사 견적서 목록 조회 API",
-            description = "모든 사용자가 올린 농사 견적서 중, 지정된 카테고리 ID에 해당하는 견적서를 조회합니다. " +
-                    "카테고리 ID와 페이지 번호를 입력해주세요."
+            summary = "농사 견적서 생성 API",
+            description = "새로운 농사 견적서를 작성하는 API입니다. " +
+                    "작성자 ID와 견적서 내용(카테고리, 견적, 상세 내용 등)을 RequestBody 등에 담아 보내주세요."
     )
     @ApiResponses({
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200", description = "OK, 성공")
