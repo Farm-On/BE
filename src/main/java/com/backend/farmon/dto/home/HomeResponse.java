@@ -15,6 +15,12 @@ public class HomeResponse {
     @Schema(description = "홈 페이지 조회 정보")
     public static class HomePageDTO {
 
+        @Schema(description = "로그인한 사용자의 이름, 로그인 하지 않은 사용자일 경우 null", example = "김팜온")
+        String name;
+
+        @Schema(description = "로그인한 사용자의 유형(농업인 or 전문가), 로그인 하지 않은 사용자일 경우 null", example = "농업인")
+        String type;
+
         @Schema(description = "커뮤니티 카테고리에 따른 게시글 리스트")
         List <PostDetailDTO> postList;
 
