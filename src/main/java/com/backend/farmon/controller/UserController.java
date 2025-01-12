@@ -1,15 +1,18 @@
 package com.backend.farmon.controller;
 
 import com.backend.farmon.apiPayload.ApiResponse;
+import com.backend.farmon.dto.user.ExchangeResponse;
 import com.backend.farmon.dto.user.MypageRequest;
 import com.backend.farmon.dto.user.MypageResponse;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
-@Tag(name = "사용자 정보 설정")
+@Tag(name = "사용자 정보")
 @RestController
 @RequiredArgsConstructor
 public class UserController {
@@ -38,4 +41,21 @@ public class UserController {
         return null;
     }
 
+    @PatchMapping("/user/exchange")
+    @Operation(
+            summary = "사용자 역할 전환 API",
+            description = "농업인 전환과 전문가 전환에 관한 API 입니다. 농업인일 경우 전문가로 전환, 전문가일 경우 농업인으로 전환됩니다. " +
+                    "유저 아이디, 사용자 유형을 쿼리 스트링으로 입력해주세요."
+    )
+    @ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200", description = "OK, 성공")
+    })
+    @Parameters({
+            @Parameter(name = "userId", description = "로그인한 유저의 아이디(pk)", example = "1"),
+            @Parameter(name = "type", description = "사용자 유형(농업인 or 전문가)", example = "농업인")
+    })
+    public ApiResponse<ExchangeResponse> patchUserRole(@RequestParam(name="userId") Long userId,
+                                                       @RequestParam(name="type") String type) {
+        return null;
+    }
 }
