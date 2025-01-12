@@ -52,7 +52,7 @@ public class UserController {
     })
     @Parameters({
             @Parameter(name = "userId", description = "로그인한 유저의 아이디(pk)", example = "1"),
-            @Parameter(name = "type", description = "사용자 유형(농업인 or 전문가)", example = "농업인")
+            @Parameter(name = "type", description = "전환하고자 하는 사용자 유형(전문가 전환 시 전문가 입력, 농업인 전환 시 농업인 입력)", example = "전문가")
     })
     public ApiResponse<ExchangeResponse> patchUserRole(@RequestParam(name="userId") Long userId,
                                                        @RequestParam(name="type") String type) {
