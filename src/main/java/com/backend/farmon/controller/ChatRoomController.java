@@ -42,11 +42,11 @@ public class ChatRoomController {
     }
 
 
-    // 전문가 이름과 일치하는 채팅 목록 조회
+    // 이름과 일치하는 채팅 목록 조회
     @Operation(
-            summary = "전문가 이름으로 검색하여 일치하는 전문가와의 채팅 목록 조회 API",
-            description = "전문가 이름을 검색하여 일치하는 채팅 목록을 조회하는 API이며, 페이징을 포함합니다. " +
-                    "유저 아이디, 읽음 여부 필터, 검색할 전문가 이름, 페이지 번호를 쿼리 스트링으로 입력해주세요."
+            summary = "채팅 상대 이름으로 검색하여 일치하는 상대방과의 채팅 목록 조회 API",
+            description = "채팅 상대방의 이름을 검색하여 일치하는 상대방과의 채팅 목록을 조회하는 API이며, 페이징을 포함합니다. " +
+                    "유저 아이디, 읽음 여부 필터, 검색할 채팅 상대 이름, 페이지 번호를 쿼리 스트링으로 입력해주세요."
     )
     @ApiResponses({
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200", description = "OK, 성공")
@@ -54,7 +54,7 @@ public class ChatRoomController {
     @Parameters({
             @Parameter(name = "userId", description = "로그인한 유저의 아이디(pk)", example = "1", required = true),
             @Parameter(name = "read", description = "읽음 여부 필터링. 안 읽은 채팅방만 필터링 시에는 false, 이외에는 true 입니다.", example = "false", required = true),
-            @Parameter(name = "expertName", description = "검색할 전문가 이름입니다.", example = "김팜온", required = true),
+            @Parameter(name = "name", description = "검색할 채팅 상대방의 이름입니다.", example = "김팜온", required = true),
             @Parameter(name = "page", description = "페이지 번호, 1부터 시작입니다.", example = "1", required = true)
     })
     @GetMapping("/rooms/expert")
