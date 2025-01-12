@@ -150,7 +150,7 @@ public class EstimateRestController {
     @Parameters({
             @Parameter(name = "estimatedId", description = "수정할 견적서의 ID(pk)", example = "100", required = true)
     })
-    @PutMapping("/update/{estimateId}")
+    @PutMapping("/{estimateId}")
     public ApiResponse<EstimateResponseDTO.UpdateDTO> updateEstimate(
             @PathVariable Long estimateId,
             @RequestBody EstimateRequestDTO.CreateDTO request
@@ -176,7 +176,7 @@ public class EstimateRestController {
     @Parameters({
             @Parameter(name = "estimateId", description = "삭제할 견적서의 ID(pk)", example = "100", required = true)
     })
-    @DeleteMapping("/delete/{estimateId}")
+    @DeleteMapping("/{estimateId}")
     public ApiResponse<EstimateResponseDTO.DeleteDTO> deleteEstimate(
             @PathVariable Long estimateId
     ) {
