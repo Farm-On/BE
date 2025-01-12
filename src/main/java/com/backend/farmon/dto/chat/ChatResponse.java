@@ -1,0 +1,126 @@
+package com.backend.farmon.dto.chat;
+
+import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.*;
+
+import java.util.List;
+
+public class ChatResponse {
+    @Getter
+    @Setter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Builder
+    @Schema(description = "채팅방 목록 정보")
+    public static class ChatRoomListDTO { 
+        @Schema(description = "채팅 대화방 세부 정보 목록")
+        List <ChatRoomDetailDTO> chatRoomInfoList;
+
+        @Schema(description = "현재 페이지의 채팅 대화방 목록 개수", example = "10")
+        Integer chatMessageListSize;
+
+        @Schema(description = "총 페이지 수", example = "8")
+        Integer totalPage;
+
+        @Schema(description = "총 채팅 대화 내역 개수", example = "80")
+        Long totalElements;
+
+        @Schema(description = "페이지 처음 여부", example = "true")
+        Boolean isFirst;
+
+        @Schema(description = "페이지 마지막 여부", example = "false")
+        Boolean isLast;
+    }
+
+    @Getter
+    @Setter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Builder
+    @Schema(description = "채팅 대화방 세부 정보")
+    public static class ChatRoomDetailDTO {
+        @Schema(description = "채팅방 아이디", example = "1")
+        Long chatRoomId;
+
+        @Schema(description = "채팅 중인 상대방 이름", example = "김팜온")
+        String name;
+
+        @Schema(description = "채팅 중인 상대방 프로필 이미지")
+        String profileImage;
+
+        @Schema(description = "신청 견적 예산", example = "500만원 ~ 1,000만원")
+        String estimateBudget;
+
+        @Schema(description = "신청 견적 종류", example = "스마트팜")
+        String estimateCategory;
+
+        @Schema(description = "신청 견적 주소", example = "경기 이천시 마장면")
+        String estimateAddress;
+
+        @Schema(description = "안 읽은 채팅 개수", example = "3")
+        Integer unreadMessageCount;
+
+        @Schema(description = "마지막 채팅 내용", example = "추가로 궁금한 점이 생기면 언제든 문의하세요.")
+        Integer lastMessageContent;
+
+        @Schema(description = "마지막 채팅 날짜", example = "2025.01.10")
+        String lastMessageDate;
+    }
+
+    @Getter
+    @Setter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Builder
+    @Schema(description = "채팅 대화방의 세부 정보 및 메시지 정보")
+    public static class ChatMessageListDTO { 
+        @Schema(description = "채팅 대화방의 메시지 목록")
+        List <ChatMessageDetailDTO> chatMesageList;
+
+        @Schema(description = "채팅 중인 상대방 이름", example = "김팜온")
+        String name;
+
+        @Schema(description = "채팅 중인 상대방 프로필 이미지")
+        String profileImage;
+
+        @Schema(description = "채팅 상대 역할, 농업인 또는 전문가", example = "농업인")
+        String type;
+
+        @Schema(description = "채팅 상대의 마지막 채팅방 접속 시간", example = "28분")
+        String lastEnterTime;
+
+        @Schema(description = "채팅 상대의 평균 메시지 응답 시간", example = "1시간")
+        String averageResponseTime;
+    }
+
+    @Getter
+    @Setter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Builder
+    @Schema(description = "채팅 대화방의 메시지 세부 정보, 채팅방 조회시 List로 전달")
+    public static class ChatMessageDetailDTO {
+        @Schema(description = "메시지 내용", example = "안녕하세요.")
+        String messageContent;
+
+        @Schema(description = "메시지 읽음 여부", example = "false")
+        Boolean isRead;
+
+        @Schema(description = "내가 보낸 메시지인지 상대방이 보낸 메시지인지 여부 / 내가 보낸 메시지라면 true, 상대방이 보낸 메시지라면 false", example = "true")
+        Boolean isMine;
+
+        @Schema(description = "메시지 전송 시간", example = "오후 5:11")
+        String sendTime;
+    }
+
+    @Getter
+    @Setter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Builder
+    @Schema(description = "채팅방 삭제 응답 정보")
+    public static class ChatRoomDeleteDTO {
+        @Schema(description = "삭제 여부 / 삭제에 성공했다면 true, 실패했다면 false", example = "true")
+        Boolean isDeleteSuccess;
+    }
+}

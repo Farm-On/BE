@@ -11,10 +11,12 @@ public class GeneralException extends RuntimeException{
     private BaseErrorCode code;
 
     public ErrorReasonDTO getErrorReason(){
+        // ErrorReasonDTO의 reason, message, isSuccess
         return this.code.getReason();
     }
 
     public ErrorReasonDTO getErrorReasonHttpStatus(){
+        // ErrorReasonDTO의 httpStatus, reason, message, isSuccess
         return this.code.getReasonHttpStatus();
     }
 }
