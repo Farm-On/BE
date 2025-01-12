@@ -19,4 +19,14 @@ public class SignupResponse {
         Long userId;
         LocalDateTime createdAt;
     }
+
+    @Builder
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Schema(description = "회원탈퇴 성공시 응답 DTO")
+    public static class WithdrawDTO{
+        Long userId;
+        LocalDateTime inactiveDate;
+    }
 }

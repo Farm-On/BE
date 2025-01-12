@@ -9,10 +9,7 @@ import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @Tag(name = "회원가입")
 @RestController
@@ -36,6 +33,15 @@ public class SignupController {
     })
     public ApiResponse<SignupResponse.JoinResultDTO> expertJoin(@RequestBody SignupRequest.ExpertJoinDto expertJoinDto){
 
+        return null;
+    }
+
+    @PatchMapping("/withdraw/{id}")
+    @Operation(summary = "회원탈퇴 API")
+    @ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200",description = "OK, 성공")
+    })
+    public ApiResponse<SignupResponse.WithdrawDTO> withdraw(@PathVariable String id) {
         return null;
     }
 }
