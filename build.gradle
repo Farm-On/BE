@@ -49,6 +49,11 @@ dependencies {
 	// STOMP
 	implementation 'org.webjars:stomp-websocket:2.3.4'
 
+	// Spring Security
+	implementation 'org.springframework.boot:spring-boot-starter-security'
+	testImplementation 'org.springframework.security:spring-security-test'
+	implementation 'org.thymeleaf.extras:thymeleaf-extras-springsecurity6:3.1.1.RELEASE'
+
 	// 테스트 의존성
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }
