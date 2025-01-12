@@ -10,10 +10,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @Tag(name = "홈 화면", description = "홈 화면에 관한 API")
 @Slf4j
@@ -31,8 +28,8 @@ public class HomeController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200",description = "OK, 성공")
     })
     @Parameters({
-            @Parameter(name = "userId", description = "로그인한 유저의 아이디(pk)", example = "1"),
-            @Parameter(name = "category", description = " 커뮤니티 카테고리", example = "인기", required = true)
+            @Parameter(name = "userId", description = "로그인한 유저의 아이디(pk), 로그인 하지 않은 사용자 일 경우 입력하지 않아도 됩니다.", example = "1"),
+            @Parameter(name = "category", description = " 커뮤니티 카테고리 이름", example = "인기", required = true)
     })
     @GetMapping("")
     public ApiResponse<HomeResponse.HomePageDTO> getChatRoomPage (@RequestParam(name = "userId", required = false) Long userId,
