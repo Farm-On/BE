@@ -1,7 +1,7 @@
 plugins {
 	id 'java'
-	id 'org.springframework.boot' version '3.4.1'
-	id 'io.spring.dependency-management' version '1.1.7'
+	id 'org.springframework.boot' version '3.0.0'
+	id 'io.spring.dependency-management' version '1.0.15.RELEASE'
 }
 
 group = 'com.backend'
@@ -28,6 +28,7 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 	implementation 'org.hibernate.orm:hibernate-core:6.0.2.Final'
 	implementation 'mysql:mysql-connector-java:8.0.33'
+	implementation 'com.h2database:h2'
 
 	// Bean Validation을 위한 Hibernate Validator
 	implementation 'org.hibernate.validator:hibernate-validator:8.0.0.Final' // 최신 호환 버전 사용
