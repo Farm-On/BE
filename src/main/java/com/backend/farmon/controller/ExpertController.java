@@ -18,6 +18,18 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class ExpertController {
 
+    // 전문가 내 프로필 페이지 조회
+    @GetMapping("/expert/{expert-id}")
+    @Operation(summary = "전문가 내 프로필 페이지 조회 API")
+    @ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200", description = "OK, 성공"),
+    })
+    public ApiResponse<ExpertProfileResponse.ExpertProfileDTO> getExpertProfilePage(
+            @Parameter(name = "expert-id", description = "전문가 아이디")
+            @PathVariable(name = "expert-id") Long expertId) {
+        return null;
+    }
+
     // 전문가 프로필 목록 조회
     @GetMapping("/expert")
     @Operation(
@@ -39,13 +51,4 @@ public class ExpertController {
         return null;
     }
 
-    // 전문가 내 프로필 페이지 조회
-    @PatchMapping("/expert/{id}")
-    @Operation(summary = "전문가 내 프로필 페이지 조회 API")
-    @ApiResponses({
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200", description = "OK, 성공"),
-    })
-    public ApiResponse<ExpertProfileResponse.ExpertProfileDTO> getExpertProfilePage(@PathVariable Long id) {
-        return null;
-    }
 }

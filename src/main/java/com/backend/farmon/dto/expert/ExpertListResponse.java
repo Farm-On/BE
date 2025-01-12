@@ -41,6 +41,9 @@ public class ExpertListResponse {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class ExpertProfileViewDTO {
+        @Schema(description = "전문가 아이디")
+        Long expertId;
+
         @Schema(description = "프로필 이미지")
         String profileImg;
 
