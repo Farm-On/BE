@@ -36,7 +36,7 @@ public class HomeController {
         return null;
     }
 
-    // 검색어 삭제 API
+    // 특정 검색어 삭제 API
     @Operation(
             summary = "홈 화면에서 특정 검색어 삭제 API",
             description = "홈 화면에서 특정 검색어를 삭제하는 API 입니다. 유저 아이디와 삭제할 검색어 이름을 쿼리 스트링으로 입력해 주세요."
@@ -63,10 +63,10 @@ public class HomeController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200",description = "OK, 성공")
     })
     @Parameters({
-            @Parameter(name = "userId", description = "로그인한 유저의 아이디(pk)", example = "1")
+            @Parameter(name = "userId", description = "로그인한 유저의 아이디(pk), 로그인 하지 않은 사용자 일 경우 입력하지 않아도 됩니다.", example = "1")
     })
     @DeleteMapping("/search/all")
-    public ApiResponse<HomeResponse.HomePageDTO> deleteAllSearchName(@RequestParam(name = "userId") Long userId){
+    public ApiResponse<HomeResponse.HomePageDTO> deleteAllSearchName(@RequestParam(name = "userId") Long userId) {
         return null;
     }
 }
