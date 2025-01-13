@@ -24,7 +24,7 @@ public class HomeResponse {
         @Schema(description = "커뮤니티 카테고리에 따른 게시글 리스트")
         List <PostDetailDTO> postList;
 
-        @Schema(description = "커뮤니티 카테고리에 따른 게시글 리스트")
+        @Schema(description = "인기 칼럼 리스트")
         List <PopularPostDetailDTO> popularPostList;
 
         @Schema(description = "최근 검색어 리스트")
@@ -41,9 +41,9 @@ public class HomeResponse {
     @Builder
     @Schema(description = "홈 페이지 커뮤니티 게시글 정보")
     public static class PostDetailDTO {
-
-        @Schema(description = "커뮤니티 카테고리", example = "Q&A")
-        String category;
+        
+        @Schema(description = "커뮤니티 게시글 아이디")
+        Long postId;
 
         @Schema(description = "커뮤니티 게시글 제목")
         String postTitle;
@@ -65,6 +65,9 @@ public class HomeResponse {
     @Builder
     @Schema(description = "홈 페이지 인기 칼럼 정보")
     public static class PopularPostDetailDTO {
+
+        @Schema(description = "인기 칼럼 게시글 아이디")
+        Long popularPostId;
 
         @Schema(description = "인기 칼럼 제목")
         String popularPostTitle;
