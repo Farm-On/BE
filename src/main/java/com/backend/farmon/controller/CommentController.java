@@ -162,7 +162,15 @@ public class CommentController {
     }
 
 
+    @Operation(summary = "게시글의 댓글  전부 삭제", description = "댓글 전부 삭제 API")
 
+    @ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "OK, 성공")
+    })
+    @Parameters({
+            @Parameter(name = "postId", description = "게시물 작성한 사람 ID", required = true),
+            @Parameter(name = "commentNo", description = "부모댓글 번호", required = true),
+    })
     /**
      * 댓글 삭제 (댓글과 대댓글 모두 포함) 부모댓글 삭제 만 포함시켰음
      */
