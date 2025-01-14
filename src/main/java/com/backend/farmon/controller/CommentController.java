@@ -31,7 +31,7 @@ public class CommentController {
             @Parameter(name = "CommentRequestDTO", description = "댓글 정보", required = true),
     })
     @PostMapping("/save")
-    public ApiResponse saveComment(@PathVariable String postId, @RequestBody @Valid CommentRequestDTO request) {
+    public ApiResponse saveComment(@PathVariable Long postId, @RequestBody @Valid CommentRequestDTO request) {
         String resultcode = SuccessStatus._OK.getCode();
 
         return ApiResponse.onSuccess(resultcode);
@@ -48,7 +48,7 @@ public class CommentController {
             @Parameter(name = "CommentSaveChildRequestDto", description = "대댓글 정보", required = true),
     })
     @PostMapping("/{commentNo}/save")
-    public ApiResponse saveChildComment(@PathVariable String postId, @PathVariable Long commentNo, @RequestBody @Valid CommentRequestDTO.CommentSaveChildRequestDto request) {
+    public ApiResponse saveChildComment(@PathVariable Long postId, @PathVariable Long commentNo, @RequestBody @Valid CommentRequestDTO.CommentSaveChildRequestDto request) {
         String resultcode = SuccessStatus._OK.getCode();
 
         return ApiResponse.onSuccess(resultcode);
@@ -88,7 +88,7 @@ public class CommentController {
             @Parameter(name = "commentNo", description = "부모댓글 번호", required = true),
     })
     @GetMapping("/{commentNo}/children")
-    public ApiResponse <CommenResponseDTO.CommentChildReadResponseDto> getChild (@PathVariable String postId, @PathVariable Long commentNo) {
+    public ApiResponse <CommenResponseDTO.CommentChildReadResponseDto> getChild (@PathVariable Long postId, @PathVariable Long commentNo) {
 
         CommenResponseDTO.CommentChildReadResponseDto dto=  CommenResponseDTO.CommentChildReadResponseDto.builder().build();
 
@@ -109,7 +109,7 @@ public class CommentController {
             @Parameter(name = "postId", description = "게시물 작성한 사람 ID", required = true),
     })
     @GetMapping("/all")
-    public ApiResponse<List<CommenResponseDTO>> getAllComments(@PathVariable String postId) {
+    public ApiResponse<List<CommenResponseDTO>> getAllComments(@PathVariable Long postId) {
 
         // 댓글 목록 조회 로직
         List<CommenResponseDTO> comments=new ArrayList<>();
@@ -131,7 +131,7 @@ public class CommentController {
             @Parameter(name = "CommentUpdateRequestDto", description = "댓글내용 수정", required = true),
     })
     @PutMapping("/{commentNo}")
-    public ApiResponse<CommenResponseDTO.CommentParentReadResponseDto> updateComment(@PathVariable String postId,@PathVariable Long commentNo, @RequestBody @Valid CommentRequestDTO.CommentUpdateRequestDto request) {
+    public ApiResponse<CommenResponseDTO.CommentParentReadResponseDto> updateComment(@PathVariable Long postId,@PathVariable Long commentNo, @RequestBody @Valid CommentRequestDTO.CommentUpdateRequestDto request) {
         CommenResponseDTO.CommentParentReadResponseDto dto=  CommenResponseDTO.CommentParentReadResponseDto.builder().build();
 
         return ApiResponse.onSuccess(dto);
@@ -153,7 +153,7 @@ public class CommentController {
 
     })
     @PutMapping("/{commentNo}/children/{ChildNo}")
-    public ApiResponse updateChildComment(@PathVariable String postId, @PathVariable Long commentNo,@PathVariable Long ChildNo,
+    public ApiResponse updateChildComment(@PathVariable Long postId, @PathVariable Long commentNo,@PathVariable Long ChildNo,
                                           @RequestBody @Valid CommentRequestDTO.CommentUpdateRequestDto request) {
 
         CommenResponseDTO.CommentChildReadResponseDto dto=  CommenResponseDTO.CommentChildReadResponseDto.builder().build();
@@ -175,7 +175,7 @@ public class CommentController {
      * 댓글 삭제 (댓글과 대댓글 모두 포함) 부모댓글 삭제 만 포함시켰음
      */
     @DeleteMapping("/{commentNo}")
-    public ApiResponse deleteComment(@PathVariable String postId, @PathVariable Long commentNo) {
+    public ApiResponse deleteComment(@PathVariable Long postId, @PathVariable Long commentNo) {
 
         String resultcode = SuccessStatus._OK.getCode();
 
