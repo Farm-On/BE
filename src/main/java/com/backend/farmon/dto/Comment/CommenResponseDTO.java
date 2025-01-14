@@ -18,7 +18,7 @@ public class CommenResponseDTO {
     @Builder
     @NoArgsConstructor
     @Schema(description = "부모 댓글 조회 DTO")
-    public class CommentParentReadResponseDto {
+    public static class CommentParentReadResponseDto {
 
         @Schema(description = "댓글 ID", example = "hjunew", required = true)
         private String id;
@@ -37,7 +37,7 @@ public class CommenResponseDTO {
     @Builder
     @NoArgsConstructor
     @Schema(description = "대댓글 조회 DTO")
-    public class CommentChildReadResponseDto {
+    public static class CommentChildReadResponseDto {
 
         @Schema(description = "댓글 ID", example = "hjunew", required = true)
         private String id;
@@ -56,7 +56,7 @@ public class CommenResponseDTO {
     @Builder
     @NoArgsConstructor
     @Schema(description = "부모댓글 + 대댓글 조회 DTO")
-    public class CommentAllByPostResponseDto {
+    public static class CommentAllByPostResponseDto {
 
         @Schema(description = "댓글 ID", example = "hjunew", required = true)
         private String id;

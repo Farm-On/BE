@@ -15,7 +15,7 @@ public class CommentRequestDTO {
     @AllArgsConstructor
     @Builder
     @Schema(description = "부모 댓글 저장 DTO")
-    public class CommentSaveRequestDto {
+    public static class CommentSaveRequestDto {
 
         @Schema(description = "댓글 내용", example = "이것은 댓글입니다.", required = true)
         private String commentContent;
@@ -33,7 +33,7 @@ public class CommentRequestDTO {
     @AllArgsConstructor
     @Builder
     @Schema(description = "대댓글 조회 DTO")
-    public class CommentParenReadtDTO {
+    public static class CommentParenReadtDTO {
 
         @Schema(name="대댓글을 특정 조회순으로 가져옴")
         private String sort;
@@ -45,7 +45,7 @@ public class CommentRequestDTO {
     @AllArgsConstructor
     @Builder
     @Schema(description = "부모 댓글 조회 DTO")
-    public class CommentChilldtDTO {
+    public static class CommentChilldtDTO {
 
         @Schema(name="부모 댓글을 특정 조회순으로 가져옴")
         private String sort;
@@ -59,7 +59,7 @@ public class CommentRequestDTO {
     @AllArgsConstructor
     @Builder
     @Schema(description = "대댓글 저장 DTO")
-    public class CommentSaveChildRequestDto {
+    public static class CommentSaveChildRequestDto {
 
         @Schema(description = "대댓글 저장 내용", required = true, example = "This is a child comment")
         private String commentContent;
@@ -78,7 +78,7 @@ public class CommentRequestDTO {
     @AllArgsConstructor
     @Builder
     @Schema(description = "댓글  수정 DTO")
-    public class CommentUpdateRequestDto {
+    public static class CommentUpdateRequestDto {
 
         @Schema(description = "업데이트할 댓글 내용", example = "수정된 댓글 내용입니다.")
         private String commentContent;
@@ -94,7 +94,7 @@ public class CommentRequestDTO {
     @AllArgsConstructor
     @Builder
     @Schema(description = "댓글 페이징 요청 DTO")
-    public class CommentPagingRequestDto {
+    public static class CommentPagingRequestDto {
 
         @Schema(description = "댓글 내용", example = "이것은 댓글입니다.", required = true)
         private String commentContent;
