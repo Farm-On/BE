@@ -15,7 +15,7 @@ public class ChatMessageController {
 
     // 채팅 메시지 보내기
     // /send/chat/message/{chatRoomId}
-    @MessageMapping(value="/chat/message/{{chatRoomId}")
+    @MessageMapping(value="/chat/message/{chatRoomId}")
     public void sendChatMessage (@DestinationVariable("chatRoomId") Long chatRoomId,
                                  ChatRequest.ChatMessageDTO dto) {
         log.info("전송할 메시지 내용: {}", dto);
@@ -24,6 +24,6 @@ public class ChatMessageController {
 
         // 구독자들에게 메시지 전달
         // /receive/chat/message/{chatRoomId}
-//        simpMessagingTemplate.convertAndSend("/sub/api/chat/message/"+chatRoomId, dto);
+//        simpMessagingTemplate.convertAndSend("/receive/chat/message/"+chatRoomId, dto);
     }
 }
