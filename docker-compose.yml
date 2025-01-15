@@ -1,0 +1,31 @@
+version: '3.9'
+services:
+  backend:
+    container_name: spring-app
+    image: mmije0ng/farmon-backend-dev:latest
+    ports:
+      - "8080:8080"  # 호스트 8080 -> 컨테이너 8080
+    networks:
+      - app-network
+
+  nginx:
+    image: nginx:latest
+    container_name: nginx-container
+    ports:
+      - "80:80"   # HTTP 요청 처리
+      - "443:443" # HTTPS 요청 처리    networks:
+    networks:
+      - app-network
+    volumes:
+#      - /etc/letsencrypt:/etc/letsencrypt:ro  # 인증서 파일
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro  # nginx.conf 파일
+    depends_on:
+      - backend
+
+networks:
+  app-network:
+    driver: bridge
+
+# Nginx가 Docker 네트워크에 연결되지 않았다면 추가
+#sudo docker network connect app-network nginx-container
+#sudo docker network connect app-network spring-app

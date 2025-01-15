@@ -19,6 +19,10 @@ configurations {
 	}
 }
 
+jar {
+	enabled = false  // 플레인 JAR 파일 생성을 비활성화
+}
+
 repositories {
 	mavenCentral()
 }
