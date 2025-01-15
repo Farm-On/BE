@@ -26,7 +26,8 @@ public class Crop extends BaseEntity {
     @Column(nullable = false)
     private String name;
 
-    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, columnDefinition = "VARCHAR(55)")
     private String category;
 
     @OneToMany(mappedBy = "crop", cascade = CascadeType.ALL)

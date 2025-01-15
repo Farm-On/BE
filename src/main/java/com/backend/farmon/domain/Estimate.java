@@ -48,6 +48,11 @@ public class Estimate extends BaseEntity {
     @JoinColumn(name = "user_id")
     private User user;
 
+//    @ManyToOne(fetch = FetchType.LAZY)
+//    @JoinColumn(name = "expert_id")
+//    private Expert expert; //회의 후 변경
+
     @OneToMany(mappedBy = "estimate", cascade = CascadeType.ALL)
     private List<EstimateImage> estimateImageList = new ArrayList<>();
+
 }
