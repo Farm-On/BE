@@ -8,16 +8,13 @@ import lombok.*;
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-public class EstimateImage {
+public class ExpertCrop {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, columnDefinition = "TEXT")
-    private String imageUrl;
-
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "estimate_id")
-    private Estimate estimate;
+    @JoinColumn(name = "crop_id")
+    private Crop crop;
 }
