@@ -19,18 +19,22 @@ public class Estimate {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, columnDefinition = "DEFAULT '작물 관리'")
+    @Column(nullable = false, columnDefinition = "VARCHAR(255) DEFAULT '작물 관리'")
     private String category;
 
     @Column(nullable = false)
     private String address;
 
     @Column(nullable = false)
-    @ColumnDefault("50만원 ~ 100만원")
+    @ColumnDefault("'50만원 ~ 100만원'")
     private String budget;
 
     @Column(nullable = false, columnDefinition = "TEXT")
     private String body;
+
+    @Column(nullable = false)
+    @ColumnDefault("0")
+    private Integer isComplete;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "crop_id")
