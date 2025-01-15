@@ -1,19 +1,13 @@
 package com.backend.farmon.domain;
 
 import com.backend.farmon.domain.commons.BaseEntity;
-import com.backend.farmon.domain.enums.Gender;
-import com.backend.farmon.domain.enums.MemberStatus;
-import com.backend.farmon.domain.enums.Role;
 import com.backend.farmon.domain.mapping.ExpertArea;
-import com.backend.farmon.domain.mapping.ExpertCrops;
+import com.backend.farmon.domain.mapping.ExpertCrop;
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
-import org.springframework.format.annotation.DateTimeFormat;
 
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -43,7 +37,7 @@ public class Expert extends BaseEntity {
     private User user;  // user와 1:1관계
 
     @OneToMany(mappedBy = "expert", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<ExpertCrops> expertCropsList = new ArrayList<>();
+    private List<ExpertCrop> expertCropList = new ArrayList<>();
 
     @OneToMany(mappedBy = "expert", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ExpertArea> expertAreaList = new ArrayList<>();

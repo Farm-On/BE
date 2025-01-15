@@ -11,7 +11,7 @@ import lombok.*;
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-public class ExpertCrops extends BaseEntity {
+public class ExpertCrop extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -20,7 +20,7 @@ public class ExpertCrops extends BaseEntity {
     @JoinColumn(name = "expert_id")
     private Expert Expert;
 
-//    @ManyToOne(fetch = FetchType.LAZY)
-//    @JoinColumn(name = "crop_id")
-//    private Crop crop;  // 작물 양방향 매핑
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "crop_id")
+    private Crop crop;  // 작물 양방향 매핑
 }
