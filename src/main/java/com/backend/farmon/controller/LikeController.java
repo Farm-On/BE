@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 
 @Tag(name = "좋아요 페이지", description = "좋아요 기능에 관한 API")
 @Controller
-@RequestMapping("posts/{boardType}/list/{postId}/likes")
+@RequestMapping("/api/posts/{boardType}/list/{postId}/likes")
 public class LikeController {
 
 

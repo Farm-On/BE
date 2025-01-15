@@ -19,7 +19,7 @@ import java.util.List;
 
 @Tag(name = "댓글 페이지", description = "댓글에 관한 API")
 @Controller
-@RequestMapping("/posts/{postId}/comments")
+@RequestMapping("/api/posts/{postId}/comments")
 public class CommentController {
 
     @Operation(summary = "댓글 저장", description = "사용자가 그냥 부모 댓글(댓글)을 저장합니다.")
