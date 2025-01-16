@@ -67,9 +67,9 @@ public class EstimateRestController {
     ){
         // 실제 조회 로직 생략, 페이징된 리스트라고 가정
         EstimateResponseDTO.ListDTO response = EstimateResponseDTO.ListDTO.builder()
-                .totalCount(2L)
-                .currentPage(page)
-                .estimates(/* 실제라면 목록을 넣음 */ null)
+//                .totalCount(2L)
+//                .currentPage(page)
+//                .estimates(/* 실제라면 목록을 넣음 */ null)
                 .build();
         return ApiResponse.onSuccess(response);
     }
@@ -95,9 +95,9 @@ public class EstimateRestController {
             @RequestParam(name = "page") Integer page
     ){
         EstimateResponseDTO.ListDTO response = EstimateResponseDTO.ListDTO.builder()
-                .totalCount(3L)
-                .currentPage(page)
-                .estimates(/* 실제라면 목록을 넣음 */ null)
+//                .totalCount(3L)
+//                .currentPage(page)
+//                .estimates(/* 실제라면 목록을 넣음 */ null)
                 .build();
 
         return ApiResponse.onSuccess(response);

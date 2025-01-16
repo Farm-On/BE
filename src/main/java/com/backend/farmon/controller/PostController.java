@@ -27,7 +27,7 @@ import java.util.List;
 
 @Tag(name = "게시판 페이지", description = "게시판과 관련된 기능을 하는 컨트롤러입니다.")
 @Controller
-@RequestMapping("/posts")
+@RequestMapping("/api/posts")
 @RequiredArgsConstructor
 public class PostController {
 

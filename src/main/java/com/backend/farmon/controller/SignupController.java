@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class SignupController {
 
-    @PostMapping("/user/join")
+    @PostMapping("/api/user/join")
     @Operation(summary = "농업인 회원가입 API")
     @ApiResponses({
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200",description = "OK, 성공")
@@ -26,7 +26,7 @@ public class SignupController {
         return null;
     }
 
-    @PostMapping("/expert/join")
+    @PostMapping("/api/expert/join")
     @Operation(summary = "전문가 회원가입 API")
     @ApiResponses({
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200",description = "OK, 성공")
@@ -36,7 +36,7 @@ public class SignupController {
         return null;
     }
 
-    @PatchMapping("/withdraw/{id}")
+    @PatchMapping("/api/withdraw/{id}")
     @Operation(summary = "회원탈퇴 API")
     @ApiResponses({
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200",description = "OK, 성공")

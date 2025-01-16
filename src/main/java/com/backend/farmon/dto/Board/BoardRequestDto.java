@@ -38,8 +38,6 @@ public class BoardRequestDto {
 
     // AllPost는 모든 종류의 게시글을 위한 클래스입니다. (BasePost를 확장)
     @Data
-    @AllArgsConstructor
-    @NoArgsConstructor
     @Schema(description = "전체게시판에 있는 글")
     public static class AllPost extends BasePost {
         // AllPost에는 추가적인 필드나 메서드가 필요할 경우 이곳에 작성
@@ -47,8 +45,6 @@ public class BoardRequestDto {
 
     // PopularPost는 인기 게시글을 위한 클래스입니다. (BasePost를 확장)
     @Data
-    @AllArgsConstructor
-    @NoArgsConstructor
     @Schema(description = "인기 게시글")
     public static class PopularPost extends BasePost {
         // PopularPost에는 추가적인 필드나 메서드가 필요할 경우 이곳에 작성

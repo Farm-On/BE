@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.*;
 @Slf4j
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/chat")
+@RequestMapping("/api/chat")
 public class ChatRoomController {
 
     // 전체 채팅 목록 조회

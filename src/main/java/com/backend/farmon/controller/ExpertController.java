@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.*;
 public class ExpertController {
 
     // 전문가 내 프로필 페이지 조회
-    @GetMapping("/expert/{expert-id}")
+    @GetMapping("/api/expert/{expert-id}")
     @Operation(summary = "전문가 내 프로필 페이지 조회 API")
     @ApiResponses({
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200", description = "OK, 성공"),
@@ -31,7 +31,7 @@ public class ExpertController {
     }
 
     // 전문가 프로필 목록 조회
-    @GetMapping("/expert")
+    @GetMapping("/api/expert")
     @Operation(
             summary = "전문가 프로필 목록 조회 API",
             description = "전문가 프로필 목록을 조회하는 API이며, 페이징을 포함합니다. " +
