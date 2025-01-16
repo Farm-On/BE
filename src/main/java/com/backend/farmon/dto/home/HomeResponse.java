@@ -12,26 +12,10 @@ public class HomeResponse {
     @NoArgsConstructor
     @AllArgsConstructor
     @Builder
-    @Schema(description = "홈 페이지 조회 정보")
-    public static class HomePageDTO {
-
-        @Schema(description = "로그인한 사용자의 이름, 로그인 하지 않은 사용자일 경우 null", example = "김팜온")
-        String name;
-
-        @Schema(description = "로그인한 사용자의 유형(농업인 or 전문가), 로그인 하지 않은 사용자일 경우 null", example = "농업인")
-        String type;
-
+    @Schema(description = "홈 페이지 게시글 리스트 정보")
+    public static class PostListDTO {
         @Schema(description = "커뮤니티 카테고리에 따른 게시글 리스트")
         List <PostDetailDTO> postList;
-
-        @Schema(description = "인기 칼럼 리스트")
-        List <PopularPostDetailDTO> popularPostList;
-
-        @Schema(description = "최근 검색어 리스트")
-        List <String> recentSearchList;
-
-        @Schema(description = "추천 검색어 리스트")
-        List <String> recommendSearchList;
     }
 
     @Getter
@@ -39,10 +23,10 @@ public class HomeResponse {
     @NoArgsConstructor
     @AllArgsConstructor
     @Builder
-    @Schema(description = "홈 페이지 커뮤니티 게시글 정보")
+    @Schema(description = "홈 페이지 커뮤니티 게시글 상세 정보")
     public static class PostDetailDTO {
         
-        @Schema(description = "커뮤니티 게시글 아이디")
+        @Schema(description = "커뮤니티 게시글 아이디", example = "1")
         Long postId;
 
         @Schema(description = "커뮤니티 게시글 제목")
@@ -58,6 +42,18 @@ public class HomeResponse {
         Integer commentCount;
     }
 
+    @ToString
+    @Getter
+    @Setter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Builder
+    @Schema(description = "홈 페이지 인기 칼럼 리스트 정보")
+    public static class PopularPostListDTO {
+        @Schema(description = "인기 칼럼 리스트")
+        List <PopularPostDetailDTO> popularPostList;
+    }
+
     @Getter
     @Setter
     @NoArgsConstructor
@@ -66,7 +62,7 @@ public class HomeResponse {
     @Schema(description = "홈 페이지 인기 칼럼 정보")
     public static class PopularPostDetailDTO {
 
-        @Schema(description = "인기 칼럼 게시글 아이디")
+        @Schema(description = "인기 칼럼 게시글 아이디", example = "1")
         Long popularPostId;
 
         @Schema(description = "인기 칼럼 제목")
@@ -83,5 +79,43 @@ public class HomeResponse {
 
         @Schema(description = "인기 칼럼 썸네일 이미지")
         String popularPostImage;
+    }
+
+    @ToString
+    @Getter
+    @Setter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Builder
+    @Schema(description = "홈 페이지 최근 검색어 정보")
+    public static class RecentSearchListDTO {
+
+        @Schema(description = "최근 검색어 리스트")
+        List <String> recentSearchList;
+    }
+
+    @ToString
+    @Getter
+    @Setter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Builder
+    @Schema(description = "홈 페이지 추천 검색어 정보")
+    public static class RecommendSearchListDTO {
+
+        @Schema(description = "추천 검색어 리스트")
+        List <String> recommendSearchList;
+    }
+
+    @Getter
+    @Setter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Builder
+    @Schema(description = "검색어 삭제 시 반환 정보")
+    public static class SearchDeleteDTO {
+
+        @Schema(description = "검색어 삭제 성공 여부", example = "true")
+        Boolean isSearchDelete;
     }
 }

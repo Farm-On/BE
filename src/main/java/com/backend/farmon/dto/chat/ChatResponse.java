@@ -118,6 +118,33 @@ public class ChatResponse {
     @NoArgsConstructor
     @AllArgsConstructor
     @Builder
+    @Schema(description = "채팅방 생성 시(전문가가 농업인이 올린 견적을 보고 채팅 신청 시) 응답 정보")
+    public static class ChatRoomCreateDTO {
+        @Schema(description = "생성된 채팅방 아이디", example = "1")
+        Long chatRoomId;
+
+        @Schema(description = "채팅 중인 상대방 이름", example = "김팜온")
+        String name;
+
+        @Schema(description = "채팅 중인 상대방 프로필 이미지")
+        String profileImage;
+
+        @Schema(description = "채팅 상대 역할, 농업인 또는 전문가", example = "농업인")
+        String type;
+
+        @Schema(description = "채팅 상대의 마지막 채팅방 접속 시간", example = "28분")
+        String lastEnterTime;
+
+        @Schema(description = "채팅 상대의 평균 메시지 응답 시간", example = "1시간")
+        String averageResponseTime;
+    }
+
+
+    @Getter
+    @Setter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Builder
     @Schema(description = "채팅방 삭제 응답 정보")
     public static class ChatRoomDeleteDTO {
         @Schema(description = "삭제 여부 / 삭제에 성공했다면 true, 실패했다면 false", example = "true")
