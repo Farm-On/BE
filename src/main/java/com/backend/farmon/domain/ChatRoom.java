@@ -35,16 +35,16 @@ public class ChatRoom extends BaseEntity {
     @OneToMany(mappedBy = "chatRoom", cascade = CascadeType.ALL, orphanRemoval = true)
     private List <ChatMessage> messageList = new ArrayList<>(); // 채팅 메시지와 일대다 양방향
 
-//    @ManyToOne(fetch = FetchType.LAZY)
-//    @JoinColumn(name = "farmer_id", nullable = false)
-//    private User farmer; // 농업인과 다대일
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "farmer_id", nullable = false)
+    private User farmer; // 농업인과 다대일
 
-//    @ManyToOne(fetch = FetchType.LAZY)
-//    @JoinColumn(name = "expert_id", nullable = false)
-//    private Expert expert; // 전문가와 다대일
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "expert_id", nullable = false)
+    private Expert expert; // 전문가와 다대일
 
-//    @ManyToOne(fetch = FetchType.LAZY)
-//    @JoinColumn(name = "estimate_id", nullable = false)
-//    private Estimate estimate; // 견적과 다대일
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "estimate_id", nullable = false)
+    private Estimate estimate; // 견적과 다대일
 
 }
