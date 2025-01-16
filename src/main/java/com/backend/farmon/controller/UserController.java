@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class UserController {
 
-    @GetMapping("/user/{id}")
+    @GetMapping("/api/user/{id}")
     @Operation(summary = "마이페이지 조회 API")
     @ApiResponses({
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200",description = "OK, 성공")
@@ -27,7 +27,7 @@ public class UserController {
         return null;
     }
 
-    @PatchMapping("/user/{id}")
+    @PatchMapping("/api/user/{id}")
     @Operation(summary = "마이페이지 수정 API")
     @ApiResponses({
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200", description = "OK, 성공"),
@@ -41,7 +41,7 @@ public class UserController {
         return null;
     }
 
-    @PatchMapping("/user/exchange")
+    @PatchMapping("/api/user/exchange")
     @Operation(
             summary = "사용자 역할 전환 API",
             description = "농업인 전환과 전문가 전환에 관한 API 입니다. 농업인일 경우 전문가로 전환, 전문가일 경우 농업인으로 전환됩니다. " +

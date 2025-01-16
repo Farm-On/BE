@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.*;
 @Slf4j
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/home")
+@RequestMapping("/api/home")
 public class HomeController {
 
     // 홈 화면 조회

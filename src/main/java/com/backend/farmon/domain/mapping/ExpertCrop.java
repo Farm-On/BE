@@ -18,7 +18,7 @@ public class ExpertCrop extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "expert_id")
-    private Expert Expert;
+    private Expert expert;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "crop_id")

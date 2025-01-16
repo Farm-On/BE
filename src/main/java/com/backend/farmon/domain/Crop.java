@@ -26,7 +26,7 @@ public class Crop extends BaseEntity {
     @Column(nullable = false)
     private String name;
 
-    @Enumerated(EnumType.STRING)
+//    @Enumerated(EnumType.STRING)
     @Column(nullable = false, columnDefinition = "VARCHAR(55)")
     private String category;
 
