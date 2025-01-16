@@ -52,7 +52,7 @@ public class Estimate extends BaseEntity {
 //    @JoinColumn(name = "expert_id")
 //    private Expert expert; //회의 후 변경
 
-    @OneToMany(mappedBy = "estimate", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "estimate", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<EstimateImage> estimateImageList = new ArrayList<>();
 
 }
