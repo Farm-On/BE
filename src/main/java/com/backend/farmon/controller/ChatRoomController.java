@@ -5,6 +5,8 @@ import com.backend.farmon.dto.chat.ChatResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -25,7 +27,10 @@ public class ChatRoomController {
                     "유저 아이디, 읽음 여부 필터, 페이지 번호를 쿼리 스트링으로 입력해주세요."
     )
     @ApiResponses({
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200",description = "OK, 성공")
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200",description = "OK, 성공"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "USER4001", description = "아이디와 일치하는 사용자가 없습니다.", content = @Content(schema = @Schema(implementation = ApiResponse.class))),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "PAGE4001", description = "페이지 번호는 1 이상이어야 합니다.", content = @Content(schema = @Schema(implementation = ApiResponse.class))),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON400", description = "잘못된 요청입니다.", content = @Content(schema = @Schema(implementation = ApiResponse.class))),
     })
     @Parameters({
             @Parameter(name = "userId", description = "로그인한 유저의 아이디(pk)", example = "1", required = true),
@@ -49,7 +54,10 @@ public class ChatRoomController {
                     "유저 아이디, 읽음 여부 필터, 검색할 채팅 상대 이름, 페이지 번호를 쿼리 스트링으로 입력해주세요."
     )
     @ApiResponses({
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200", description = "OK, 성공")
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200", description = "OK, 성공"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "USER4001", description = "아이디와 일치하는 사용자가 없습니다.", content = @Content(schema = @Schema(implementation = ApiResponse.class))),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "PAGE4001", description = "페이지 번호는 1 이상이어야 합니다.", content = @Content(schema = @Schema(implementation = ApiResponse.class))),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON400", description = "잘못된 요청입니다.", content = @Content(schema = @Schema(implementation = ApiResponse.class))),
     })
     @Parameters({
             @Parameter(name = "userId", description = "로그인한 유저의 아이디(pk)", example = "1", required = true),
@@ -75,7 +83,10 @@ public class ChatRoomController {
                     "유저 아이디, 읽음 여부 필터, 검색할 전문가의 작물 이름, 페이지 번호를 쿼리 스트링으로 입력해주세요."
     )
     @ApiResponses({
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200",description = "OK, 성공")
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200",description = "OK, 성공"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "USER4001", description = "아이디와 일치하는 사용자가 없습니다.", content = @Content(schema = @Schema(implementation = ApiResponse.class))),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "PAGE4001", description = "페이지 번호는 1 이상이어야 합니다.", content = @Content(schema = @Schema(implementation = ApiResponse.class))),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON400", description = "잘못된 요청입니다.", content = @Content(schema = @Schema(implementation = ApiResponse.class))),
     })
     @Parameters({
             @Parameter(name = "userId", description = "로그인한 유저의 아이디(pk)", example = "1", required = true),
@@ -94,6 +105,31 @@ public class ChatRoomController {
     }
 
 
+    // 전문가가 농업인의 견적을 보고 채팅 신청 (채팅방 생성)
+    @Operation(
+            summary = "전문가가 농업인의 견적을 보고 채팅을 신청하여 채팅방을 생성",
+            description = "전문가가 농업인의 견적을 보고 채팅을 신청하여 채팅방을 생성하는 API 입니다. " +
+                    "유저 아이디, 견적 아이디를 쿼리 스트링으로 입력해주세요."
+    )
+    @ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200",description = "OK, 성공"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "EXPERT4001", description = "아이디와 일치하는 전문가가 없습니다.", content = @Content(schema = @Schema(implementation = ApiResponse.class))),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "ESTIMATE4001", description = "견적 아이디와 일치하는 견적이 없습니다.", content = @Content(schema = @Schema(implementation = ApiResponse.class))),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON400", description = "잘못된 요청입니다.", content = @Content(schema = @Schema(implementation = ApiResponse.class))),
+    })
+    @Parameters({
+            @Parameter(name = "userId", description = "로그인한 유저(전문가)의 아이디(pk)", example = "1", required = true),
+            @Parameter(name = "estimateId", description = "채팅하려는 견적의 아이디", example = "1", required = true),
+    })
+    @PostMapping("/room")
+    public ApiResponse<ChatResponse.ChatRoomCreateDTO> postChatRoom (@RequestParam(name = "userId") Long userId,
+                                                                     @RequestParam(name = "estimateId") Long estimateId) {
+        ChatResponse.ChatRoomCreateDTO response = ChatResponse.ChatRoomCreateDTO.builder().build();
+
+        return ApiResponse.onSuccess(response);
+    }
+
+
     // 채팅방 입장
     @Operation(
             summary = "채팅방 아이디이와 일치하는 채팅방 입장",
@@ -101,7 +137,10 @@ public class ChatRoomController {
                     "유저 아이디, 채팅방 아이디를 쿼리 스트링으로 입력해주세요."
     )
     @ApiResponses({
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200",description = "OK, 성공")
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200",description = "OK, 성공"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "USER4001", description = "아이디와 일치하는 사용자가 없습니다.", content = @Content(schema = @Schema(implementation = ApiResponse.class))),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "CHATROOM4001", description = "채팅방 아이디와 일치하는 채팅방이 없습니다.", content = @Content(schema = @Schema(implementation = ApiResponse.class))),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON400", description = "잘못된 요청입니다.", content = @Content(schema = @Schema(implementation = ApiResponse.class))),
     })
     @Parameters({
             @Parameter(name = "userId", description = "로그인한 유저의 아이디(pk)", example = "1", required = true),
@@ -123,7 +162,10 @@ public class ChatRoomController {
                     "유저 아이디, 채팅방 아이디를 쿼리 스트링으로 입력해주세요."
     )
     @ApiResponses({
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200", description = "OK, 성공")
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200", description = "OK, 성공"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "USER4001", description = "아이디와 일치하는 사용자가 없습니다.", content = @Content(schema = @Schema(implementation = ApiResponse.class))),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "CHATROOM4001", description = "채팅방 아이디와 일치하는 채팅방이 없습니다.", content = @Content(schema = @Schema(implementation = ApiResponse.class))),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON400", description = "잘못된 요청입니다.", content = @Content(schema = @Schema(implementation = ApiResponse.class))),
     })
     @Parameters({
             @Parameter(name = "userId", description = "로그인한 유저의 아이디(pk)", example = "1", required = true),
