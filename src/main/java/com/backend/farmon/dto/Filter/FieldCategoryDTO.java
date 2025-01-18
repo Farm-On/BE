@@ -1,14 +1,16 @@
 package com.backend.farmon.dto.Filter;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.*;
 
 import java.util.List;
 
+@Getter
+@Builder
+@Schema(description = "분야에 대한 필터링 DTO")
 public class FieldCategoryDTO {
-    private String fieldName;
+    @Setter
+    private FieldCategory fieldCategory;
     private List<SubCategoryDTO> subCategories;
 
     @Getter
@@ -16,7 +18,21 @@ public class FieldCategoryDTO {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class SubCategoryDTO {
-        private String subCategoryName; // 예: 쌀, 보리 등
-        private Boolean isSelected; // 선택 여부
+        private String subCategoryName;
+        private Boolean isSelected;
+    }
+
+    // 생성자, getter, setter 추가
+    public FieldCategoryDTO(FieldCategory fieldCategory, List<SubCategoryDTO> subCategories) {
+        this.fieldCategory = fieldCategory;
+        this.subCategories = subCategories;
+    }
+
+    public FieldCategory getFieldCategory() {
+        return fieldCategory;
+    }
+
+    public List<SubCategoryDTO> getSubCategories() {
+        return subCategories;
     }
 }
