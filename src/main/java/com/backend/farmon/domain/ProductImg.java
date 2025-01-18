@@ -23,7 +23,7 @@ public class ProductImg {
 
     // Img:Post = N:1
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "post_no")
+    @JoinColumn(name = "post_id")
     @JsonBackReference
     private Post post;
 
