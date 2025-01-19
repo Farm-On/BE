@@ -15,7 +15,7 @@ public class PostRequestDTO {
     @AllArgsConstructor
     @Builder
     @Schema(description = "게시글 저장 DTO")
-    public class PostSaveRequestDto {
+    public static class PostSaveRequestDto {
 
 
         @Schema(description = "게시글 제목", required = true)
