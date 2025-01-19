@@ -44,7 +44,7 @@ public class ChatConverter {
                     .name(chatRoom.getFarmer().getUserName())
                     .profileImage(chatRoom.getFarmer().getProfileImageUrl())
                     .type("농업인")
-                    .lastEnterTime(ConvertTime.convertToTime(chatRoom.getFarmerLastEnter()))
+                    .lastEnterTime(ConvertTime.convertLocalDatetimeToTime(chatRoom.getFarmerLastEnter()))
                     .averageResponseTime(chatRoom.getFarmer().getChatAverageResponseTime())
                     .build();
         }
@@ -53,7 +53,7 @@ public class ChatConverter {
                 .name(chatRoom.getExpert().getUser().getUserName())
                 .profileImage(chatRoom.getExpert().getUser().getProfileImageUrl())
                 .type("전문가")
-                .lastEnterTime(ConvertTime.convertToTime(chatRoom.getExpertLastEnter()))
+                .lastEnterTime(ConvertTime.convertLocalDatetimeToTime(chatRoom.getExpertLastEnter()))
                 .averageResponseTime(chatRoom.getExpert().getUser().getChatAverageResponseTime())
                 .build();
     }

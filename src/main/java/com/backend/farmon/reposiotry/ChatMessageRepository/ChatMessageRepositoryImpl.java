@@ -28,14 +28,15 @@ public class ChatMessageRepositoryImpl implements ChatMessageRepositoryCustom {
                 .fetch();
     }
 
-    // 채팅방 아이디와 일치하는 채팅 메시지 중, 안 읽은 메시지를 읽음 처리
+    // 채팅방 아이디와 일치하는 채팅 메시지 중, 상대방이 보낸 메시지 중 안 읽은 메시지를 읽음 처리
     @Transactional
     @Override
-    public void updateMessagesToReadByChatRoomId(Long chatRoomId) {
+    public void updateMessagesToReadByChatRoomId(Long chatRoomId, Long userId) {
         queryFactory.update(chatMessage)
                 .set(chatMessage.isRead, true)
                 .where(
                         chatMessage.chatRoom.id.eq(chatRoomId),
+                        chatMessage.senderId.notIn(userId),
                         chatMessage.isRead.isFalse()
                 )
                 .execute();

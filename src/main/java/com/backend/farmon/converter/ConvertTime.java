@@ -14,6 +14,11 @@ public class ConvertTime {
     public static final int MONTH = 12;
 
     public static String convertLocalDatetimeToTime(LocalDateTime localDateTime) {
+        // null 체크
+        if (localDateTime == null) {
+            return null;
+        }
+
         LocalDateTime now = LocalDateTime.now();
 
         long diffTime = localDateTime.until(now, ChronoUnit.SECONDS); // now보다 이후면 +, 전이면 -
@@ -49,6 +54,10 @@ public class ConvertTime {
 
     // LocalDateTime을 "12:00" 형식의 문자열로 파싱
     public static String convertToTime(LocalDateTime now) {
+        // null이면 null 반환
+        if (now == null) {
+            return null;
+        }
         // LocalDateTime 객체를 "HH:mm" 형식으로 변환
         return now.format(DateTimeFormatter.ofPattern("HH:mm"));
     }

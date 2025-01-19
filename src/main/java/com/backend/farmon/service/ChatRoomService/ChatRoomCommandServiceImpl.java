@@ -47,15 +47,17 @@ public class ChatRoomCommandServiceImpl implements ChatRoomCommandService{
                 .orElseThrow(()-> new EstimateHandler(ErrorStatus.USER_NOT_FOUND));
 
         ChatRoom chatRoom = ChatConverter.toChatRoom(expert, estimate, farmer);
-
 //        chatRoom.setExpert(expert);
 //        cahtRoom.setFarmer(farmer);
 //        chatRoom.setEstimate(estimate);
+
+        chatRoomRepository.save(chatRoom);
 
         return ChatConverter.toChatRoomCreateDTO(chatRoom);
     }
 
     // 채팅방 입장
+    @Transactional
     @Override
     public ChatResponse.ChatRoomEnterDTO updateLastEnterTime(Long userId, Long chatRoomId) {
         User user = userRepository.findById(userId)
@@ -75,7 +77,7 @@ public class ChatRoomCommandServiceImpl implements ChatRoomCommandService{
         }
 
         // 안 읽은 메시지들을 읽음 처리
-        chatMessageRepository.updateMessagesToReadByChatRoomId(chatRoomId);
+        chatMessageRepository.updateMessagesToReadByChatRoomId(chatRoomId, userId);
 
         String userType = isExpert ? "전문가" : "농업인";
         return ChatConverter.toChatRoomEnterDTO(chatRoom, userType);

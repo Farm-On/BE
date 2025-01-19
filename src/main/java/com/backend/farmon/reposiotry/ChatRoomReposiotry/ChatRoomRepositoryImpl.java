@@ -1,9 +1,6 @@
 package com.backend.farmon.reposiotry.ChatRoomReposiotry;
 
-import com.backend.farmon.domain.ChatRoom;
-import com.backend.farmon.domain.QChatRoom;
-import com.backend.farmon.domain.QExpert;
-import com.backend.farmon.domain.QUser;
+import com.backend.farmon.domain.*;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -18,8 +15,7 @@ import java.util.List;
 public class ChatRoomRepositoryImpl implements ChatRoomRepositoryCustom{
     private final JPAQueryFactory queryFactory;
     QChatRoom chatRoom = QChatRoom.chatRoom;
-    QUser farmer = QUser.user;
-    QExpert expert = QExpert.expert;
+    QChatMessage chatMessage = QChatMessage.chatMessage;
 
     // userId와 연관된 채팅방 페이징 조회
     @Override
@@ -35,4 +31,23 @@ public class ChatRoomRepositoryImpl implements ChatRoomRepositoryCustom{
         // Page 객체 반환 (total은 조회된 데이터의 크기로 설정)
         return new PageImpl<>(content, pageable, content.size());
     }
+
+    // userId와 연관된 채팅방 중 안 읽음 메시지가 존재하는 채팅방만 페이징 조회
+    @Override
+    public Page<ChatRoom> findUnReadChatRoomsByUserId(Long userId, Pageable pageable){
+        List<ChatRoom> content = queryFactory.select(chatRoom)
+                .from(chatRoom)
+                .join(chatMessage).on(chatMessage.chatRoom.id.eq(chatRoom.id))
+                .where(
+                        chatRoom.farmer.id.eq(userId).or(chatRoom.expert.user.id.eq(userId)), // 사용자 ID 조건
+                        chatMessage.isRead.isFalse() // 읽지 않은 메시지 조건
+                )
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .fetch();
+
+        // Page 객체 반환 (total은 조회된 데이터의 크기로 설정)
+        return new PageImpl<>(content, pageable, content.size());
+    }
+
 }
