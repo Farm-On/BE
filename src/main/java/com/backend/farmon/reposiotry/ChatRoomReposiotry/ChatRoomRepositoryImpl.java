@@ -24,6 +24,7 @@ public class ChatRoomRepositoryImpl implements ChatRoomRepositoryCustom{
         List<ChatRoom> content = queryFactory.selectFrom(chatRoom)
                 .where(chatRoom.farmer.id.eq(userId)
                         .or(chatRoom.expert.user.id.eq(userId)))
+                .orderBy(chatRoom.createdAt.desc())
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .fetch();
@@ -42,6 +43,7 @@ public class ChatRoomRepositoryImpl implements ChatRoomRepositoryCustom{
                         chatRoom.farmer.id.eq(userId).or(chatRoom.expert.user.id.eq(userId)), // 사용자 ID 조건
                         chatMessage.isRead.isFalse() // 읽지 않은 메시지 조건
                 )
+                .orderBy(chatRoom.createdAt.desc())
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .fetch();
