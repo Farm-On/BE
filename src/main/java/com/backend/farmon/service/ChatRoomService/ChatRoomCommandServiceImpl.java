@@ -81,21 +81,6 @@ public class ChatRoomCommandServiceImpl implements ChatRoomCommandService{
         return ChatConverter.toChatRoomEnterDTO(chatRoom, userType);
     }
 
-    // 채팅 메시지 내역 조회
-    @Override
-    public ChatResponse.ChatMessageListDTO findChatMessageList(Long userId, Long chatRoomId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(()-> new EstimateHandler(ErrorStatus.USER_NOT_FOUND));
-
-        ChatRoom chatRoom = chatRoomRepository.findById(chatRoomId)
-                .orElseThrow(()-> new EstimateHandler(ErrorStatus.CHATROOM_NOT_FOUND));
-
-        // 모든 채팅 메시지 내역 조회 (EXIT, COMPLETE 제외)
-        List<ChatMessage> chatMessageList = chatMessageRepository.findNonExitCompleteMessagesByChatRoomId(chatRoomId);
-
-        return ChatConverter.toChatMessageListDTO(chatMessageList);
-    }
-
     // 채팅방 삭제
     @Transactional
     @Override

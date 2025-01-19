@@ -57,4 +57,9 @@ public class ConvertTime {
     public static String convertToAmPmFormat(LocalDateTime dateTime) {
         return dateTime.format(DateTimeFormatter.ofPattern("a h:mm"));
     }
+
+    // LocalDateTime을 "2025.01.10" 형식의 문자열로 변환
+    public static String convertToYearMonthDay(LocalDateTime dateTime) {
+        return dateTime.format(DateTimeFormatter.ofPattern("yyyy.MM.dd"));
+    }
 }

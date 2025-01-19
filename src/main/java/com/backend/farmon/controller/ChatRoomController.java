@@ -2,7 +2,9 @@ package com.backend.farmon.controller;
 
 import com.backend.farmon.apiPayload.ApiResponse;
 import com.backend.farmon.dto.chat.ChatResponse;
+import com.backend.farmon.service.ChatMessageService.ChatMessageQueryService;
 import com.backend.farmon.service.ChatRoomService.ChatRoomCommandService;
+import com.backend.farmon.service.ChatRoomService.ChatRoomQueryService;
 import com.backend.farmon.validaton.annotation.CheckPage;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -25,6 +27,8 @@ import org.springframework.web.bind.annotation.*;
 public class ChatRoomController {
 
     private final ChatRoomCommandService chatRoomCommandService;
+    private final ChatRoomQueryService chatRoomQueryService;
+    private final ChatMessageQueryService chatMessageQueryService;
 
     // 전체 채팅 목록 조회
     @Operation(
@@ -47,7 +51,8 @@ public class ChatRoomController {
     public ApiResponse<ChatResponse.ChatRoomListDTO> getChatRoomPage (@RequestParam(name = "userId") Long userId,
                                                                       @RequestParam(name = "read") String read,
                                                                       @CheckPage Integer page){
-        ChatResponse.ChatRoomListDTO response = ChatResponse.ChatRoomListDTO.builder().build();
+
+        ChatResponse.ChatRoomListDTO response = chatRoomQueryService.findChatRoom(userId, read, page);
 
         return ApiResponse.onSuccess(response);
     }
@@ -171,7 +176,6 @@ public class ChatRoomController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200",description = "OK, 성공"),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "USER4001", description = "아이디와 일치하는 사용자가 없습니다.", content = @Content(schema = @Schema(implementation = ApiResponse.class))),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "CHATROOM4001", description = "채팅방 아이디와 일치하는 채팅방이 없습니다.", content = @Content(schema = @Schema(implementation = ApiResponse.class))),
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "PAGE4001", description = "페이지 번호는 1 이상이어야 합니다.", content = @Content(schema = @Schema(implementation = ApiResponse.class))),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON400", description = "잘못된 요청입니다.", content = @Content(schema = @Schema(implementation = ApiResponse.class))),
     })
     @Parameters({
@@ -181,7 +185,7 @@ public class ChatRoomController {
     @GetMapping("/room")
     public ApiResponse<ChatResponse.ChatMessageListDTO> getChatMessageList (@RequestParam(name = "userId") Long userId,
                                                                             @RequestParam(name = "chatRoomId") Long chatRoomId) {
-        ChatResponse.ChatMessageListDTO response = chatRoomCommandService.findChatMessageList(userId, chatRoomId);
+        ChatResponse.ChatMessageListDTO response = chatMessageQueryService.findChatMessageList(userId, chatRoomId);
 
         return ApiResponse.onSuccess(response);
     }

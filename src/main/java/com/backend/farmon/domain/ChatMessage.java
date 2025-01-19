@@ -19,6 +19,10 @@ public class ChatMessage extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id; // pk
 
+    // 보낸사람 pk
+    @Column(nullable = false)
+    private Long senderId;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private ChatMessageType type; // 메시지 타입
@@ -28,9 +32,6 @@ public class ChatMessage extends BaseEntity {
 
     @Column(columnDefinition = "TINYINT(1) DEFAULT 0", nullable = false)
     private Boolean isRead; // 메시지 읽음 여부
-
-    @Column(nullable = false)
-    private Boolean isMine; // 내가 보낸 메시지인지 여부
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "chat_room_id", nullable = false)

@@ -61,7 +61,7 @@ public class ChatResponse {
         Integer unreadMessageCount;
 
         @Schema(description = "마지막 채팅 내용", example = "추가로 궁금한 점이 생기면 언제든 문의하세요.")
-        Integer lastMessageContent;
+        String lastMessageContent;
 
         @Schema(description = "마지막 채팅 날짜", example = "2025.01.10")
         String lastMessageDate;
