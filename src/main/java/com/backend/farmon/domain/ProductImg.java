@@ -4,14 +4,14 @@ import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
         import lombok.*;
 
-@Table(name = "ProductImg")
+@Table(name = "PostImg")
 @Entity
 @Getter
 @Setter
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class ProductImg {
+public class PostImg {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name="img_id")
