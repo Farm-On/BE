@@ -1,11 +1,20 @@
 package com.backend.farmon.config;
 
+import com.backend.farmon.validaton.validator.PageCheckValidator;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
+import java.util.List;
+
+@RequiredArgsConstructor
 @Configuration
 public class WebConfig implements WebMvcConfigurer {
+    private final PageCheckValidator pageCheckValidator;
+
     @Override
     public void addCorsMappings(CorsRegistry registry) {
 
@@ -16,5 +25,11 @@ public class WebConfig implements WebMvcConfigurer {
                 .allowedMethods("*") // 허용할 HTTP 메서드 명시
                 .allowCredentials(true) // 자격 증명(쿠키, 인증 헤더 등)을 포함한 요청을 허용
                 .maxAge(3600); // Preflight 요청 결과를 캐시하는 시간 (초)
+    }
+
+
+    @Override
+    public void addArgumentResolvers(List<HandlerMethodArgumentResolver> resolvers) {
+        resolvers.add(0, pageCheckValidator); // resolver 등록
     }
 }

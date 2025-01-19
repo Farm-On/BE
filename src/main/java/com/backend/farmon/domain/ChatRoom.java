@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Getter
+@Setter
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
@@ -46,5 +47,32 @@ public class ChatRoom extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "estimate_id", nullable = false)
     private Estimate estimate; // 견적과 다대일
+
+//    public void setFarmer(User farmer){
+//        if(this.farmer!=null)
+//            farmer.getChatRoomList().remove(this);
+//
+//        this.farmer = farmer;
+//
+//        farmer.getChatRoomList().add(this);
+//    }
+
+//    public void setExpert(Expert expert){
+//        if(this.expert!=null)
+//            expert.getUser().getChatRoomList().remove(this);
+//
+//        this.expert = expert;
+//
+//        expert.getUser().getChatRoomList().add(this);
+//    }
+
+//        public void setEstimate(Estimate estimate){
+//        if(this.estimate!=null)
+//            estimate.getChatRoomList().remove(this);
+//
+//        this.estimate = estimate;
+//
+//        estimate.getChatRoomList().add(this);
+//    }
 
 }
