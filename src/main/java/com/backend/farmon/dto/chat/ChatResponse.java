@@ -161,4 +161,39 @@ public class ChatResponse {
         @Schema(description = "삭제 여부 / 삭제에 성공했다면 true, 실패했다면 false", example = "true")
         Boolean isDeleteSuccess;
     }
+
+    @Getter
+    @Setter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Builder
+    @Schema(description = "채팅방 견적 응답 정보")
+    public static class ChatRoomEstimateDTO {
+        @Schema(description = "작물 카테고리", example = "곡물, 채소작물, 과일 등")
+        String cropCategory;
+
+        @Schema(description = "작물 이름", example = "쌀, 고구마, 사과 등")
+        String cropName;
+
+        @Schema(description = "견적 제목")
+        String title;
+
+        @Schema(description = "견적 신청자")
+        String applyName;
+
+        @Schema(description = "견적 카테고리", example = "작물 관리, 스마트팜 등")
+        String estimateCategory;
+
+        @Schema(description = "견적 주소", example = "서울 강동구")
+        String address;
+
+        @Schema(description = "견적 예산", example = "50만원 ~ 100만원")
+        String budget;
+
+        @Schema(description = "컨설팅 내용")
+        String content;
+
+        @Schema(description = "견적 이미지 리스트")
+        List<String> estimateImageList;
+    }
 }
