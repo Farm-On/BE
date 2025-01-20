@@ -60,11 +60,11 @@ public class ChatRoomQueryServiceImpl implements ChatRoomQueryService {
                     .orElse(null);
 
             // 채팅방 대화방 세부 정보를 dto로 변환
-            return ChatConverter.toChatRoomDetailDto(chatRoom, lastMessage, isExpert, unReadMessageCount);
+            return ChatConverter.toChatRoomDetailDTO(chatRoom, lastMessage, isExpert, unReadMessageCount);
         }).toList();
 
         // 최종 채팅방 목록 정보 DTO 생성 및 반환
-        return ChatConverter.toChatRoomListDto(chatRoomPage, chatRoomInfoList);
+        return ChatConverter.toChatRoomListDTO(chatRoomPage, chatRoomInfoList);
     }
 
     // 채팅방의 견적 조회
