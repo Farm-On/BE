@@ -54,8 +54,11 @@ public class EstimateRequestDTO {
         @NotNull(message = "견적 카테고리는 필수입니다.")
         private String category;
 
+        @NotNull(message = "지역 id는 필수입니다.")
+        private Long areaId;
+
         @NotNull(message = "상세 주소는 필수입니다.")
-        private String address;
+        private String addressDetail;
 
         @NotNull(message = "예산은 필수입니다.")
         private String budget;

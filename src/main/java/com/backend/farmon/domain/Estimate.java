@@ -12,6 +12,7 @@ import java.util.List;
 
 @Entity
 @Getter
+@Setter
 @DynamicUpdate
 @DynamicInsert
 @Builder
@@ -42,7 +43,7 @@ public class Estimate extends BaseEntity {
 
     @Column(nullable = false, columnDefinition = "TINYINT(1)")
     @ColumnDefault("0")
-    private Integer isComplete;
+    private Integer status;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "crop_id", nullable = false)
