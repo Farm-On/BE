@@ -7,7 +7,9 @@ import com.backend.farmon.domain.Estimate;
 import com.backend.farmon.domain.User;
 import com.backend.farmon.dto.estimate.EstimateRequestDTO;
 import com.backend.farmon.dto.estimate.EstimateResponseDTO;
+import com.backend.farmon.repository.CropRepository.CropRepository;
 import com.backend.farmon.repository.EstimateRepository.EstimateRepository;
+import com.backend.farmon.repository.UserRepository.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -16,8 +18,9 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 @Transactional
 public class EstimateCommandServiceImpl implements EstimateCommandService {
-    //private final UserRepository userRepository;
+    private final UserRepository userRepository;
     private final EstimateRepository estimateRepository;
+    private final CropRepository cropRepository;
     //private final AreaRepository areaRepository;
     private final EstimateConverter estimateConverter;
     /**
@@ -27,8 +30,10 @@ public class EstimateCommandServiceImpl implements EstimateCommandService {
     @Override
     public EstimateResponseDTO.CreateDTO createEstimate(EstimateRequestDTO.CreateDTO requestDTO) {
         // 1) Entity 생성
-        User user = User.builder().build();
-        Crop crop = Crop.builder().build();
+        User user = userRepository.findById(requestDTO.getUserId())
+                .orElseThrow(() -> new IllegalArgumentException("유효하지 않은 사용자 ID 입니다."));
+        Crop crop = cropRepository.findById(requestDTO.getCropId())
+                .orElseThrow(() -> new IllegalArgumentException("유호하지 않은 작물 ID 입니다."));
         Area area = Area.builder().build();
 
         Estimate estimate = estimateConverter.toEntity(requestDTO, user, crop, area);
