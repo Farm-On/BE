@@ -1,6 +1,8 @@
 package com.backend.farmon.domain;
 
 import com.backend.farmon.domain.commons.BaseEntity;
+import com.backend.farmon.domain.mapping.ExpertArea;
+import com.backend.farmon.domain.mapping.ExpertCrop;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.DynamicInsert;
@@ -16,7 +18,7 @@ import java.util.List;
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-public class Portfolio extends BaseEntity {
+public class ExpertCareer extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -25,15 +27,20 @@ public class Portfolio extends BaseEntity {
     private String title;
 
     @Column(nullable = false)
-    private String thumbnailImg;
+    private Integer startYear;
 
     @Column(nullable = false)
-    private String text;
+    private Integer startMonth;
+
+    @Column(nullable = false)
+    private Integer endYear;
+
+    @Column(nullable = false)
+    private Integer endMonth;
+
+    private String detailContent;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "expert_id")
     private Expert expert;
-
-    @OneToMany(mappedBy = "portfolio", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<PortfolioImg> portfolioImgList = new ArrayList<>();
 }

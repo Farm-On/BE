@@ -7,6 +7,8 @@ import com.backend.farmon.dto.user.MypageResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -48,7 +50,9 @@ public class UserController {
                     "유저 아이디, 사용자 유형을 쿼리 스트링으로 입력해주세요."
     )
     @ApiResponses({
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200", description = "OK, 성공")
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200", description = "OK, 성공"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "USER4001", description = "아이디와 일치하는 사용자가 없습니다.", content = @Content(schema = @Schema(implementation = ApiResponse.class))),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON400", description = "잘못된 요청입니다.", content = @Content(schema = @Schema(implementation = ApiResponse.class))),
     })
     @Parameters({
             @Parameter(name = "userId", description = "로그인한 유저의 아이디(pk)", example = "1"),
@@ -56,6 +60,8 @@ public class UserController {
     })
     public ApiResponse<ExchangeResponse> patchUserRole(@RequestParam(name="userId") Long userId,
                                                        @RequestParam(name="type") String type) {
-        return null;
+        ExchangeResponse response = ExchangeResponse.builder().isExchange(true).build();
+
+        return ApiResponse.onSuccess(response);
     }
 }

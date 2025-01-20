@@ -5,5 +5,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 @RequiredArgsConstructor
-public class EstimateRepositoryImpl {
+public class EstimateRepositoryImpl implements EstimateRepositoryCustom {
 }
