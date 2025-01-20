@@ -1,4 +1,4 @@
-package com.backend.farmon.reposiotry.EstimateRepository;
+package com.backend.farmon.repository.EstimateRepository;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;

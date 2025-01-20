@@ -1,4 +1,4 @@
-package com.backend.farmon.reposiotry.ChatMessageRepository;
+package com.backend.farmon.repository.ChatMessageRepository;
 
 import com.backend.farmon.domain.ChatMessage;
 import org.springframework.data.jpa.repository.JpaRepository;

@@ -1,9 +1,9 @@
-package com.backend.farmon.reposiotry.UserRepository;
+package com.backend.farmon.repository.ExpertReposiotry;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
 @Repository
 @RequiredArgsConstructor
-public class UserRepositoryImpl implements UserRepositoryCustom{
+public class ExpertRepositoryImpl implements ExpertRepositoryCustom {
 }

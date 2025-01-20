@@ -7,16 +7,14 @@ import com.backend.farmon.domain.ChatMessage;
 import com.backend.farmon.domain.ChatRoom;
 import com.backend.farmon.domain.User;
 import com.backend.farmon.dto.chat.ChatResponse;
-import com.backend.farmon.reposiotry.ChatMessageRepository.ChatMessageRepository;
-import com.backend.farmon.reposiotry.ChatRoomReposiotry.ChatRoomRepository;
-import com.backend.farmon.reposiotry.UserRepository.UserRepository;
+import com.backend.farmon.repository.ChatMessageRepository.ChatMessageRepository;
+import com.backend.farmon.repository.ChatRoomReposiotry.ChatRoomRepository;
+import com.backend.farmon.repository.UserRepository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
 
 @Slf4j
 @RequiredArgsConstructor

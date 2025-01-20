@@ -6,18 +6,17 @@ import com.backend.farmon.apiPayload.exception.handler.ExpertHandler;
 import com.backend.farmon.converter.ChatConverter;
 import com.backend.farmon.domain.*;
 import com.backend.farmon.dto.chat.ChatResponse;
-import com.backend.farmon.reposiotry.ChatMessageRepository.ChatMessageRepository;
-import com.backend.farmon.reposiotry.ChatRoomReposiotry.ChatRoomRepository;
-import com.backend.farmon.reposiotry.EstimateRepository.EstimateRepository;
-import com.backend.farmon.reposiotry.ExpertReposiotry.ExpertRepository;
-import com.backend.farmon.reposiotry.UserRepository.UserRepository;
+import com.backend.farmon.repository.ChatMessageRepository.ChatMessageRepository;
+import com.backend.farmon.repository.ChatRoomReposiotry.ChatRoomRepository;
+import com.backend.farmon.repository.EstimateRepository.EstimateRepository;
+import com.backend.farmon.repository.ExpertReposiotry.ExpertRepository;
+import com.backend.farmon.repository.UserRepository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Slf4j
 @RequiredArgsConstructor

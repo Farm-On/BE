@@ -1,9 +1,8 @@
-package com.backend.farmon.repository.ChatRoomRepository;
+package com.backend.farmon.repository.ChatRoomReposiotry;
 
 import com.backend.farmon.domain.ChatRoom;
 import com.backend.farmon.domain.QChatMessage;
 import com.backend.farmon.domain.QChatRoom;
-import com.backend.farmon.reposiotry.ChatRoomReposiotry.ChatRoomRepositoryCustom;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.QueryResults;
 import com.querydsl.jpa.impl.JPAQueryFactory;

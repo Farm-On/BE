@@ -1,11 +1,8 @@
-package com.backend.farmon.reposiotry.ChatMessageRepository;
+package com.backend.farmon.repository.ChatMessageRepository;
 
 import com.backend.farmon.domain.ChatMessage;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
-
-import java.util.List;
 
 public interface ChatMessageRepositoryCustom {
     // 채팅방 아이디와 일치하는 채팅 메시지 중, 안 읽은 메시지를 읽음 처리
