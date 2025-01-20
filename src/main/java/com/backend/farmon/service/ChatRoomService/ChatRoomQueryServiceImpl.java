@@ -1,7 +1,9 @@
 package com.backend.farmon.service.ChatRoomService;
 
 import com.backend.farmon.apiPayload.code.status.ErrorStatus;
+import com.backend.farmon.apiPayload.exception.handler.ChatRoomHandler;
 import com.backend.farmon.apiPayload.exception.handler.EstimateHandler;
+import com.backend.farmon.apiPayload.exception.handler.UserHandler;
 import com.backend.farmon.converter.ChatConverter;
 import com.backend.farmon.domain.*;
 import com.backend.farmon.dto.chat.ChatResponse;
@@ -41,7 +43,7 @@ public class ChatRoomQueryServiceImpl implements ChatRoomQueryService {
     @Override
     public ChatResponse.ChatRoomListDTO findChatRoom(Long userId, Integer read, Integer pageNumber) {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new EstimateHandler(ErrorStatus.USER_NOT_FOUND));
+                .orElseThrow(() -> new UserHandler(ErrorStatus.USER_NOT_FOUND));
 
         // 안 읽음 필터링에 따른 유저의 모든 채팅방 목록을 페이지네이션으로 조회
         Page<ChatRoom> chatRoomPage = read.equals(1)
@@ -77,12 +79,15 @@ public class ChatRoomQueryServiceImpl implements ChatRoomQueryService {
     @Override
     public ChatResponse.ChatRoomEstimateDTO findChatRoomEstimate(Long userId, Long chatRoomId) {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new EstimateHandler(ErrorStatus.USER_NOT_FOUND));
+                .orElseThrow(() -> new UserHandler(ErrorStatus.USER_NOT_FOUND));
 
         ChatRoom chatRoom = chatRoomRepository.findById(chatRoomId)
-                .orElseThrow(() -> new EstimateHandler(ErrorStatus.CHATROOM_NOT_FOUND));
+                .orElseThrow(() -> new ChatRoomHandler(ErrorStatus.CHATROOM_NOT_FOUND));
 
-        Estimate estimate = estimateRepository.findEstimateWithImages(chatRoom.getEstimate().getId());
+        // 견적 이미지와 함께 견적 조회
+        Estimate estimate = estimateRepository.findEstimateWithImages(chatRoom.getEstimate().getId())
+                .orElseThrow(() -> new EstimateHandler(ErrorStatus.ESTIMATE_NOT_FOUND));
+
         log.info("채팅방의 견적 조회 완료 - userId: {}, estimateId: {}", userId, estimate.getId());
 
         return ChatConverter.toChatRoomEstimateDTO(estimate, estimate.getEstimateImageList());

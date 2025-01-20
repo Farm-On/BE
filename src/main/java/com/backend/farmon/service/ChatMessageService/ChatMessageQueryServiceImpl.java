@@ -1,7 +1,8 @@
 package com.backend.farmon.service.ChatMessageService;
 
 import com.backend.farmon.apiPayload.code.status.ErrorStatus;
-import com.backend.farmon.apiPayload.exception.handler.EstimateHandler;
+import com.backend.farmon.apiPayload.exception.handler.ChatRoomHandler;
+import com.backend.farmon.apiPayload.exception.handler.UserHandler;
 import com.backend.farmon.converter.ChatConverter;
 import com.backend.farmon.domain.ChatMessage;
 import com.backend.farmon.domain.ChatRoom;
@@ -36,10 +37,10 @@ public class ChatMessageQueryServiceImpl implements ChatMessageQueryService{
     @Override
     public ChatResponse.ChatMessageListDTO findChatMessageList(Long userId, Long chatRoomId, Integer pageNumber) {
         User user = userRepository.findById(userId)
-                .orElseThrow(()-> new EstimateHandler(ErrorStatus.USER_NOT_FOUND));
+                .orElseThrow(()-> new UserHandler(ErrorStatus.USER_NOT_FOUND));
 
         ChatRoom chatRoom = chatRoomRepository.findById(chatRoomId)
-                .orElseThrow(()-> new EstimateHandler(ErrorStatus.CHATROOM_NOT_FOUND));
+                .orElseThrow(()-> new ChatRoomHandler(ErrorStatus.CHATROOM_NOT_FOUND));
 
         // 모든 채팅 메시지 내역 조회 (EXIT, COMPLETE 제외)
         Slice<ChatMessage> chatMessageList = chatMessageRepository.findNonExitCompleteMessagesByChatRoomId(chatRoomId, pageRequest(pageNumber));

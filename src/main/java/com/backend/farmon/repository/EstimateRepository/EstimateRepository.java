@@ -6,8 +6,9 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface EstimateRepository extends JpaRepository<Estimate, Long>, EstimateRepositoryCustom {
     @Query("SELECT e FROM Estimate e LEFT JOIN FETCH e.estimateImageList WHERE e.id = :estimateId")
-    Estimate findEstimateWithImages(@Param("estimateId") Long estimateId);
+    Optional<Estimate> findEstimateWithImages(@Param("estimateId") Long estimateId);
 }

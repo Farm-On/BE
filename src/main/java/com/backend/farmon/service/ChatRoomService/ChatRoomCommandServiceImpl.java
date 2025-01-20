@@ -1,8 +1,10 @@
 package com.backend.farmon.service.ChatRoomService;
 
 import com.backend.farmon.apiPayload.code.status.ErrorStatus;
+import com.backend.farmon.apiPayload.exception.handler.ChatRoomHandler;
 import com.backend.farmon.apiPayload.exception.handler.EstimateHandler;
 import com.backend.farmon.apiPayload.exception.handler.ExpertHandler;
+import com.backend.farmon.apiPayload.exception.handler.UserHandler;
 import com.backend.farmon.converter.ChatConverter;
 import com.backend.farmon.domain.*;
 import com.backend.farmon.dto.chat.ChatResponse;
@@ -43,7 +45,7 @@ public class ChatRoomCommandServiceImpl implements ChatRoomCommandService{
 
         // 견적을 신청한 농업인
         User farmer = userRepository.findById(estimate.getUser().getId())
-                .orElseThrow(()-> new EstimateHandler(ErrorStatus.USER_NOT_FOUND));
+                .orElseThrow(()-> new UserHandler(ErrorStatus.USER_NOT_FOUND));
 
         ChatRoom chatRoom = ChatConverter.toChatRoom(expert, estimate, farmer);
 //        chatRoom.setExpert(expert);
@@ -62,10 +64,10 @@ public class ChatRoomCommandServiceImpl implements ChatRoomCommandService{
     @Override
     public ChatResponse.ChatRoomEnterDTO updateLastEnterTime(Long userId, Long chatRoomId) {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new EstimateHandler(ErrorStatus.USER_NOT_FOUND));
+                .orElseThrow(() -> new UserHandler(ErrorStatus.USER_NOT_FOUND));
 
         ChatRoom chatRoom = chatRoomRepository.findById(chatRoomId)
-                .orElseThrow(() -> new EstimateHandler(ErrorStatus.CHATROOM_NOT_FOUND));
+                .orElseThrow(() -> new ChatRoomHandler(ErrorStatus.CHATROOM_NOT_FOUND));
 
         boolean isExpert = chatRoom.getExpert().getId().equals(userId);
         LocalDateTime now = LocalDateTime.now();
@@ -90,12 +92,12 @@ public class ChatRoomCommandServiceImpl implements ChatRoomCommandService{
     @Override
     public ChatResponse.ChatRoomDeleteDTO removeChatRoom(Long userId, Long chatRoomId) {
         User user = userRepository.findById(userId)
-                .orElseThrow(()-> new EstimateHandler(ErrorStatus.USER_NOT_FOUND));
+                .orElseThrow(()-> new UserHandler(ErrorStatus.USER_NOT_FOUND));
 
         ChatRoom chatRoom = chatRoomRepository.findById(chatRoomId)
-                .orElseThrow(()-> new EstimateHandler(ErrorStatus.CHATROOM_NOT_FOUND));
+                .orElseThrow(()-> new ChatRoomHandler(ErrorStatus.CHATROOM_NOT_FOUND));
 
-//        chatMessageRepository.deleteByChatRoomId(chatRoomId); // 채팅 메시지 삭제
+        chatMessageRepository.deleteByChatRoomId(chatRoomId); // 채팅 메시지 삭제
         chatRoomRepository.delete(chatRoom); // 채팅방 삭제
         log.info("채팅방 삭제 완료 - 채팅방 아아디: {}", chatRoomId);
 
