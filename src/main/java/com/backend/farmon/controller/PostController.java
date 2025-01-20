@@ -180,7 +180,7 @@ public class PostController {
 
 ///// 게시글 목록 그냥 조회 (상세조회X) 리스트 형식으로 돌아옴
 
-    @GetMapping("/all/list/{boardNo}")
+    @GetMapping("/all/list/{boardId}")
     @Operation(
             summary = "전체글에서 정보를 조회 boardNo 는 게시판 종류 (상세 조회 아님)",
             description = "사용자는 전체글에서 글을 조회할 수 있습니다."
