@@ -30,4 +30,7 @@ public class Area extends BaseEntity {
 
     @OneToMany(mappedBy = "area", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ExpertArea> expertAreaList = new ArrayList<>();
+
+    @OneToMany(mappedBy = "area", cascade = CascadeType.ALL)
+    private List<Estimate> estimateList = new ArrayList<>();
 }

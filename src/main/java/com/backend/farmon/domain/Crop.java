@@ -1,7 +1,6 @@
 package com.backend.farmon.domain;
 
 import com.backend.farmon.domain.commons.BaseEntity;
-import com.backend.farmon.domain.mapping.ExpertCrop;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.DynamicInsert;
@@ -26,14 +25,11 @@ public class Crop extends BaseEntity {
     @Column(nullable = false)
     private String name;
 
-//    @Enumerated(EnumType.STRING)
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false, columnDefinition = "VARCHAR(55)")
     private String category;
 
     @OneToMany(mappedBy = "crop", cascade = CascadeType.ALL)
     private List<Estimate> estimateList = new ArrayList<>();
-
-    @OneToMany(mappedBy = "crop", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<ExpertCrop> expertCropList = new ArrayList<>();
 
 }

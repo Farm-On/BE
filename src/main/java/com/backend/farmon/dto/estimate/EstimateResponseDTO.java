@@ -17,28 +17,11 @@ public class EstimateResponseDTO {
     @NoArgsConstructor
     @Builder
     public static class CreateDTO {
-        private Long estimateId;
-        private Long userId;
+        Long estimateId;
+        Long userId;
     }
 
-    // 2) ReadListDto
-    @Schema(description = "농사 견적서 리스트 응답 DTO")
-    @Getter
-    @Setter
-    @AllArgsConstructor
-    @NoArgsConstructor
-    @Builder
-    public static class ListDTO {
-        private Integer listSize;
-        private Integer totalPage;
-        private Long totalElements;
-        private Integer currentPage;
-        private Boolean isFirst;
-        private Boolean isLast;
-
-        private List<PreviewDTO> estimateList; // 실제로는 List<SomeEstimateData> 형태
-    }
-    // 3) DetailDTO
+    // 2) Read DetailDTO
     @Schema(description = "농사 견적서 상세정보 응답 DTO")
     @Getter
     @Setter
@@ -46,19 +29,19 @@ public class EstimateResponseDTO {
     @NoArgsConstructor
     @Builder
     public static class DetailDTO {
-        private Long estimateId;
-        private Long userId;
-        private String cropName;
-        private String cropCategory;
-        private String userName;
-        private String category;
-        private String address;
-        private String budget;
-        private String body;
-        private LocalDate createDate;
+        Long estimateId;
+        Long userId;
+        String cropName;
+        String cropCategory;
+        String userName;
+        String category;
+        String address;
+        String budget;
+        String body;
+        LocalDate createDate;
     }
 
-    // 4) UpdateDto
+    // 3) UpdateDto
     @Schema(description = "농사 견적서 수정 응답 DTO")
     @Getter
     @Setter
@@ -66,11 +49,11 @@ public class EstimateResponseDTO {
     @NoArgsConstructor
     @Builder
     public static class UpdateDTO {
-        private Long estimateId;
-        private Long userId;
+        Long estimateId;
+        Long userId;
     }
 
-    // 5) DeleteDto
+    // 4) DeleteDto
     @Schema(description = "농사 견적서 삭제 응답 DTO")
     @Getter
     @Setter
@@ -78,25 +61,44 @@ public class EstimateResponseDTO {
     @NoArgsConstructor
     @Builder
     public static class DeleteDTO {
-        private Long estimateId;
-        private boolean deleted;
+        Long estimateId;
+        Boolean deleted;
+    }
+    // 5) ReadListDto
+    @Schema(description = "전문가-견적찾기 농사 견적서 리스트 응답 DTO")
+    @Getter
+    @Setter
+    @AllArgsConstructor
+    @NoArgsConstructor
+    @Builder
+    public static class ListDTO {
+        Integer listSize;
+        Integer totalPage;
+        Long totalElements;
+        Integer currentPage;
+        Boolean isFirst;
+        Boolean isLast;
+
+        List<PreviewDTO> estimateList; // 실제로는 List<SomeEstimateData> 형태
     }
 
-    @Schema(description = "농사 견적서 목록용 미리보기 DTO")
+    // 6) ListDTO를 위한 Preview dto
+    @Schema(description = "전문가-견적찾기 농사 견적서 목록용 미리보기 DTO")
     @Getter
     @Setter
     @AllArgsConstructor
     @NoArgsConstructor
     @Builder
     public static class PreviewDTO {
-        private Long estimateId;
-        private String cropName;
-        private String cropCategory;
-        private String category;
-        private String address;
-        private String budget;
-        private LocalDate createdAt;
-        private int isComplete;
+        Long estimateId;
+        String cropName;
+        String cropCategory;
+        String estimateCategory;
+        String areaName;
+        String areaNameDetail;
+        String budget;
+        LocalDate createdAt;
+        Integer isComplete;
     }
 
 
