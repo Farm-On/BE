@@ -32,7 +32,7 @@ public class Estimate extends BaseEntity {
     private Area area;
 
     @Column(nullable = false)
-    private String addressDetail;
+    private String address;
 
     @Column(nullable = false)
     @ColumnDefault("'50만원 ~ 100만원'")

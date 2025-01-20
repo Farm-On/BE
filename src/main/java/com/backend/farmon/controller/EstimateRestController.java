@@ -2,6 +2,8 @@ package com.backend.farmon.controller;
 
 import com.backend.farmon.dto.estimate.EstimateRequestDTO;
 import com.backend.farmon.dto.estimate.EstimateResponseDTO;
+import com.backend.farmon.service.EstimateRepository.EstimateCommandService;
+import com.backend.farmon.service.EstimateRepository.EstimateQueryService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
@@ -19,6 +21,9 @@ import com.backend.farmon.apiPayload.ApiResponse;
 @RequiredArgsConstructor
 @RequestMapping("/api/estimate")
 public class EstimateRestController {
+
+    private final EstimateCommandService estimateCommandService;
+    private final EstimateQueryService estimateQueryService;
     /**
      * (1) 견적서 생성 (농업인 전용)
      */
@@ -39,10 +44,7 @@ public class EstimateRestController {
         // 예시로 작성된 Dto 를 그대로 반환
         // 여기서 response에는 DB 저장 후 생성된 estimateId 등을 담았다고 가정
 
-        EstimateResponseDTO.CreateDTO response = EstimateResponseDTO.CreateDTO.builder()
-                .estimateId(1L)  // DB 저장 시 생성된 PK 값
-                .userId(request.getUserId())
-                .build();
+        EstimateResponseDTO.CreateDTO response =  estimateCommandService.createEstimate(request);
 
         return ApiResponse.onSuccess(response);
     }
@@ -67,17 +69,7 @@ public class EstimateRestController {
             @PathVariable Long estimateId
     ) {
         // 실제 조회 로직 대신 예시
-        EstimateResponseDTO.DetailDTO response = EstimateResponseDTO.DetailDTO.builder()
-                .estimateId(estimateId)
-                .userId(1L)
-                .cropName("옥수수")
-                .cropCategory("곡물")
-                .userName("이지수")
-                .category("작물 관리")
-                .address("경기도")
-                .budget("1000~2000")
-                .body("옥수수 재배 관련 상담 요청")
-                .build();
+        EstimateResponseDTO.DetailDTO response = estimateQueryService.getEstimateDetail(estimateId);
 
         return ApiResponse.onSuccess(response);
     }
@@ -103,10 +95,7 @@ public class EstimateRestController {
             @RequestBody EstimateRequestDTO.UpdateDTO request
     ){
         // 실제 로직 생략, 예시로 수정 내용 반환
-        EstimateResponseDTO.UpdateDTO response = EstimateResponseDTO.UpdateDTO.builder()
-                .estimateId(estimateId)
-                .userId(request.getUserId())
-                .build();
+        EstimateResponseDTO.UpdateDTO response = estimateCommandService.updateEstimate(estimateId, request);
         return ApiResponse.onSuccess(response);
     }
 
@@ -128,10 +117,7 @@ public class EstimateRestController {
             @PathVariable Long estimateId
     ) {
         // 실제 삭제 로직 생략, 예시로 삭제 결과 DTO 반환
-        EstimateResponseDTO.DeleteDTO response = EstimateResponseDTO.DeleteDTO.builder()
-                .estimateId(estimateId)
-                .deleted(true)
-                .build();
+        EstimateResponseDTO.DeleteDTO response = estimateCommandService.deleteEstimate(estimateId);
 
         return ApiResponse.onSuccess(response);
 
