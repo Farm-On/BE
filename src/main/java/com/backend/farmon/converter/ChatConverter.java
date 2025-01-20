@@ -67,7 +67,7 @@ public class ChatConverter {
 
         return ChatResponse.ChatMessageListDTO.builder()
                 .chatMesageList(chatMessageDetailDTOList)
-                .chatMessageListSize(chatMessageDetailDTOList.size())
+                .chatMessageListSize(chatMessages.getNumberOfElements())
                 .isFirst(chatMessages.isFirst())
                 .isLast(chatMessages.isLast())
                 .hasNext(chatMessages.hasNext())

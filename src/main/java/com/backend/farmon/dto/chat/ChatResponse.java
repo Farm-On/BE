@@ -77,14 +77,8 @@ public class ChatResponse {
         @Schema(description = "채팅 대화방의 메시지 목록")
         List <ChatMessageDetailDTO> chatMesageList;
 
-        @Schema(description = "현재 페이지의 채팅 대화내역 개수", example = "20")
+        @Schema(description = "현재 페이지의 채팅 대화 내역 개수", example = "20")
         Integer chatMessageListSize;
-
-        @Schema(description = "총 페이지 수", example = "8")
-        Integer totalPage;
-
-        @Schema(description = "총 채팅 메시지 개수", example = "80")
-        Long totalElements;
 
         @Schema(description = "페이지 처음 여부", example = "true")
         Boolean isFirst;

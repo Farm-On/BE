@@ -61,7 +61,7 @@ public class ChatRoomQueryServiceImpl implements ChatRoomQueryService {
                     .findFirstByChatRoomIdOrderByCreatedAtDesc(chatRoom.getId())
                     .orElse(null);
 
-            log.info("채팅방과 일치하는 최신 메시지 조회 완료 - userId: {}, 내용: {}", userId, lastMessage);
+            log.info("채팅방과 일치하는 최신 메시지 조회 완료 - userId: {}, 내용: {}", userId, lastMessage.getContent());
 
             // 채팅방 대화방 세부 정보를 dto로 변환
             return ChatConverter.toChatRoomDetailDTO(chatRoom, lastMessage, isExpert, unReadMessageCount);
@@ -80,7 +80,7 @@ public class ChatRoomQueryServiceImpl implements ChatRoomQueryService {
         ChatRoom chatRoom = chatRoomRepository.findById(chatRoomId)
                 .orElseThrow(() -> new EstimateHandler(ErrorStatus.CHATROOM_NOT_FOUND));
 
-        Estimate estimate = chatRoom.getEstimate(); // 채팅방의 견적 조회
+        Estimate estimate = chatRoom.getEstimate();
         log.info("채팅방의 견적 조회 완료 - userId: {}, estimateId: {}", userId, estimate.getId());
 
         List<EstimateImage> estimateImageList = estimate.getEstimateImageList();
