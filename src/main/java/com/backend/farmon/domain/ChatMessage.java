@@ -19,6 +19,10 @@ public class ChatMessage extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id; // pk
 
+    // 보낸사람 pk
+    @Column(nullable = false)
+    private Long senderId;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private ChatMessageType type; // 메시지 타입

@@ -17,7 +17,7 @@ public class ChatResponse {
         List <ChatRoomDetailDTO> chatRoomInfoList;
 
         @Schema(description = "현재 페이지의 채팅 대화방 목록 개수", example = "10")
-        Integer chatMessageListSize;
+        Integer chatRoomInfoListSize;
 
         @Schema(description = "총 페이지 수", example = "8")
         Integer totalPage;
@@ -61,7 +61,7 @@ public class ChatResponse {
         Integer unreadMessageCount;
 
         @Schema(description = "마지막 채팅 내용", example = "추가로 궁금한 점이 생기면 언제든 문의하세요.")
-        Integer lastMessageContent;
+        String lastMessageContent;
 
         @Schema(description = "마지막 채팅 날짜", example = "2025.01.10")
         String lastMessageDate;
@@ -77,20 +77,17 @@ public class ChatResponse {
         @Schema(description = "채팅 대화방의 메시지 목록")
         List <ChatMessageDetailDTO> chatMesageList;
 
-        @Schema(description = "채팅 중인 상대방 이름", example = "김팜온")
-        String name;
+        @Schema(description = "현재 페이지의 채팅 대화 내역 개수", example = "20")
+        Integer chatMessageListSize;
 
-        @Schema(description = "채팅 중인 상대방 프로필 이미지")
-        String profileImage;
+        @Schema(description = "페이지 처음 여부", example = "true")
+        Boolean isFirst;
 
-        @Schema(description = "채팅 상대 역할, 농업인 또는 전문가", example = "농업인")
-        String type;
+        @Schema(description = "페이지 마지막 여부", example = "false")
+        Boolean isLast;
 
-        @Schema(description = "채팅 상대의 마지막 채팅방 접속 시간", example = "28분")
-        String lastEnterTime;
-
-        @Schema(description = "채팅 상대의 평균 메시지 응답 시간", example = "1시간")
-        String averageResponseTime;
+        @Schema(description = "다음 페이지가 있는지 여부", example = "true")
+        Boolean hasNext;
     }
 
     @Getter
@@ -103,8 +100,8 @@ public class ChatResponse {
         @Schema(description = "메시지 내용", example = "안녕하세요.")
         String messageContent;
 
-        @Schema(description = "메시지 읽음 여부", example = "false")
-        Boolean isRead;
+        @Schema(description = "상대방이 메시지 읽음 여부", example = "false")
+        Boolean isOtherRead;
 
         @Schema(description = "내가 보낸 메시지인지 상대방이 보낸 메시지인지 여부 / 내가 보낸 메시지라면 true, 상대방이 보낸 메시지라면 false", example = "true")
         Boolean isMine;
@@ -132,13 +129,36 @@ public class ChatResponse {
         @Schema(description = "채팅 상대 역할, 농업인 또는 전문가", example = "농업인")
         String type;
 
+        @Schema(description = "채팅 상대의 마지막 채팅방 접속 시간, 채팅방 생성시에는 null", example = "28분")
+        String lastEnterTime;
+
+        @Schema(description = "채팅 상대의 평균 메시지 응답 시간, 채팅방 생성시에는 null", example = "1시간")
+        String averageResponseTime;
+    }
+
+    @Getter
+    @Setter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Builder
+    @Schema(description = "채팅방 입장 성공")
+    public static class ChatRoomEnterDTO {
+
+        @Schema(description = "채팅 중인 상대방 이름", example = "김팜온")
+        String name;
+
+        @Schema(description = "채팅 중인 상대방 프로필 이미지")
+        String profileImage;
+
+        @Schema(description = "채팅 상대 역할, 농업인 또는 전문가", example = "농업인")
+        String type;
+
         @Schema(description = "채팅 상대의 마지막 채팅방 접속 시간", example = "28분")
         String lastEnterTime;
 
         @Schema(description = "채팅 상대의 평균 메시지 응답 시간", example = "1시간")
         String averageResponseTime;
     }
-
 
     @Getter
     @Setter
@@ -149,5 +169,37 @@ public class ChatResponse {
     public static class ChatRoomDeleteDTO {
         @Schema(description = "삭제 여부 / 삭제에 성공했다면 true, 실패했다면 false", example = "true")
         Boolean isDeleteSuccess;
+    }
+
+    @Getter
+    @Setter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Builder
+    @Schema(description = "채팅방 견적 응답 정보")
+    public static class ChatRoomEstimateDTO {
+        @Schema(description = "작물 카테고리", example = "곡물, 채소작물, 과일 등")
+        String cropCategory;
+
+        @Schema(description = "작물 이름", example = "쌀, 고구마, 사과 등")
+        String cropName;
+
+        @Schema(description = "견적 신청자")
+        String applyName;
+
+        @Schema(description = "견적 카테고리", example = "작물 관리, 스마트팜 등")
+        String estimateCategory;
+
+        @Schema(description = "견적 주소", example = "서울 강동구")
+        String address;
+
+        @Schema(description = "견적 예산", example = "50만원 ~ 100만원")
+        String budget;
+
+        @Schema(description = "컨설팅 내용")
+        String content;
+
+        @Schema(description = "견적 이미지 리스트")
+        List<String> estimateImageList;
     }
 }

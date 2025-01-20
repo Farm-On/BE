@@ -10,7 +10,7 @@ import org.springframework.stereotype.Controller;
 @Slf4j
 @Controller
 @RequiredArgsConstructor
-public class ChatMessageController {
+public class MessageController {
 //    private final SimpMessagingTemplate simpMessagingTemplate;
 
     // 채팅 메시지 보내기
