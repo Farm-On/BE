@@ -70,19 +70,27 @@ public class User extends BaseEntity {
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private Expert expert; // 전문가와 1:1관계
 
-//    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-//    private List<CharRoom> charRoomList = new ArrayList<>(); // 채팅방 양방향 매핑
-//
-//    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-//    private List<Estimate> estimateList = new ArrayList<>();  // 견적 양방향 매핑
-//
-//    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-//    private List<Post> postList = new ArrayList<>();  // 게시글 양방향 매핑
-//
-//    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-//    private List<Like> likeList = new ArrayList<>();  // 좋아요 양방향 매핑
-//
-//    public void encodePassword(String password) {
-//        this.password = password;
-//    }
+    @OneToMany(mappedBy = "farmer", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ChatRoom> chatRoomList = new ArrayList<>(); // 채팅방 양방향 매핑
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Estimate> estimateList = new ArrayList<>();  // 견적 양방향 매핑
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Post> postList = new ArrayList<>();  // 게시글 양방향 매핑
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<LikeCount> likeList = new ArrayList<>();  // 좋아요 양방향 매핑
+
+    public void encodePassword(String password) {
+        this.password = password;
+    }
+
+    public void updateRole(Role role) { // 멤버 상태 변경 ex)전문가 전환
+        this.role = role;
+    }
+
+    public void updateStatus(MemberStatus status) { // 멤버 상태 변경 ex)계정 비활성화
+        this.status = status;
+    }
 }

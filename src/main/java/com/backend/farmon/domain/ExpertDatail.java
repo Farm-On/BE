@@ -6,9 +6,6 @@ import lombok.*;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 
-import java.util.ArrayList;
-import java.util.List;
-
 @Entity
 @Getter
 @DynamicUpdate
@@ -16,24 +13,15 @@ import java.util.List;
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-public class Portfolio extends BaseEntity {
+public class ExpertDatail extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(nullable = false)
-    private String title;
-
-    @Column(nullable = false)
-    private String thumbnailImg;
-
-    @Column(nullable = false)
-    private String text;
+    private String detailContent;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "expert_id")
     private Expert expert;
-
-    @OneToMany(mappedBy = "portfolio", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<PortfolioImg> portfolioImgList = new ArrayList<>();
 }
