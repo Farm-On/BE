@@ -95,8 +95,8 @@ public class ChatRoomCommandServiceImpl implements ChatRoomCommandService{
         ChatRoom chatRoom = chatRoomRepository.findById(chatRoomId)
                 .orElseThrow(()-> new EstimateHandler(ErrorStatus.CHATROOM_NOT_FOUND));
 
-        chatMessageRepository.deleteByChatRoomId(chatRoomId); // 채팅 메시지 삭제
-        chatRoomRepository.deleteById(chatRoomId); // 채팅방 삭제
+//        chatMessageRepository.deleteByChatRoomId(chatRoomId); // 채팅 메시지 삭제
+        chatRoomRepository.delete(chatRoom); // 채팅방 삭제
         log.info("채팅방 삭제 완료 - 채팅방 아아디: {}", chatRoomId);
 
         return ChatConverter.toChatRoomDeleteDTO();

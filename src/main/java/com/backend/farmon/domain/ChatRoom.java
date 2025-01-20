@@ -33,7 +33,7 @@ public class ChatRoom extends BaseEntity {
 
     private LocalDateTime expertLastEnter; // 전문가 마지막 접속 시간
 
-    @OneToMany(mappedBy = "chatRoom", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "chatRoom", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List <ChatMessage> messageList = new ArrayList<>(); // 채팅 메시지와 일대다 양방향
 
     @ManyToOne(fetch = FetchType.LAZY)

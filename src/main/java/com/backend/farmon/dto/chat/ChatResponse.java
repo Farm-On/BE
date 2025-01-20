@@ -101,7 +101,7 @@ public class ChatResponse {
         String messageContent;
 
         @Schema(description = "상대방이 메시지 읽음 여부", example = "false")
-        Boolean isRead;
+        Boolean isOtherRead;
 
         @Schema(description = "내가 보낸 메시지인지 상대방이 보낸 메시지인지 여부 / 내가 보낸 메시지라면 true, 상대방이 보낸 메시지라면 false", example = "true")
         Boolean isMine;

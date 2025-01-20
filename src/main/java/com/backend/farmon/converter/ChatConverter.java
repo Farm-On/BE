@@ -8,8 +8,6 @@ import org.springframework.data.domain.Slice;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import static java.util.stream.Collectors.toList;
-
 public class ChatConverter {
     public static ChatRoom toChatRoom(Expert expert, Estimate estimate, User farmer){
         return ChatRoom.builder()
@@ -77,7 +75,7 @@ public class ChatConverter {
     public static ChatResponse.ChatMessageDetailDTO toChatMessageDetailDTO(ChatMessage chatMessage, Long userId){
         return ChatResponse.ChatMessageDetailDTO.builder()
                 .messageContent(chatMessage.getContent())
-                .isRead(chatMessage.getIsRead())
+                .isOtherRead(chatMessage.getIsRead())
                 .isMine(chatMessage.getSenderId().equals(userId))
                 .sendTime(ConvertTime.convertToAmPmFormat(chatMessage.getCreatedAt()))
                 .build();
