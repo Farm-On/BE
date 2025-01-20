@@ -7,6 +7,7 @@ import com.backend.farmon.domain.*;
 import com.backend.farmon.dto.chat.ChatResponse;
 import com.backend.farmon.repository.ChatMessageRepository.ChatMessageRepository;
 import com.backend.farmon.repository.ChatRoomReposiotry.ChatRoomRepository;
+import com.backend.farmon.repository.EstimateRepository.EstimateRepository;
 import com.backend.farmon.repository.UserRepository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -27,6 +28,7 @@ public class ChatRoomQueryServiceImpl implements ChatRoomQueryService {
     private final ChatRoomRepository chatRoomRepository;
     private final ChatMessageRepository chatMessageRepository;
     private final UserRepository userRepository;
+    private final EstimateRepository estimateRepository;
 
     private static final Integer PAGE_SIZE=10;
 
@@ -80,11 +82,9 @@ public class ChatRoomQueryServiceImpl implements ChatRoomQueryService {
         ChatRoom chatRoom = chatRoomRepository.findById(chatRoomId)
                 .orElseThrow(() -> new EstimateHandler(ErrorStatus.CHATROOM_NOT_FOUND));
 
-        Estimate estimate = chatRoom.getEstimate();
+        Estimate estimate = estimateRepository.findEstimateWithImages(chatRoom.getEstimate().getId());
         log.info("채팅방의 견적 조회 완료 - userId: {}, estimateId: {}", userId, estimate.getId());
 
-        List<EstimateImage> estimateImageList = estimate.getEstimateImageList();
-
-        return ChatConverter.toChatRoomEstimateDTO(estimate, estimateImageList);
+        return ChatConverter.toChatRoomEstimateDTO(estimate, estimate.getEstimateImageList());
     }
 }
