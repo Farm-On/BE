@@ -1,6 +1,9 @@
 package com.backend.farmon.reposiotry.ChatMessageRepository;
 
 import com.backend.farmon.domain.ChatMessage;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 
 import java.util.List;
 
@@ -9,8 +12,5 @@ public interface ChatMessageRepositoryCustom {
     void updateMessagesToReadByChatRoomId(Long chatRoomId, Long userId);
 
     // 채팅방 아이디와 일치하는 퇴장, 거래 완료가 아닌  채팅 메시지 리스트 조회
-    List<ChatMessage> findNonExitCompleteMessagesByChatRoomId(Long chatRoomId);
-
-    // 채팅방 아이디와 일치하는 채팅 메시지 중, 안 읽은 메시지 리스트 조회
-    List<ChatMessage> findUnreadMessagesByChatRoomId(Long chatRoomId);
+    public Slice<ChatMessage> findNonExitCompleteMessagesByChatRoomId(Long chatRoomId, Pageable pageable);
 }

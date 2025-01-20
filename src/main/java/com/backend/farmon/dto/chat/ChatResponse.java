@@ -79,6 +79,21 @@ public class ChatResponse {
 
         @Schema(description = "현재 페이지의 채팅 대화내역 개수", example = "20")
         Integer chatMessageListSize;
+
+        @Schema(description = "총 페이지 수", example = "8")
+        Integer totalPage;
+
+        @Schema(description = "총 채팅 메시지 개수", example = "80")
+        Long totalElements;
+
+        @Schema(description = "페이지 처음 여부", example = "true")
+        Boolean isFirst;
+
+        @Schema(description = "페이지 마지막 여부", example = "false")
+        Boolean isLast;
+
+        @Schema(description = "다음 페이지가 있는지 여부", example = "true")
+        Boolean hasNext;
     }
 
     @Getter

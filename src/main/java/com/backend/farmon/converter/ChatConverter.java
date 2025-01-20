@@ -3,6 +3,7 @@ package com.backend.farmon.converter;
 import com.backend.farmon.domain.*;
 import com.backend.farmon.dto.chat.ChatResponse;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Slice;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -58,7 +59,7 @@ public class ChatConverter {
                 .build();
     }
 
-    public static ChatResponse.ChatMessageListDTO toChatMessageListDTO(List<ChatMessage> chatMessages, Long userId) {
+    public static ChatResponse.ChatMessageListDTO toChatMessageListDTO(Slice<ChatMessage> chatMessages, Long userId) {
         // 채팅 메시지 리스트를 ChatMessageDetailDTO로 변환
         List<ChatResponse.ChatMessageDetailDTO> chatMessageDetailDTOList = chatMessages.stream()
                 .map(chatMessage -> toChatMessageDetailDTO(chatMessage, userId))
@@ -67,6 +68,9 @@ public class ChatConverter {
         return ChatResponse.ChatMessageListDTO.builder()
                 .chatMesageList(chatMessageDetailDTOList)
                 .chatMessageListSize(chatMessageDetailDTOList.size())
+                .isFirst(chatMessages.isFirst())
+                .isLast(chatMessages.isLast())
+                .hasNext(chatMessages.hasNext())
                 .build();
     }
 

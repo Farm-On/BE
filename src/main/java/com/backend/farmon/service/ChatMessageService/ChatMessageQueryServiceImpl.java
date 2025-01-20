@@ -12,6 +12,7 @@ import com.backend.farmon.reposiotry.ChatRoomReposiotry.ChatRoomRepository;
 import com.backend.farmon.reposiotry.UserRepository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,9 +27,16 @@ public class ChatMessageQueryServiceImpl implements ChatMessageQueryService{
     private final ChatRoomRepository chatRoomRepository;
     private final UserRepository userRepository;
 
+    private static final Integer PAGE_SIZE=12;
+
+    // 페이지 정렬, 최신순
+    private Pageable pageRequest(Integer pageNumber) {
+        return PageRequest.of(pageNumber, PAGE_SIZE, Sort.by("createdAt").descending());
+    }
+
     // 채팅 메시지 내역 조회
     @Override
-    public ChatResponse.ChatMessageListDTO findChatMessageList(Long userId, Long chatRoomId) {
+    public ChatResponse.ChatMessageListDTO findChatMessageList(Long userId, Long chatRoomId, Integer pageNumber) {
         User user = userRepository.findById(userId)
                 .orElseThrow(()-> new EstimateHandler(ErrorStatus.USER_NOT_FOUND));
 
@@ -36,7 +44,8 @@ public class ChatMessageQueryServiceImpl implements ChatMessageQueryService{
                 .orElseThrow(()-> new EstimateHandler(ErrorStatus.CHATROOM_NOT_FOUND));
 
         // 모든 채팅 메시지 내역 조회 (EXIT, COMPLETE 제외)
-        List<ChatMessage> chatMessageList = chatMessageRepository.findNonExitCompleteMessagesByChatRoomId(chatRoomId);
+        Slice<ChatMessage> chatMessageList = chatMessageRepository.findNonExitCompleteMessagesByChatRoomId(chatRoomId, pageRequest(pageNumber));
+        log.info("모든 채팅 메시지 내역 조회 완료 - 채팅방 아아디: {}", chatRoomId);
 
         return ChatConverter.toChatMessageListDTO(chatMessageList, userId);
     }

@@ -18,7 +18,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Optional;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -47,17 +46,22 @@ public class ChatRoomQueryServiceImpl implements ChatRoomQueryService {
                 ? chatRoomRepository.findUnReadChatRoomsByUserId(userId, pageRequest(pageNumber))
                 : chatRoomRepository.findChatRoomsByUserId(userId, pageRequest(pageNumber));
 
+        log.info("안 읽음 필터링에 따른 유저의 모든 채팅방 목록 페이지네이션 조회 완료 - userId: {}", userId);
+
         // 채팅 대화방 세부 정보 목록 생성
         List<ChatResponse.ChatRoomDetailDTO> chatRoomInfoList = chatRoomPage.stream().map(chatRoom -> {
             boolean isExpert = chatRoom.getExpert().getId().equals(userId);
 
             // 안 읽은 채팅 메시지 개수 조회
             int unReadMessageCount = chatMessageRepository.findByChatRoomIdAndIsReadFalse(chatRoom.getId()).size();
+            log.info("안 읽은 채팅 메시지 개수 조회 완료 - userId: {}, 안 읽은 메시지 개수: {}", userId, unReadMessageCount);
 
             // 채팅방과 일치하는 최신 메시지 조회
             ChatMessage lastMessage = chatMessageRepository
                     .findFirstByChatRoomIdOrderByCreatedAtDesc(chatRoom.getId())
                     .orElse(null);
+
+            log.info("채팅방과 일치하는 최신 메시지 조회 완료 - userId: {}, 내용: {}", userId, lastMessage);
 
             // 채팅방 대화방 세부 정보를 dto로 변환
             return ChatConverter.toChatRoomDetailDTO(chatRoom, lastMessage, isExpert, unReadMessageCount);
@@ -77,6 +81,7 @@ public class ChatRoomQueryServiceImpl implements ChatRoomQueryService {
                 .orElseThrow(() -> new EstimateHandler(ErrorStatus.CHATROOM_NOT_FOUND));
 
         Estimate estimate = chatRoom.getEstimate(); // 채팅방의 견적 조회
+        log.info("채팅방의 견적 조회 완료 - userId: {}, estimateId: {}", userId, estimate.getId());
 
         List<EstimateImage> estimateImageList = estimate.getEstimateImageList();
 

@@ -53,6 +53,8 @@ public class ChatRoomCommandServiceImpl implements ChatRoomCommandService{
 
         chatRoomRepository.save(chatRoom);
 
+        log.info("채팅방 생성 완료 - 채팅방 아아디: {}, 생성한 전문가 expertId: {}", chatRoom.getId(), expert.getId());
+
         return ChatConverter.toChatRoomCreateDTO(chatRoom);
     }
 
@@ -78,6 +80,7 @@ public class ChatRoomCommandServiceImpl implements ChatRoomCommandService{
 
         // 안 읽은 메시지들을 읽음 처리
         chatMessageRepository.updateMessagesToReadByChatRoomId(chatRoomId, userId);
+        log.info("안 읽은 메시지들 읽음 처리 완료 - 채팅방 아아디: {}", chatRoomId);
 
         String userType = isExpert ? "전문가" : "농업인";
         return ChatConverter.toChatRoomEnterDTO(chatRoom, userType);
@@ -94,6 +97,7 @@ public class ChatRoomCommandServiceImpl implements ChatRoomCommandService{
                 .orElseThrow(()-> new EstimateHandler(ErrorStatus.CHATROOM_NOT_FOUND));
 
         chatRoomRepository.delete(chatRoom);
+        log.info("채팅방 삭제 완료 - 채팅방 아아디: {}", chatRoomId);
 
         return ChatConverter.toChatRoomDeleteDTO();
     }

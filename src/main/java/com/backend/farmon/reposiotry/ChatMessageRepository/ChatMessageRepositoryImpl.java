@@ -5,6 +5,7 @@ import com.backend.farmon.domain.QChatMessage;
 import com.backend.farmon.domain.enums.ChatMessageType;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.*;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,15 +18,27 @@ public class ChatMessageRepositoryImpl implements ChatMessageRepositoryCustom {
     private final JPAQueryFactory queryFactory;
     QChatMessage chatMessage = QChatMessage.chatMessage;
 
-    // 채팅방 아이디와 일치하는 퇴장, 거래 완료가 아닌 채팅 메시지 리스트 조회
+    // 채팅방 아이디와 일치하는 퇴장, 거래 완료가 아닌 채팅 메시지 무한스크롤 조회
     @Override
-    public List<ChatMessage> findNonExitCompleteMessagesByChatRoomId(Long chatRoomId) {
-        return queryFactory.selectFrom(chatMessage)
+    public Slice<ChatMessage> findNonExitCompleteMessagesByChatRoomId(Long chatRoomId, Pageable pageable) {
+        // 요청된 페이지 크기보다 1개 더 가져오기
+        List<ChatMessage> content = queryFactory.selectFrom(chatMessage)
                 .where(
                         chatMessage.chatRoom.id.eq(chatRoomId),
                         chatMessage.type.notIn(ChatMessageType.EXIT, ChatMessageType.COMPLETE)
                 )
+                .orderBy(chatMessage.createdAt.desc())
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize() + 1) // 추가 데이터 1개 로드
                 .fetch();
+
+        // Slice 객체 반환
+        boolean hasNext = content.size() > pageable.getPageSize();
+        if (hasNext) {
+            content.remove(content.size() - 1); // 추가로 가져온 데이터 제거
+        }
+
+        return new SliceImpl<>(content, pageable, hasNext);
     }
 
     // 채팅방 아이디와 일치하는 채팅 메시지 중, 상대방이 보낸 메시지 중 안 읽은 메시지를 읽음 처리
@@ -40,17 +53,5 @@ public class ChatMessageRepositoryImpl implements ChatMessageRepositoryCustom {
                         chatMessage.isRead.isFalse()
                 )
                 .execute();
-    }
-
-    // 채팅방 아이디와 일치하는 채팅 메시지 중, 안 읽은 퇴장, 거래 완료가 아닌 채팅 메시지 리스트 조회
-    @Override
-    public List<ChatMessage> findUnreadMessagesByChatRoomId(Long chatRoomId) {
-        return queryFactory.selectFrom(chatMessage)
-                .where(
-                        chatMessage.chatRoom.id.eq(chatRoomId),
-                        chatMessage.isRead.isFalse(),
-                        chatMessage.type.notIn(ChatMessageType.EXIT, ChatMessageType.COMPLETE)
-                )
-                .fetch();
     }
 }
