@@ -37,12 +37,12 @@ public class ChatRoomQueryServiceImpl implements ChatRoomQueryService {
 
     // 채팅방 목록 조회
     @Override
-    public ChatResponse.ChatRoomListDTO findChatRoom(Long userId, String read, Integer pageNumber) {
+    public ChatResponse.ChatRoomListDTO findChatRoom(Long userId, Integer read, Integer pageNumber) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new EstimateHandler(ErrorStatus.USER_NOT_FOUND));
 
         // 안 읽음 필터링에 따른 유저의 모든 채팅방 목록을 페이지네이션으로 조회
-        Page<ChatRoom> chatRoomPage = read.equals("false")
+        Page<ChatRoom> chatRoomPage = read.equals(1)
                 ? chatRoomRepository.findUnReadChatRoomsByUserId(userId, pageRequest(pageNumber))
                 : chatRoomRepository.findChatRoomsByUserId(userId, pageRequest(pageNumber));
 

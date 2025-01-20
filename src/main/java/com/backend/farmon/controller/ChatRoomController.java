@@ -44,12 +44,12 @@ public class ChatRoomController {
     })
     @Parameters({
             @Parameter(name = "userId", description = "로그인한 유저의 아이디(pk)", example = "1", required = true),
-            @Parameter(name = "read", description = "읽음 여부 필터링. 안 읽은 채팅방만 필터링 시에는 false, 이외에는 true 입니다.", example = "false", required = true),
+            @Parameter(name = "read", description = "읽음 여부 필터링. 안 읽은 채팅방만 필터링 시에는 1, 이외에는 0 입니다.", example = "0", required = true),
             @Parameter(name = "page", description = "페이지 번호, 1부터 시작입니다.", example = "1", required = true)
     })
     @GetMapping("/rooms/all")
     public ApiResponse<ChatResponse.ChatRoomListDTO> getChatRoomPage (@RequestParam(name = "userId") Long userId,
-                                                                      @RequestParam(name = "read") String read,
+                                                                      @RequestParam(name = "read") Integer read,
                                                                       @CheckPage Integer page){
 
         ChatResponse.ChatRoomListDTO response = chatRoomQueryService.findChatRoom(userId, read, page);
