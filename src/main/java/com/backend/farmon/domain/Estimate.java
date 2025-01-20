@@ -38,6 +38,9 @@ public class Estimate extends BaseEntity {
     @ColumnDefault("'50만원 ~ 100만원'")
     private String budget;
 
+    @Column(nullable = false)
+    private String title;
+
     @Column(nullable = false, columnDefinition = "TEXT")
     private String body;
 

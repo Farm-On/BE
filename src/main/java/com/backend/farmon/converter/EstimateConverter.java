@@ -18,6 +18,7 @@ public class EstimateConverter {
                 .area(area)
                 .address(requestDTO.getAddressDetail())
                 .budget(requestDTO.getBudget())
+                .title(requestDTO.getTitle())
                 .body(requestDTO.getBody())
                 .status(0) // 기본 상태
                 .user(user)
@@ -60,6 +61,7 @@ public class EstimateConverter {
                 .category(estimate.getCategory())
                 .address(estimate.getAddress())
                 .budget(estimate.getBudget())
+                .title(estimate.getTitle())
                 .body(estimate.getBody())
                 .createDate(estimate.getCreatedAt().toLocalDate())
                 .build();

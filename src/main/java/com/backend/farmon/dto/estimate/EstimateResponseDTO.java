@@ -37,6 +37,7 @@ public class EstimateResponseDTO {
         String category;
         String address;
         String budget;
+        String title;
         String body;
         LocalDate createDate;
     }

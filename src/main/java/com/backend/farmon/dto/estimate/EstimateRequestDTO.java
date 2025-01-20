@@ -33,6 +33,9 @@ public class EstimateRequestDTO {
         @NotNull(message = "예산은 필수입니다.")
         private String budget;
 
+        @NotNull(message = "제목은 필수입니다.")
+        private String title;
+
         @NotNull(message = "견적 상세설명은 필수입니다.")
         private String body;
     }
@@ -62,6 +65,9 @@ public class EstimateRequestDTO {
 
         @NotNull(message = "예산은 필수입니다.")
         private String budget;
+
+        @NotNull(message = "제목은 필수입니다.")
+        private String title;
 
         @NotNull(message = "견적 상세설명은 필수입니다.")
         private String body;
