@@ -3,9 +3,7 @@ package com.backend.farmon.service.ChatRoomService;
 import com.backend.farmon.apiPayload.code.status.ErrorStatus;
 import com.backend.farmon.apiPayload.exception.handler.EstimateHandler;
 import com.backend.farmon.converter.ChatConverter;
-import com.backend.farmon.domain.ChatMessage;
-import com.backend.farmon.domain.ChatRoom;
-import com.backend.farmon.domain.User;
+import com.backend.farmon.domain.*;
 import com.backend.farmon.dto.chat.ChatResponse;
 import com.backend.farmon.reposiotry.ChatMessageRepository.ChatMessageRepository;
 import com.backend.farmon.reposiotry.ChatRoomReposiotry.ChatRoomRepository;
@@ -67,5 +65,21 @@ public class ChatRoomQueryServiceImpl implements ChatRoomQueryService {
 
         // 최종 채팅방 목록 정보 DTO 생성 및 반환
         return ChatConverter.toChatRoomListDto(chatRoomPage, chatRoomInfoList);
+    }
+
+    // 채팅방의 견적 조회
+    @Override
+    public ChatResponse.ChatRoomEstimateDTO findChatRoomEstimate(Long userId, Long chatRoomId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new EstimateHandler(ErrorStatus.USER_NOT_FOUND));
+
+        ChatRoom chatRoom = chatRoomRepository.findById(chatRoomId)
+                .orElseThrow(() -> new EstimateHandler(ErrorStatus.CHATROOM_NOT_FOUND));
+
+        Estimate estimate = chatRoom.getEstimate(); // 채팅방의 견적 조회
+
+        List<EstimateImage> estimateImageList = estimate.getEstimateImageList();
+
+        return ChatConverter.toChatRoomEstimateDTO(estimate, estimateImageList);
     }
 }

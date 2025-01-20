@@ -175,9 +175,6 @@ public class ChatResponse {
         @Schema(description = "작물 이름", example = "쌀, 고구마, 사과 등")
         String cropName;
 
-        @Schema(description = "견적 제목")
-        String title;
-
         @Schema(description = "견적 신청자")
         String applyName;
 

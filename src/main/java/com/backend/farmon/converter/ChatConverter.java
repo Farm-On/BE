@@ -79,7 +79,7 @@ public class ChatConverter {
                 .build();
     }
 
-    public static ChatResponse.ChatRoomListDTO toChatRoomListDto(Page<ChatRoom> chatRoomPage, List<ChatResponse.ChatRoomDetailDTO> chatRoomInfoList){
+    public static ChatResponse.ChatRoomListDTO toChatRoomListDTO(Page<ChatRoom> chatRoomPage, List<ChatResponse.ChatRoomDetailDTO> chatRoomInfoList){
 
         return ChatResponse.ChatRoomListDTO.builder()
                 .chatRoomInfoList(chatRoomInfoList)
@@ -91,7 +91,7 @@ public class ChatConverter {
                 .build();
     }
 
-    public static ChatResponse.ChatRoomDetailDTO toChatRoomDetailDto(
+    public static ChatResponse.ChatRoomDetailDTO toChatRoomDetailDTO(
             ChatRoom chatRoom, ChatMessage chatMessage, Boolean isExpert, Integer unReadMessageCount) {
 
         User user = isExpert
@@ -111,4 +111,21 @@ public class ChatConverter {
                 .build();
     }
 
+    public static ChatResponse.ChatRoomEstimateDTO toChatRoomEstimateDTO(Estimate estimate, List<EstimateImage> estimateImageList){
+        return ChatResponse.ChatRoomEstimateDTO.builder()
+                .cropCategory(estimate.getCrop().getCategory())
+                .cropName(estimate.getCrop().getName())
+                .applyName(estimate.getUser().getUserName())
+                .estimateCategory(estimate.getCategory())
+                .address(estimate.getAddress())
+                .budget(estimate.getBudget())
+                .content(estimate.getBody())
+                // map을 사용하여 imageUrl 리스트로 변환
+                .estimateImageList(
+                        estimateImageList.stream()
+                                .map(EstimateImage::getImageUrl)
+                                .toList()
+                )
+                .build();
+    }
 }

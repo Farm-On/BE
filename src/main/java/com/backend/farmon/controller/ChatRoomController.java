@@ -220,25 +220,22 @@ public class ChatRoomController {
     @Operation(
             summary = "채팅방에서 견적서 상세 보기",
             description = "채팅방에서 현재 대화중인 견적에 대한 상세를 조회하는 API입니다. " +
-                    "유저 아이디, 채팅방 아이디, 견적 아이디를 쿼리 스트링으로 입력해주세요."
+                    "유저 아이디, 채팅방 아이디를 쿼리 스트링으로 입력해주세요."
     )
     @ApiResponses({
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200", description = "OK, 성공"),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "USER4001", description = "아이디와 일치하는 사용자가 없습니다.", content = @Content(schema = @Schema(implementation = ApiResponse.class))),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "CHATROOM4001", description = "채팅방 아이디와 일치하는 채팅방이 없습니다.", content = @Content(schema = @Schema(implementation = ApiResponse.class))),
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "ESTIMATE4001", description = "견적 아이디와 일치하는 견적이 없습니다.", content = @Content(schema = @Schema(implementation = ApiResponse.class))),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON400", description = "잘못된 요청입니다.", content = @Content(schema = @Schema(implementation = ApiResponse.class))),
     })
     @Parameters({
             @Parameter(name = "userId", description = "로그인한 유저의 아이디(pk)", example = "1", required = true),
-            @Parameter(name = "chatRoomId", description = "채팅방의 아이디", example = "1", required = true),
-            @Parameter(name = "estimateId", description = "견적서 상세를 보기 위한 견적 아이디", example = "1", required = true),
+            @Parameter(name = "chatRoomId", description = "채팅방의 아이디", example = "1", required = true)
     })
     @GetMapping("/room/estimate")
     public ApiResponse<ChatResponse.ChatRoomEstimateDTO> getChatRoomEstimate (@RequestParam(name = "userId") Long userId,
-                                                                              @RequestParam(name = "chatRoomId") Long chatRoomId,
-                                                                              @RequestParam(name = "estimateId") Long estimateId) {
-        ChatResponse.ChatRoomEstimateDTO response = ChatResponse.ChatRoomEstimateDTO.builder().build();
+                                                                              @RequestParam(name = "chatRoomId") Long chatRoomId) {
+        ChatResponse.ChatRoomEstimateDTO response = chatRoomQueryService.findChatRoomEstimate(userId, chatRoomId);
 
         return ApiResponse.onSuccess(response);
     }
