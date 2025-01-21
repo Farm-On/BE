@@ -2,7 +2,6 @@ package com.backend.farmon.domain;
 
 import com.backend.farmon.domain.commons.BaseEntity;
 import com.backend.farmon.domain.mapping.ExpertArea;
-import com.backend.farmon.domain.mapping.ExpertCrop;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.DynamicInsert;
@@ -36,6 +35,9 @@ public class Expert extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "crop_id")
     private Crop crop; // 전문가와 작물은 1:N관계
+
+    @OneToMany(mappedBy = "expert", cascade = CascadeType.ALL)
+    private List<Estimate> estimateList = new ArrayList<>();
 
     @OneToMany(mappedBy = "expert", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ExpertArea> expertAreaList = new ArrayList<>();

@@ -12,6 +12,7 @@ import java.util.List;
 
 @Entity
 @Getter
+@Setter
 @DynamicUpdate
 @DynamicInsert
 @Builder
@@ -26,6 +27,10 @@ public class Estimate extends BaseEntity {
     @Column(nullable = false, columnDefinition = "VARCHAR(255) DEFAULT '작물 관리'")
     private String category;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "area_id", nullable = false)
+    private Area area;
+
     @Column(nullable = false)
     private String address;
 
@@ -33,26 +38,29 @@ public class Estimate extends BaseEntity {
     @ColumnDefault("'50만원 ~ 100만원'")
     private String budget;
 
+    @Column(nullable = false)
+    private String title;
+
     @Column(nullable = false, columnDefinition = "TEXT")
     private String body;
 
-    @Column(nullable = false)
+    @Column(nullable = false, columnDefinition = "TINYINT(1)")
     @ColumnDefault("0")
-    private Integer isComplete;
+    private Integer status;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "crop_id")
+    @JoinColumn(name = "crop_id", nullable = false)
     private Crop crop;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-//    @ManyToOne(fetch = FetchType.LAZY)
-//    @JoinColumn(name = "expert_id")
-//    private Expert expert; //회의 후 변경
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "expert_id")
+    private Expert expert; //회의 후 변경
 
-    @OneToMany(mappedBy = "estimate", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "estimate", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<EstimateImage> estimateImageList = new ArrayList<>();
 
 }
