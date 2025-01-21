@@ -2,6 +2,7 @@ package com.backend.farmon.controller;
 
 import com.backend.farmon.apiPayload.ApiResponse;
 import com.backend.farmon.dto.home.HomeResponse;
+import com.backend.farmon.dto.post.PostType;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
@@ -38,7 +39,7 @@ public class HomeController {
     })
     @GetMapping("/community")
     public ApiResponse<HomeResponse.PostListDTO> getHomePosts (@RequestParam(name = "userId", required = false) Long userId,
-                                                               @RequestParam(name = "category") String category){
+                                                               @RequestParam(name = "category") PostType category){
         HomeResponse.PostListDTO response = HomeResponse.PostListDTO.builder().build();;
         return ApiResponse.onSuccess(response);
     }
