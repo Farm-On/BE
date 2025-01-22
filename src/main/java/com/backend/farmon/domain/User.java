@@ -19,6 +19,7 @@ import java.util.List;
 
 @Entity
 @Getter
+@Setter
 @DynamicUpdate
 @DynamicInsert
 @Builder
@@ -57,13 +58,7 @@ public class User extends BaseEntity {
     @Column(nullable = false, columnDefinition = "VARCHAR(15) DEFAULT 'ACTIVE'")
     private MemberStatus status;
 
-    private String profileImageUrl;
-
     private String chatAverageResponseTime; // 채팅 평균 응답 시간
-
-    @Column(nullable = false)
-    @ColumnDefault("false")
-    private Boolean isPhoneVerified; // 휴대폰 본인인증 여부
 
     private LocalDate inactiveDate;  // 탈퇴일
 
