@@ -86,10 +86,6 @@ public class User extends BaseEntity {
         this.password = password;
     }
 
-    public void updateRole(Role role) { // 멤버 상태 변경 ex)전문가 전환
-        this.role = role;
-    }
-
     public void updateStatus(MemberStatus status) { // 멤버 상태 변경 ex)계정 비활성화
         this.status = status;
     }
