@@ -52,4 +52,18 @@ public class PostQueryServiceImpl implements PostQueryService {
 
         return HomeConverter.toPostListDTO(postList, likeCountList, commentCountList);
     }
+
+    // 인기 전문가 칼럼 6개 조회
+    @Override
+    public HomeResponse.PopularPostListDTO findPopularExpertColumnPosts() {
+        // 별도로 인기 칼럼으로 지정할 지정할 전문가 칼럼 게시글 아이디 리스트
+        List<Long> popularPostsIdList = new ArrayList<>();
+        popularPostsIdList.add(4L);
+
+        // 인기 전문가 칼럼 6개 조회
+        List<Post> expertColumnPostList = postRepository.findTop6ExpertColumnPostsByPostId(popularPostsIdList);
+        log.info("홈 화면 인기 전문가 칼럼 조회 성공");
+
+        return HomeConverter.toPopularPostListDTO(expertColumnPostList);
+    }
 }

@@ -55,7 +55,7 @@ public class HomeController {
     })
     @GetMapping("/popular")
     public ApiResponse<HomeResponse.PopularPostListDTO> getHomePopularPosts (){
-        HomeResponse.PopularPostListDTO response = HomeResponse.PopularPostListDTO.builder().build();;
+        HomeResponse.PopularPostListDTO response = postQueryService.findPopularExpertColumnPosts();
         return ApiResponse.onSuccess(response);
     }
 

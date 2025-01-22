@@ -46,7 +46,12 @@ public class HomeConverter {
                 .popularPostContent(post.getPostContent())
                 .writer(post.getUser().getUserName())
                 .profileImage(post.getUser().getExpert().getProfileImageUrl())
-                .popularPostImage(post.getPostImgs().get(0).getStoredFileName())
+                // 게시글 이미지 가져오기
+                .popularPostImage(
+                        (post.getPostImgs() != null && !post.getPostImgs().isEmpty())
+                                ? post.getPostImgs().get(0).getStoredFileName()
+                                : null
+                )
                 .build();
     }
 }
