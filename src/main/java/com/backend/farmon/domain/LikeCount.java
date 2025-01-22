@@ -36,12 +36,5 @@ public class LikeCount {
     private LocalDateTime likeTime;
 
 
-    public LikeCount(Post post, User user) {
-        this.post = post;
-        this.user = user;
-    }
-
-    public LikeCount() {
-
-    }
+  
 }
