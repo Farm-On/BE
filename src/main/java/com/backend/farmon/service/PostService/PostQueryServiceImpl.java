@@ -8,9 +8,8 @@ import com.backend.farmon.domain.Post;
 import com.backend.farmon.domain.User;
 import com.backend.farmon.dto.home.HomeResponse;
 import com.backend.farmon.dto.post.PostType;
-import com.backend.farmon.repository.CommendRepository.CommentRepository;
+import com.backend.farmon.repository.CommentRepository.CommentRepository;
 import com.backend.farmon.repository.LikeCountRepository.LikeCountRepository;
-import com.backend.farmon.repository.PostRepository.PostRepository;
 import com.backend.farmon.repository.UserRepository.UserRepository;
 import com.backend.farmon.strategy.postType.PostFetchStrategy;
 import com.backend.farmon.strategy.postType.PostFetchStrategyFactory;
@@ -19,7 +18,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Slf4j

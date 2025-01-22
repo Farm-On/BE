@@ -1,4 +1,4 @@
-package com.backend.farmon.repository.CommendRepository;
+package com.backend.farmon.repository.CommentRepository;
 
 import com.backend.farmon.domain.Comment;
 import org.springframework.data.jpa.repository.JpaRepository;
