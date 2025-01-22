@@ -1,6 +1,6 @@
 package com.backend.farmon.dto.Board;
 
-import com.backend.farmon.dto.PostType;
+import com.backend.farmon.dto.post.PostType;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -38,14 +38,14 @@ public class BoardRequestDto {
 
     // AllPost는 모든 종류의 게시글을 위한 클래스입니다. (BasePost를 확장)
     @Data
-    @Schema(description = "전체게시판에 있는 글")
+    @Schema(description = "전체 게시판에 있는 글")
     public static class AllPost extends BasePost {
         // AllPost에는 추가적인 필드나 메서드가 필요할 경우 이곳에 작성
     }
 
     // PopularPost는 인기 게시글을 위한 클래스입니다. (BasePost를 확장)
     @Data
-    @Schema(description = "인기 게시글")
+    @Schema(description = "인기 게시판에 있는 글")
     public static class PopularPost extends BasePost {
         // PopularPost에는 추가적인 필드나 메서드가 필요할 경우 이곳에 작성
     }
@@ -57,35 +57,18 @@ public class BoardRequestDto {
     @Schema(description = "QnA 게시판에 관련된 게시글 ")
     public static class QnaPost extends BasePost {
 
-        @Schema(description = "답변 여부 (QnA 게시판에서만 사용)", example = "true")
-        private boolean isAnswered;  // 답변 여부 (QnA 게시판에서만 사용)
 
-        // QnA 게시판에서만 답변 여부를 설정하도록 하는 메서드
-        @Schema(description = "QnA 게시판에서만 답변 여부를 설정하는 메서드입니다.")
-        public void setAnsweredForQnA(boolean answered) {
-            if (this.postType == PostType.QnA) {
-                this.isAnswered = answered;
-            }
-        }
-
-        @Schema(description = "답변 여부를 반환하는 메서드입니다.", example = "true")
-        private boolean getIsAnswered() {
-            return isAnswered;
-        }
     }
 
     // ExpertLounge는 전문가 라운지 게시글을 위한 클래스입니다. (BasePost를 확장)
     @Data
     @AllArgsConstructor
     @NoArgsConstructor
-    @Schema(description = "전문가 라운지 게시글")
-    public static class ExpertLounge extends BasePost {
+    @Schema(description = "자유 게시판에 있는 게시글")
+    public static class FreePost extends BasePost {
 
-        @Schema(description = "지역 ID", example = "123")
-        private Long areaId; // 지역 ID
 
-        @Schema(description = "위치 ID", example = "456")
-        private Long locationId; // 위치 ID
+
     }
 
     // ExpertColumn은 전문가 칼럼 게시글을 위한 클래스입니다. (BasePost를 확장)
@@ -94,11 +77,7 @@ public class BoardRequestDto {
     @NoArgsConstructor
     @Schema(description = "전문가 칼럼 게시글")
     public static class ExpertColumn extends BasePost {
-
-        @Schema(description = "전체 칼럼 수", example = "10")
-        private Long All;  // 전체 칼럼 수
-
-        @Schema(description = "노하우 칼럼 수", example = "5")
-        private Long knowHow;  // 노하우 칼럼 수
+        @Schema(description = "분야 ID", example = "123")
+        private Long FilterId; // 지역 ID
     }
 }
