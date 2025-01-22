@@ -1,6 +1,6 @@
 package com.backend.farmon.dto.PostForm;
 
-import com.backend.farmon.dto.PostType;
+import com.backend.farmon.dto.post.PostType;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
