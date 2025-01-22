@@ -34,8 +34,8 @@ public class JWTAuthenticationFilter extends OncePerRequestFilter {
                 Long userId = tokenGenerator.extractUserId(token);  // userId 추출
                 String role = tokenGenerator.extractRole(token);    // role 추출
 
-//                // 로그로 추출한 데이터 출력
-//                logger.info(String.format("Authenticated User ID: %s, Role: %s", userId, role));
+                // 로그로 추출한 데이터 출력
+                logger.info(String.format("Authenticated User ID: %s, Role: %s", userId, role));
 
                 // 인증 정보 생성
                 GrantedAuthority authority = new SimpleGrantedAuthority(role);
