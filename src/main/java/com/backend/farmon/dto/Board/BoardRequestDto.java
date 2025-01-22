@@ -1,5 +1,8 @@
 package com.backend.farmon.dto.Board;
 
+import com.backend.farmon.domain.Answer;
+import com.backend.farmon.dto.Answer.AnswerRequestDTO;
+import com.backend.farmon.dto.Filter.FieldCategory;
 import com.backend.farmon.dto.post.PostType;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
@@ -58,7 +61,12 @@ public class BoardRequestDto {
     @EqualsAndHashCode(callSuper=false)
     @Schema(description = "QnA 게시판 게시글")
     public static class QnaPost extends BasePost {
-        // 필요한 경우 추가 필드 선언
+        @Schema(description = "분야 카테고리", example = "GRAIN")
+        private FieldCategory fieldCategory;
+
+        @Schema(description = "질문 답변")
+        private AnswerRequestDTO dto;
+
     }
 
     //FreePost 자유게시판
@@ -74,7 +82,7 @@ public class BoardRequestDto {
     @EqualsAndHashCode(callSuper=false)
     @Schema(description = "전문가 칼럼 게시글")
     public static class ExpertColumn extends BasePost {
-        @Schema(description = "분야 ID", example = "123")
-        private Long FilterId; // 지역 ID
+        @Schema(description = "분야 카테고리", example = "GRAIN")
+        private FieldCategory fieldCategory;
     }
 }
