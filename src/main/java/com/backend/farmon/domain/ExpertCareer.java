@@ -11,6 +11,7 @@ import java.util.List;
 
 @Entity
 @Getter
+@Setter
 @DynamicUpdate
 @DynamicInsert
 @Builder
@@ -30,13 +31,17 @@ public class ExpertCareer extends BaseEntity {
     @Column(nullable = false)
     private Integer startMonth;
 
-    @Column(nullable = false)
     private Integer endYear;
 
-    @Column(nullable = false)
     private Integer endMonth;
 
-    private String detailContent;
+    @Column(nullable = false, columnDefinition = "TINYINT(1) DEFAULT 0")
+    private Boolean isOngoing; // 진행중 여부
+
+    private String detailContent1;
+    private String detailContent2;
+    private String detailContent3;
+    private String detailContent4;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "expert_id")

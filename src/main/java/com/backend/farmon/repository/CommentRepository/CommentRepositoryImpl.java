@@ -1,4 +1,4 @@
-package com.backend.farmon.repository.CommendRepository;
+package com.backend.farmon.repository.CommentRepository;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
