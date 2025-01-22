@@ -38,9 +38,8 @@ public class HomeController {
             @Parameter(name = "category", description = "커뮤니티 카테고리 이름", example = "POPULAR", required = true)
     })
     @GetMapping("/community")
-    public ApiResponse<HomeResponse.PostListDTO> getHomePostsByCategory (@RequestParam(name = "userId", required = false) Long userId,
-                                                                         @RequestParam(name = "category", defaultValue = "POPULAR") PostType category){
-        HomeResponse.PostListDTO response = postQueryService.findHomePostsByCategory(userId, category);
+    public ApiResponse<HomeResponse.PostListDTO> getHomePostsByCategory (@RequestParam(name = "category", defaultValue = "POPULAR") PostType category){
+        HomeResponse.PostListDTO response = postQueryService.findHomePostsByCategory(category);
         return ApiResponse.onSuccess(response);
     }
 
