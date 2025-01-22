@@ -49,17 +49,17 @@ public class Post extends BaseEntity {
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL,orphanRemoval = true)
     @JsonManagedReference
     private List<PostImg> postImgs = new ArrayList<>();
-
-    public void addLike(User user) {
-        LikeCount likeCount = new LikeCount(this, user);
-        this.postlikes.add(likeCount);
-    }
-
-    public void removeLike(User user) {
-        this.postlikes.removeIf(like -> like.getUser().equals(user));
-    }
-
-    public int getLikeCount() {
-        return this.postlikes.size();
-    }
+//
+//    public void addLike(User user) {
+//        LikeCount likeCount = new LikeCount(this, user);
+//        this.postlikes.add(likeCount);
+//    }
+//
+//    public void removeLike(User user) {
+//        this.postlikes.removeIf(like -> like.getUser().equals(user));
+//    }
+//
+//    public int getLikeCount() {
+//        return this.postlikes.size();
+//    }
 }

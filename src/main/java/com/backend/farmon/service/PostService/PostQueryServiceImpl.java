@@ -2,6 +2,7 @@ package com.backend.farmon.service.PostService;
 
 import com.backend.farmon.apiPayload.code.status.ErrorStatus;
 import com.backend.farmon.apiPayload.exception.handler.UserHandler;
+import com.backend.farmon.config.security.UserAuthorizationUtil;
 import com.backend.farmon.converter.HomeConverter;
 import com.backend.farmon.domain.Post;
 import com.backend.farmon.domain.User;
@@ -31,13 +32,21 @@ public class PostQueryServiceImpl implements PostQueryService {
     private final CommentRepository commentRepository;
     private final LikeCountRepository likeCountRepository;
     private final UserRepository userRepository;
+    private final UserAuthorizationUtil userAuthorizationUtil;
 
     // 홈 화면 카테고리에 따른 커뮤니티 게시글 3개씩 조회
     // 인기, 전체, QNA, 전문가 칼럼
     @Override
     public HomeResponse.PostListDTO findHomePostsByCategory(Long userId, PostType category) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(()-> new UserHandler(ErrorStatus.USER_NOT_FOUND));
+        if(userId!=null){
+            User user = userRepository.findById(userId)
+                    .orElseThrow(()-> new UserHandler(ErrorStatus.USER_NOT_FOUND));
+
+            if(!userAuthorizationUtil.getCurrentUserId().equals(userId)){
+                log.error("userId 불일치, 로그인 userId: {}, 파라미터 userId: {}", userAuthorizationUtil.getCurrentUserId(), userId);
+                // 에러 던지기
+            }
+        }
 
         // 카테고리별 게시글 조회
         PostFetchStrategy strategy = strategyFactory.getStrategy(category);
