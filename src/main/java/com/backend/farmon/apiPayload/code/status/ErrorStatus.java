@@ -30,7 +30,10 @@ public enum ErrorStatus implements BaseErrorCode {
     CHATROOM_NOT_FOUND(HttpStatus.BAD_REQUEST, "CHATROOM4001", "채팅방 아이디와 일치하는 채팅방이 없습니다."),
 
     // 페이지 번호
-    PAGE_NOT_FOUND(HttpStatus.BAD_REQUEST, "PAGE4001", "페이지 번호는 1 이상이어야 합니다.");
+    PAGE_NOT_FOUND(HttpStatus.BAD_REQUEST, "PAGE4001", "페이지 번호는 1 이상이어야 합니다."),
+
+    // 회원가입 에러
+    EMAIL_ALREADY_EXIST(HttpStatus.BAD_REQUEST, "PAGE4001", "이미 가입된 이메일주소입니다.");
 
     private final HttpStatus httpStatus;
     private final String code;
