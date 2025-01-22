@@ -50,30 +50,24 @@ public class BoardRequestDto {
         // PopularPost에는 추가적인 필드나 메서드가 필요할 경우 이곳에 작성
     }
 
-    // QnaPost는 QnA 게시판의 게시글을 위한 클래스입니다. (BasePost를 확장)
+    //QnaPost는 질문게시판
     @Data
-    @AllArgsConstructor
     @NoArgsConstructor
-    @Schema(description = "QnA 게시판에 관련된 게시글 ")
+    @AllArgsConstructor
     public static class QnaPost extends BasePost {
-
-
+        // 필요한 경우 추가 필드 선언
     }
 
-    // ExpertLounge는 전문가 라운지 게시글을 위한 클래스입니다. (BasePost를 확장)
+    //FreePost 자유게시판
     @Data
-    @AllArgsConstructor
     @NoArgsConstructor
-    @Schema(description = "자유 게시판에 있는 게시글")
+    @AllArgsConstructor
     public static class FreePost extends BasePost {
-
-
-
+        // 필요한 경우 추가 필드 선언
     }
 
     // ExpertColumn은 전문가 칼럼 게시글을 위한 클래스입니다. (BasePost를 확장)
     @Data
-    @AllArgsConstructor
     @NoArgsConstructor
     @Schema(description = "전문가 칼럼 게시글")
     public static class ExpertColumn extends BasePost {
