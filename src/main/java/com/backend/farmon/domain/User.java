@@ -82,6 +82,9 @@ public class User extends BaseEntity {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<LikeCount> likeList = new ArrayList<>();  // 좋아요 양방향 매핑
 
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Answer> answerList = new ArrayList<>();
+
     public void encodePassword(String password) {
         this.password = password;
     }

@@ -46,9 +46,15 @@ public class Post extends BaseEntity {
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Comment> comments = new ArrayList<>();
 
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Answer> answers = new ArrayList<>();
+
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL,orphanRemoval = true)
     @JsonManagedReference
     private List<PostImg> postImgs = new ArrayList<>();
+
+
+
 //
 //    public void addLike(User user) {
 //        LikeCount likeCount = new LikeCount(this, user);
@@ -62,4 +68,6 @@ public class Post extends BaseEntity {
 //    public int getLikeCount() {
 //        return this.postlikes.size();
 //    }
+
+
 }

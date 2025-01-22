@@ -24,6 +24,16 @@ public class AmazonS3Manager{
     private final UuidRepository uuidRepository;
 
 
-    public String uploadFile(String keyName, MultipartFile file){ return null;}
+    public String uploadFile(String keyName, MultipartFile file){
+        ObjectMetadata metadata = new ObjectMetadata();
+        metadata.setContentLength(file.getSize());
+        try {
+            amazonS3.putObject(new PutObjectRequest(amazonConfig.getBucket(), keyName, file.getInputStream(), metadata));
+        } catch (IOException e){
+            log.error("error at AmazonS3Manager uploadFile : {}", (Object) e.getStackTrace());
+        }
+
+        return amazonS3.getUrl(amazonConfig.getBucket(), keyName).toString();
+    }
 
 }
