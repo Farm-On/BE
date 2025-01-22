@@ -28,4 +28,25 @@ public class HomeConverter {
                 .commentCount(commentCount)
                 .build();
     }
+
+    public static HomeResponse.PopularPostListDTO toPopularPostListDTO(List<Post> postList) {
+        List<HomeResponse.PopularPostDetailDTO> popularPostDetailDTOList = postList.stream()
+                .map(HomeConverter::toPopularPostDetailListDTO)
+                .toList();
+
+        return HomeResponse.PopularPostListDTO.builder()
+                .popularPostList(popularPostDetailDTOList)
+                .build();
+    }
+
+    public static HomeResponse.PopularPostDetailDTO toPopularPostDetailListDTO(Post post) {
+        return HomeResponse.PopularPostDetailDTO.builder()
+                .popularPostId(post.getId())
+                .popularPostTitle(post.getPostTitle())
+                .popularPostContent(post.getPostContent())
+                .writer(post.getUser().getUserName())
+                .profileImage(post.getUser().getExpert().getProfileImageUrl())
+                .popularPostImage(post.getPostImgs().get(0).getStoredFileName())
+                .build();
+    }
 }
