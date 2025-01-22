@@ -17,5 +17,5 @@ public class AnswerRequestDTO {
     private String content;
 
     @Schema(description = "답변자 ID")
-    private String answeredUserId; // 답변한 사람의 ID 추가
+    private Long answeredUserId; // 답변한 사람의 ID 추가
 }
