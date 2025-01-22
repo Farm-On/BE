@@ -27,21 +27,19 @@ public class HomeController {
     @Operation(
             summary = "홈 화면 커뮤니티 게시글 조회 API",
             description = "홈 화면에서 커뮤니티 카테고리에 따른 게시글을 조회합니다. " +
-                    "필터링 할 커뮤니티 카테고리 이름을 쿼리 스트링으로 입력해 주세요. " +
-                    "로그인 한 사용자의 경우에는 유저 아이디를 쿼리 스트링으로 입력해 주세요."
+                    "필터링 할 커뮤니티 카테고리 이름을 쿼리 스트링으로 입력해 주세요. "
     )
     @ApiResponses({
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200",description = "OK, 성공"),
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "USER4001", description = "아이디와 일치하는 사용자가 없습니다.", content = @Content(schema = @Schema(implementation = ApiResponse.class))),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "POST_TYPE4001", description = "지원되지 않는 게시판 타입 입니다.", content = @Content(schema = @Schema(implementation = ApiResponse.class))),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON400", description = "잘못된 요청입니다.", content = @Content(schema = @Schema(implementation = ApiResponse.class))),
     })
     @Parameters({
-            @Parameter(name = "userId", description = "로그인한 유저의 아이디(pk), 로그인 하지 않은 사용자 일 경우 입력하지 않아도 됩니다.", example = "1"),
-            @Parameter(name = "category", description = "커뮤니티 카테고리 이름", example = "인기", required = true)
+            @Parameter(name = "category", description = "커뮤니티 카테고리 이름", example = "POPULAR", required = true)
     })
     @GetMapping("/community")
     public ApiResponse<HomeResponse.PostListDTO> getHomePostsByCategory (@RequestParam(name = "userId", required = false) Long userId,
-                                                                         @RequestParam(name = "category") PostType category){
+                                                                         @RequestParam(name = "category", defaultValue = "POPULAR") PostType category){
         HomeResponse.PostListDTO response = postQueryService.findHomePostsByCategory(userId, category);
         return ApiResponse.onSuccess(response);
     }
@@ -50,18 +48,14 @@ public class HomeController {
     // 홈 화면 - 인기 칼럼 조회
     @Operation(
             summary = "홈 화면 인기 칼럼 조회 API",
-            description = "홈 화면에서 인기 칼럼 게시글 목록을 조회합니다. 로그인 한 사용자의 경우에는 유저 아이디를 쿼리 스트링으로 입력해 주세요."
+            description = "홈 화면에서 인기 칼럼 게시글 목록을 조회합니다."
     )
     @ApiResponses({
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200",description = "OK, 성공"),
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "USER4001", description = "아이디와 일치하는 사용자가 없습니다.", content = @Content(schema = @Schema(implementation = ApiResponse.class))),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON400", description = "잘못된 요청입니다.", content = @Content(schema = @Schema(implementation = ApiResponse.class))),
     })
-    @Parameters({
-            @Parameter(name = "userId", description = "로그인한 유저의 아이디(pk), 로그인 하지 않은 사용자 일 경우 입력하지 않아도 됩니다.", example = "1"),
-    })
     @GetMapping("/popular")
-    public ApiResponse<HomeResponse.PopularPostListDTO> getHomePopularPosts (@RequestParam(name = "userId", required = false) Long userId){
+    public ApiResponse<HomeResponse.PopularPostListDTO> getHomePopularPosts (){
         HomeResponse.PopularPostListDTO response = HomeResponse.PopularPostListDTO.builder().build();;
         return ApiResponse.onSuccess(response);
     }

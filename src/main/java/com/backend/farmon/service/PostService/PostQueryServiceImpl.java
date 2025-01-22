@@ -48,7 +48,7 @@ public class PostQueryServiceImpl implements PostQueryService {
 
         // 카테고리별 게시글 조회
         PostFetchStrategy strategy = strategyFactory.getStrategy(category);
-        List<Post> postList = strategy.fetchPosts();
+        List<Post> postList = strategy.fetchPosts(category);
         log.info("홈 화면 카테고리별 게시글 조회 성공, userId: {}", userId);
 
         // 각 게시물의 좋아요 개수 조회

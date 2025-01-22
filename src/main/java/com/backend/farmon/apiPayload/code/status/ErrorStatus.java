@@ -34,7 +34,10 @@ public enum ErrorStatus implements BaseErrorCode {
     PAGE_NOT_FOUND(HttpStatus.BAD_REQUEST, "PAGE4001", "페이지 번호는 1 이상이어야 합니다."),
 
     // 회원가입 에러
-    EMAIL_ALREADY_EXIST(HttpStatus.BAD_REQUEST, "PAGE4001", "이미 가입된 이메일주소입니다.");
+    EMAIL_ALREADY_EXIST(HttpStatus.BAD_REQUEST, "PAGE4001", "이미 가입된 이메일주소입니다."),
+
+    // 커뮤니티 게시판
+    POST_TYPE_NOT_FOUND(HttpStatus.BAD_REQUEST, "POST_TYPE4001", "지원되지 않는 게시판 타입 입니다.");
 
     private final HttpStatus httpStatus;
     private final String code;

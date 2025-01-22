@@ -1,6 +1,7 @@
 package com.backend.farmon.repository.PostRepository;
 
 import com.backend.farmon.domain.Post;
+import com.backend.farmon.dto.post.PostType;
 
 import java.util.List;
 
@@ -10,4 +11,7 @@ public interface PostRepositoryCustom {
 
     // 커뮤니티 인기 게시글 3개 조회
     public List<Post> findTop3PostsByLikes();
+
+    // 커뮤니티 카테고리별 게시글 3개 조회
+    public List<Post> findTop3PostsByPostTYpe(PostType postType);
 }
