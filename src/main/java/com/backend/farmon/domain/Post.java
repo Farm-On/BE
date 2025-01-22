@@ -48,7 +48,7 @@ public class Post extends BaseEntity {
 
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL,orphanRemoval = true)
     @JsonManagedReference
-    private List<Img> postImgs = new ArrayList<>();
+    private List<PostImg> postImgs = new ArrayList<>();
 
     public void addLike(User user) {
         LikeCount likeCount = new LikeCount(this, user);

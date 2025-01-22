@@ -1,5 +1,6 @@
 package com.backend.farmon.domain;
 
+import com.backend.farmon.domain.commons.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -12,7 +13,7 @@ import java.util.List;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Board {
+public class Board extends BaseEntity {
     //게시판 이름
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

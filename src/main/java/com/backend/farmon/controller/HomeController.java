@@ -2,6 +2,8 @@ package com.backend.farmon.controller;
 
 import com.backend.farmon.apiPayload.ApiResponse;
 import com.backend.farmon.dto.home.HomeResponse;
+import com.backend.farmon.dto.post.PostType;
+import com.backend.farmon.service.PostService.PostQueryService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
@@ -19,6 +21,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/home")
 public class HomeController {
+    private final PostQueryService postQueryService;
 
     // 홈 화면 - 커뮤니티 게시글 조회
     @Operation(
@@ -37,9 +40,9 @@ public class HomeController {
             @Parameter(name = "category", description = "커뮤니티 카테고리 이름", example = "인기", required = true)
     })
     @GetMapping("/community")
-    public ApiResponse<HomeResponse.PostListDTO> getHomePosts (@RequestParam(name = "userId", required = false) Long userId,
-                                                               @RequestParam(name = "category") String category){
-        HomeResponse.PostListDTO response = HomeResponse.PostListDTO.builder().build();;
+    public ApiResponse<HomeResponse.PostListDTO> getHomePostsByCategory (@RequestParam(name = "userId", required = false) Long userId,
+                                                                         @RequestParam(name = "category") PostType category){
+        HomeResponse.PostListDTO response = postQueryService.findHomePostsByCategory(userId, category);
         return ApiResponse.onSuccess(response);
     }
 
@@ -58,7 +61,7 @@ public class HomeController {
             @Parameter(name = "userId", description = "로그인한 유저의 아이디(pk), 로그인 하지 않은 사용자 일 경우 입력하지 않아도 됩니다.", example = "1"),
     })
     @GetMapping("/popular")
-    public ApiResponse<HomeResponse.PopularPostListDTO> getPopularPosts (@RequestParam(name = "userId", required = false) Long userId){
+    public ApiResponse<HomeResponse.PopularPostListDTO> getHomePopularPosts (@RequestParam(name = "userId", required = false) Long userId){
         HomeResponse.PopularPostListDTO response = HomeResponse.PopularPostListDTO.builder().build();;
         return ApiResponse.onSuccess(response);
     }
