@@ -7,6 +7,6 @@ import lombok.*;
 @Getter
 @Setter
 public class LoginResponseDTO {
-    private String userId;
-    private String role;
+    private Long userId;
+    private String token;
 }
