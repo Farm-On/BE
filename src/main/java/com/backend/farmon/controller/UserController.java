@@ -76,8 +76,6 @@ public class UserController {
                                                          HttpServletRequest request) {
         // JWTUtil을 통해 토큰 추출
         String token = jwtUtil.extractTokenFromRequest(request);
-        log.info("Extracted Token: {}", token);
-
         ExchangeResponse response = userQueryService.exchangeRole(userId, role, token);
 
         return ApiResponse.onSuccess(response);

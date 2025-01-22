@@ -5,6 +5,7 @@ import com.backend.farmon.domain.QBoard;
 import com.backend.farmon.domain.QLikeCount;
 import com.backend.farmon.domain.QPost;
 import com.backend.farmon.dto.post.PostType;
+import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
@@ -32,7 +33,7 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
     @Override
     public List<Post> findTop3PostsByLikes() {
         return queryFactory.selectFrom(post)
-                .leftJoin(post.postlikes, likeCount)
+                .join(post.postlikes, likeCount).fetchJoin()
                 .groupBy(post)
                 .orderBy(likeCount.count().desc(), post.createdAt.desc())
                 .limit(3)
@@ -45,7 +46,8 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
         return queryFactory.selectFrom(post)
                 .join(post.board, board).fetchJoin() // Post와 Board를 조인
                 .where(board.postType.eq(postType)) // PostType으로 필터링
-                .orderBy(post.createdAt.desc()) // 최신순 정렬
+                .groupBy(post)
+                .orderBy(likeCount.count().desc(), post.createdAt.desc())
                 .limit(3) // 3개 제한
                 .fetch();
     }

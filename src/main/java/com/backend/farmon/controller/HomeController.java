@@ -47,7 +47,7 @@ public class HomeController {
     // 홈 화면 - 인기 칼럼 조회
     @Operation(
             summary = "홈 화면 인기 칼럼 조회 API",
-            description = "홈 화면에서 인기 칼럼 게시글 목록을 조회합니다."
+            description = "홈 화면에서 인기 칼럼 게시글 목록을 6개 조회합니다."
     )
     @ApiResponses({
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200",description = "OK, 성공"),
