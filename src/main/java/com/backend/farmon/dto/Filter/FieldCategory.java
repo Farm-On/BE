@@ -8,7 +8,6 @@ public enum FieldCategory {
     GRAIN("곡물"),
     VEGETABLE("채소"),
     FRUIT("과일"),
-    LIVESTOCK("축산"),
     SPECIAL_CROP("특용"),
     FLOWER("화훼"),
     FEED("사료"),

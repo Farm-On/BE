@@ -19,6 +19,7 @@ import java.util.List;
 
 @Entity
 @Getter
+@Setter
 @DynamicUpdate
 @DynamicInsert
 @Builder
@@ -57,13 +58,7 @@ public class User extends BaseEntity {
     @Column(nullable = false, columnDefinition = "VARCHAR(15) DEFAULT 'ACTIVE'")
     private MemberStatus status;
 
-    private String profileImageUrl;
-
     private String chatAverageResponseTime; // 채팅 평균 응답 시간
-
-    @Column(nullable = false)
-    @ColumnDefault("false")
-    private Boolean isPhoneVerified; // 휴대폰 본인인증 여부
 
     private LocalDate inactiveDate;  // 탈퇴일
 
@@ -82,12 +77,11 @@ public class User extends BaseEntity {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<LikeCount> likeList = new ArrayList<>();  // 좋아요 양방향 매핑
 
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Answer> answerList = new ArrayList<>();
+
     public void encodePassword(String password) {
         this.password = password;
-    }
-
-    public void updateRole(Role role) { // 멤버 상태 변경 ex)전문가 전환
-        this.role = role;
     }
 
     public void updateStatus(MemberStatus status) { // 멤버 상태 변경 ex)계정 비활성화

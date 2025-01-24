@@ -6,19 +6,17 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 
 @Table(name = "Like_count")
 @Entity
 @Getter
 @Setter
-public class LikeCount {
+public class LikeCount extends BaseEntity {
 
     // update가 필요한가?
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
 

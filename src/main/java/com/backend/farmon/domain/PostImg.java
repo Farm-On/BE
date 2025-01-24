@@ -1,5 +1,6 @@
 package com.backend.farmon.domain;
 
+import com.backend.farmon.domain.commons.BaseEntity;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
         import lombok.*;
@@ -11,7 +12,7 @@ import jakarta.persistence.*;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class PostImg {
+public class PostImg extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name="img_id")
