@@ -2,6 +2,7 @@ package com.backend.farmon.domain;
 
 import com.backend.farmon.domain.commons.BaseEntity;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
@@ -12,6 +13,7 @@ import java.time.LocalDateTime;
 @Entity
 @Getter
 @Setter
+@AllArgsConstructor
 @Builder
 public class LikeCount extends BaseEntity {
 
