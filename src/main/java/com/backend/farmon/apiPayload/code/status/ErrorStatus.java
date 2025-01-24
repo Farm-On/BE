@@ -19,6 +19,7 @@ public enum ErrorStatus implements BaseErrorCode {
     // 유저 관려 에러
     USER_NOT_FOUND(HttpStatus.BAD_REQUEST, "USER4001", "아이디와 일치하는 사용자가 없습니다."),
     NICKNAME_NOT_EXIST(HttpStatus.BAD_REQUEST, "USER4002", "닉네임은 필수 입니다."),
+    EXCHANGE_ROLE_SAME(HttpStatus.BAD_REQUEST, "USER4003", "전환하려는 역할과 현재 로그인한 역할이 일치합니다."),
 
     // 전문가 관련 에러
     EXPERT_NOT_FOUND(HttpStatus.BAD_REQUEST, "EXPERT4001", "아이디와 일치하는 전문가가 없습니다."),
@@ -37,7 +38,10 @@ public enum ErrorStatus implements BaseErrorCode {
     EMAIL_ALREADY_EXIST(HttpStatus.BAD_REQUEST, "PAGE4001", "이미 가입된 이메일주소입니다."),
 
     // 커뮤니티 게시판
-    POST_TYPE_NOT_FOUND(HttpStatus.BAD_REQUEST, "POST_TYPE4001", "지원되지 않는 게시판 타입 입니다.");
+    POST_TYPE_NOT_FOUND(HttpStatus.BAD_REQUEST, "POST_TYPE4001", "지원되지 않는 게시판 타입 입니다."),
+
+    // 사용자 인증 정보
+    AUTHORIZATION_NOT_EQUALS(HttpStatus.FORBIDDEN, "AUTHORIZATION_4031", "인증된 사용자 정보와 요청된 리소스의 사용자 정보가 다릅니다. (userId 불일치)");
 
     private final HttpStatus httpStatus;
     private final String code;

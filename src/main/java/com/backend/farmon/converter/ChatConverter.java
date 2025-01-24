@@ -94,7 +94,7 @@ public class ChatConverter {
     }
 
     public static ChatResponse.ChatRoomDetailDTO toChatRoomDetailDTO(
-            ChatRoom chatRoom, ChatMessage chatMessage, Boolean isExpert, Integer unReadMessageCount) {
+            ChatRoom chatRoom, ChatMessage chatMessage, Area area, Boolean isExpert, Integer unReadMessageCount) {
 
         User user = isExpert
                 ? chatRoom.getExpert().getUser()
@@ -106,7 +106,8 @@ public class ChatConverter {
 //                .profileImage(user.getProfileImageUrl())
                 .estimateBudget(chatRoom.getEstimate().getBudget())
                 .estimateCategory(chatRoom.getEstimate().getCategory())
-                //.estimateAddress(chatRoom.getEstimate().getAddress())
+                .areaName(area.getAreaName())
+                .areaName(area.getAreaNameDetail())
                 .unreadMessageCount(unReadMessageCount)
                 .lastMessageContent(chatMessage != null ? chatMessage.getContent() : null) // null-safe 처리
                 .lastMessageDate(chatMessage != null ? ConvertTime.convertToYearMonthDay(chatMessage.getCreatedAt()) : null) // null-safe 처리
@@ -114,14 +115,18 @@ public class ChatConverter {
     }
 
     public static ChatResponse.ChatRoomEstimateDTO toChatRoomEstimateDTO(Estimate estimate, List<EstimateImage> estimateImageList){
+        // 견적과 연관된 지역
+        Area area = estimate.getArea();
+
         return ChatResponse.ChatRoomEstimateDTO.builder()
                 .cropCategory(estimate.getCrop().getCategory())
                 .cropName(estimate.getCrop().getName())
                 .applyName(estimate.getUser().getUserName())
                 .estimateCategory(estimate.getCategory())
-                //.address(estimate.getAddress())
+                .areaName(area.getAreaName())
+                .areaName(area.getAreaNameDetail())
                 .budget(estimate.getBudget())
-                .content(estimate.getBody())
+                .estimateContent(estimate.getBody())
                 // map을 사용하여 imageUrl 리스트로 변환
                 .estimateImageList(
                         estimateImageList.stream()

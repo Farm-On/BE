@@ -54,8 +54,11 @@ public class ChatResponse {
         @Schema(description = "신청 견적 종류", example = "스마트팜")
         String estimateCategory;
 
-        @Schema(description = "신청 견적 주소", example = "경기 이천시 마장면")
-        String estimateAddress;
+        @Schema(description = "신청 견적 주소", example = "경기")
+        String areaName;
+
+        @Schema(description = "신청 견적 주소 디테일", example = "이천시")
+        String areaDetail;
 
         @Schema(description = "안 읽은 채팅 개수", example = "3")
         Integer unreadMessageCount;
@@ -178,10 +181,10 @@ public class ChatResponse {
     @Builder
     @Schema(description = "채팅방 견적 응답 정보")
     public static class ChatRoomEstimateDTO {
-        @Schema(description = "작물 카테고리", example = "곡물, 채소작물, 과일 등")
+        @Schema(description = "견적 작물 카테고리", example = "곡물, 채소작물, 과일 등")
         String cropCategory;
 
-        @Schema(description = "작물 이름", example = "쌀, 고구마, 사과 등")
+        @Schema(description = "견적 작물 이름", example = "쌀, 고구마, 사과 등")
         String cropName;
 
         @Schema(description = "견적 신청자")
@@ -190,14 +193,17 @@ public class ChatResponse {
         @Schema(description = "견적 카테고리", example = "작물 관리, 스마트팜 등")
         String estimateCategory;
 
-        @Schema(description = "견적 주소", example = "서울 강동구")
-        String address;
+        @Schema(description = "신청 견적 주소", example = "경기")
+        String areaName;
+
+        @Schema(description = "신청 견적 주소 디테일", example = "이천시")
+        String areaDetail;
 
         @Schema(description = "견적 예산", example = "50만원 ~ 100만원")
         String budget;
 
         @Schema(description = "컨설팅 내용")
-        String content;
+        String estimateContent;
 
         @Schema(description = "견적 이미지 리스트")
         List<String> estimateImageList;
