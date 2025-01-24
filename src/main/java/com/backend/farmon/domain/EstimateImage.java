@@ -23,6 +23,6 @@ public class EstimateImage extends BaseEntity {
     private String imageUrl;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "estimate_id")
+    @JoinColumn(name = "estimate_id", nullable = false)
     private Estimate estimate;
 }

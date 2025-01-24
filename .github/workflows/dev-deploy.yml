@@ -81,5 +81,12 @@ jobs:
               exit 1
             fi
             
+            # Connect All Running Containers to app-network
+            if [ "$(sudo docker ps -q)" ]; then
+              for container_id in $(sudo docker ps -q); do
+                sudo docker network connect app-network $container_id || echo "Container $container_id is already connected to app-network"
+              done
+            fi
+            
             # Clean Up Unused Docker Images
             sudo docker image prune -f

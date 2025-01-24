@@ -31,7 +31,8 @@ public class SwaggerConfig {
                         .bearerFormat("JWT"));
 
         return new OpenAPI()
-                .addServersItem(new Server().url("http://localhost:8080")) // 서버 URL 설정
+                .addServersItem(new Server().url("http://localhost:8080")) // 로컬 서버 URL 설정
+                .addServersItem(new Server().url("http://43.201.137.131:8080")) // 배포된 서버 URL
                 .info(info)
                 .addSecurityItem(securityRequirement)
                 .components(components);

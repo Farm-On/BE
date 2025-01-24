@@ -1,26 +1,28 @@
-package com.backend.farmon.domain.mapping;
+package com.backend.farmon.domain;
 
-import com.backend.farmon.domain.Crop;
-import com.backend.farmon.domain.Expert;
 import com.backend.farmon.domain.commons.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.DynamicInsert;
+import org.hibernate.annotations.DynamicUpdate;
 
 @Entity
 @Getter
+@Setter
+@DynamicUpdate
+@DynamicInsert
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-public class ExpertCrop extends BaseEntity {
+public class ExpertDatail extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(nullable = false)
+    private String detailContent;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "expert_id")
     private Expert expert;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "crop_id")
-    private Crop crop;  // 작물 양방향 매핑
 }

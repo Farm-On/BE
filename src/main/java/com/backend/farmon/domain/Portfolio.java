@@ -11,6 +11,7 @@ import java.util.List;
 
 @Entity
 @Getter
+@Setter
 @DynamicUpdate
 @DynamicInsert
 @Builder
@@ -24,11 +25,11 @@ public class Portfolio extends BaseEntity {
     @Column(nullable = false)
     private String title;
 
+    @Column(nullable = false)
     private String thumbnailImg;
 
-    // 나중에 카테고리 테이블이랑 매핑하는 방식으로 수정될 수도 있음
     @Column(nullable = false)
-    private String serviceCategory;
+    private String text;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "expert_id")
