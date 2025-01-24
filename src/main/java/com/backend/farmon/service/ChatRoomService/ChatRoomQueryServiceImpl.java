@@ -7,6 +7,7 @@ import com.backend.farmon.apiPayload.exception.handler.UserHandler;
 import com.backend.farmon.config.security.UserAuthorizationUtil;
 import com.backend.farmon.converter.ChatConverter;
 import com.backend.farmon.domain.*;
+import com.backend.farmon.domain.enums.Role;
 import com.backend.farmon.dto.chat.ChatResponse;
 import com.backend.farmon.repository.ChatMessageRepository.ChatMessageRepository;
 import com.backend.farmon.repository.ChatRoomReposiotry.ChatRoomRepository;
@@ -57,7 +58,7 @@ public class ChatRoomQueryServiceImpl implements ChatRoomQueryService {
         // 채팅 대화방 세부 정보 목록 생성
         List<ChatResponse.ChatRoomDetailDTO> chatRoomInfoList = chatRoomPage.stream().map(chatRoom -> {
             // 전문가 여부
-            boolean isExpert = userAuthorizationUtil.getCurrentUserRole().equals("EXPERT");
+            boolean isExpert = userAuthorizationUtil.isCurrentUserRoleMatching(Role.EXPERT.toString());
 
             // 안 읽은 채팅 메시지 개수 조회
             int unReadMessageCount = chatMessageRepository.findByChatRoomIdAndIsReadFalse(chatRoom.getId()).size();
