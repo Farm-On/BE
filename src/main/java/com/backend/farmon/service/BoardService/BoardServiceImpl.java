@@ -43,10 +43,10 @@ public class BoardServiceImpl implements BoardService {
         User user =userRepository.findById(postDto.getUserId())
                 .orElseThrow(()->new GeneralException(ErrorStatus.USER_NOT_FOUND));
         Board board=boardRepository.findById(postDto.getBoardId())
-                .orElseThrow(()->new GeneralException(ErrorStatus.BOARD_NOT_FOUND));
+                .orElseThrow(()->new GeneralException(ErrorStatus.POST_NOT_FOUND));
 
         if(board.getPostType() != PostType.ALL){
-            throw new GeneralException(ErrorStatus.BOARD_NOT_FOUND);
+            throw new GeneralException(ErrorStatus.POST_NOT_FOUND);
         }
 
         Post post = createPostByBoardType(postDto, user, board);
@@ -66,10 +66,10 @@ public class BoardServiceImpl implements BoardService {
         User user =userRepository.findById(postDto.getUserId())
                 .orElseThrow(()->new GeneralException(ErrorStatus.USER_NOT_FOUND));
         Board board=boardRepository.findById(postDto.getBoardId())
-                .orElseThrow(()->new GeneralException(ErrorStatus.BOARD_NOT_FOUND));
+                .orElseThrow(()->new GeneralException(ErrorStatus.POST_NOT_FOUND));
 
         if(board.getPostType() != PostType.ALL){
-            throw new GeneralException(ErrorStatus.BOARD_NOT_FOUND);
+            throw new GeneralException(ErrorStatus.POST_NOT_FOUND);
         }
 
         Post post = createPostByBoardType(postDto, user, board);
@@ -88,10 +88,10 @@ public class BoardServiceImpl implements BoardService {
         User user =userRepository.findById(postDto.getUserId())
                 .orElseThrow(()->new GeneralException(ErrorStatus.USER_NOT_FOUND));
         Board board=boardRepository.findById(postDto.getBoardId())
-                .orElseThrow(()->new GeneralException(ErrorStatus.BOARD_NOT_FOUND));
+                .orElseThrow(()->new GeneralException(ErrorStatus.POST_NOT_FOUND));
 
         if(board.getPostType() != PostType.ALL){
-            throw new GeneralException(ErrorStatus.BOARD_NOT_FOUND);
+            throw new GeneralException(ErrorStatus.POST_NOT_FOUND);
         }
 
         Post post = createPostByBoardType(postDto, user, board);
@@ -111,10 +111,10 @@ public class BoardServiceImpl implements BoardService {
         User user =userRepository.findById(postDto.getUserId())
                 .orElseThrow(()->new GeneralException(ErrorStatus.USER_NOT_FOUND));
         Board board=boardRepository.findById(postDto.getBoardId())
-                .orElseThrow(()->new GeneralException(ErrorStatus.BOARD_NOT_FOUND));
+                .orElseThrow(()->new GeneralException(ErrorStatus.POST_NOT_FOUND));
 
         if(board.getPostType() != PostType.ALL){
-            throw new GeneralException(ErrorStatus.BOARD_NOT_FOUND);
+            throw new GeneralException(ErrorStatus.POST_NOT_FOUND);
         }
 
         Post post = createPostByBoardType(postDto, user, board);
@@ -135,10 +135,10 @@ public class BoardServiceImpl implements BoardService {
         User user =userRepository.findById(postDto.getUserId())
                 .orElseThrow(()->new GeneralException(ErrorStatus.USER_NOT_FOUND));
         Board board=boardRepository.findById(postDto.getBoardId())
-                .orElseThrow(()->new GeneralException(ErrorStatus.BOARD_NOT_FOUND));
+                .orElseThrow(()->new GeneralException(ErrorStatus.POST_NOT_FOUND));
 
         if(board.getPostType() != PostType.ALL){
-            throw new GeneralException(ErrorStatus.BOARD_NOT_FOUND);
+            throw new GeneralException(ErrorStatus.POST_NOT_FOUND);
         }
 
         Post post = createPostByBoardType(postDto, user, board);

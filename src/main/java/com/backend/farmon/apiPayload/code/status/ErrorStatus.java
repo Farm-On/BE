@@ -37,10 +37,19 @@ public enum ErrorStatus implements BaseErrorCode {
     EMAIL_ALREADY_EXIST(HttpStatus.BAD_REQUEST, "PAGE4001", "이미 가입된 이메일주소입니다."),
 
     // 커뮤니티 게시판
-    POST_TYPE_NOT_FOUND(HttpStatus.BAD_REQUEST, "POST_TYPE4001", "지원되지 않는 게시판 타입 입니다."),
-    POST_NOT_FOUND(HttpStatus.BAD_REQUEST, "POST_TYPE4002", "지원되지 않는 게시판입니다."),
-    BOARD_NOT_FOUND(HttpStatus.BAD_REQUEST, "POST_TYPE4003", "게시판을 찾을수 없습니다. ")
+    POST_TYPE_NOT_FOUND(HttpStatus.BAD_REQUEST, "POST_TYPE4001", "게시글을 찾을 수 없습니다"),
+    POST_NOT_SAVED(HttpStatus.BAD_REQUEST, "POST_TYPE4002", "게시글이 저장되지 않았습니다."),
+    POST_NOT_FOUND(HttpStatus.BAD_REQUEST, "POST_TYPE4003", "게시글을 찾을 수 없습니다."),
 
+    //댓글
+    COMMENT_TYPE_NOT_FOUND(HttpStatus.BAD_REQUEST, "COMMENT_TYPE4001", "댓글을 찾을 수 없습니다."),
+    COMMENT_NOT_SAVED(HttpStatus.BAD_REQUEST, "COMMENT_TYPE4002", "댓글(대댓글)이 저장되지 않았습니다."),
+    COMMENT_NOT_DELETED(HttpStatus.BAD_REQUEST, "COMMENT_TYPE4003", "댓글이 삭제되지 않았습니다."),
+
+    //좋아요
+    Like_TYPE_NOT_SAVED(HttpStatus.BAD_REQUEST, "LIKE_TYPE4001", "좋아요가 눌리지 않았습니다."),
+
+    //
     ;
 
     private final HttpStatus httpStatus;

@@ -4,6 +4,8 @@ import com.backend.farmon.apiPayload.ApiResponse;
 import com.backend.farmon.dto.like.LikeRequestDTO;
 import com.backend.farmon.dto.like.LikeResponseDTO;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.stereotype.Controller;
@@ -20,7 +22,8 @@ public class LikeController {
      */
     @Operation(summary = "좋아요 추가", description = "사용자가 특정 게시글에 좋아요를 추가합니다.")
     @ApiResponses({
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "OK, 성공")
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200", description = "OK, 성공"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "LIKE_TYPE4001", description = "좋아요를 누를 수 없습니다.", content = @Content(schema = @Schema(implementation = ApiResponse.class)))
     })
     @PostMapping
     public ApiResponse<LikeResponseDTO> addLike(
@@ -45,8 +48,8 @@ public class LikeController {
      */
 
     @Operation(summary = "좋아요 삭제", description = "사용자가 특정 게시글의 좋아요를 취소합니다.")
-    @ApiResponses({
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "OK, 성공")
+    @ApiResponses({            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200", description = "OK, 성공"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "LIKE_TYPE4001", description = "좋아요를 누를 수 없습니다.", content = @Content(schema = @Schema(implementation = ApiResponse.class)))
     })
     @DeleteMapping
     public ApiResponse<Integer> removeLike(

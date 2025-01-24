@@ -7,6 +7,8 @@ import com.backend.farmon.dto.Comment.CommentRequestDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -24,7 +26,9 @@ public class CommentController {
 
     @Operation(summary = "댓글 저장", description = "사용자가 그냥 부모 댓글(댓글)을 저장합니다.")
     @ApiResponses({
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "OK, 성공")
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200", description = "OK, 성공"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMENT_TYPE4002", description = "댓글(대댓글)을 저장할 수 없습니다.", content = @Content(schema = @Schema(implementation = ApiResponse.class)))
+
     })
     @Parameters({
             @Parameter(name = "postId", description = "게시물 작성한 사람 ID", required = true),
@@ -40,7 +44,8 @@ public class CommentController {
 
     @Operation(summary = "대댓글 저장", description = "사용자가 대댓글을 저장합니다..")
     @ApiResponses({
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "OK, 성공")
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200", description = "OK, 성공"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMENT_TYPE4002", description = "댓글(대댓글)을 저장할 수 없습니다.", content = @Content(schema = @Schema(implementation = ApiResponse.class)))
     })
     @Parameters({
             @Parameter(name = "postId", description = "게시물 작성한 사람 ID", required = true),
@@ -54,56 +59,14 @@ public class CommentController {
         return ApiResponse.onSuccess(resultcode);
     }
 
-
-
-
-
-    ///// 조회
-
-    @Operation(summary = "부모 댓글 조회", description = "사용자가 댓글(부모 댓글)을 조회합니다..")
-
-    @ApiResponses({
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "OK, 성공")
-            })
-    @Parameters({
-            @Parameter(name = "postId", description = "게시물 작성한 사람 ID", required = true),
-            })
-    @GetMapping
-    public ApiResponse<CommenResponseDTO.CommentParentReadResponseDto> getParentComments(@PathVariable String postId) {
-
-        CommenResponseDTO.CommentParentReadResponseDto dto=  CommenResponseDTO.CommentParentReadResponseDto.builder().build();
-
-        return ApiResponse.onSuccess(dto);
-    }
-
-
-
-    @Operation(summary = "특정 댓글의 대댓글(자식 댓글) 조회", description = "사용자가 부모 댓글의 대댓글(자식 댓글) 조회합니다..")
-
-    @ApiResponses({
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "OK, 성공")
-    })
-    @Parameters({
-            @Parameter(name = "postId", description = "게시물 작성한 사람 ID", required = true),
-            @Parameter(name = "commentNo", description = "부모댓글 번호", required = true),
-    })
-    @GetMapping("/{commentNo}/children")
-    public ApiResponse <CommenResponseDTO.CommentChildReadResponseDto> getChild (@PathVariable Long postId, @PathVariable Long commentNo) {
-
-        CommenResponseDTO.CommentChildReadResponseDto dto=  CommenResponseDTO.CommentChildReadResponseDto.builder().build();
-
-        return ApiResponse.onSuccess(dto);
-    }
-
-
-
     /**
      * 게시글의 모든 댓글 조회 (부모 + 자식 모두)
      */
     @Operation(summary = "게시글의 모든 댓글 조회", description = "사용자가 게시글의 모든 댓글 조회합니다..")
 
     @ApiResponses({
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "OK, 성공")
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200", description = "OK, 성공"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMENT_TYPE4001", description = "댓글을 찾을 수 없습니다.", content = @Content(schema = @Schema(implementation = ApiResponse.class)))
     })
     @Parameters({
             @Parameter(name = "postId", description = "게시물 작성한 사람 ID", required = true),
@@ -120,62 +83,23 @@ public class CommentController {
     }
 
 
-    @Operation(summary = "게시글의 부모 댓글(댓글) 수정", description = "사용자가 게시글의 부모 댓글 수정합니다..")
-
-    @ApiResponses({
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "OK, 성공")
-    })
-    @Parameters({
-            @Parameter(name = "postId", description = "게시물 작성한 사람 ID", required = true),
-            @Parameter(name = "commentNo", description = "부모댓글번호", required = true),
-            @Parameter(name = "CommentUpdateRequestDto", description = "댓글내용 수정", required = true),
-    })
-    @PutMapping("/{commentNo}")
-    public ApiResponse<CommenResponseDTO.CommentParentReadResponseDto> updateComment(@PathVariable Long postId,@PathVariable Long commentNo, @RequestBody @Valid CommentRequestDTO.CommentUpdateRequestDto request) {
-        CommenResponseDTO.CommentParentReadResponseDto dto=  CommenResponseDTO.CommentParentReadResponseDto.builder().build();
-
-        return ApiResponse.onSuccess(dto);
-    }
 
 
-
-
-    @Operation(summary = "게시글의 대댓글  수정", description = "사용자가 게시글의 대댓글 수정합니다..")
-
-    @ApiResponses({
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "OK, 성공")
-    })
-    @Parameters({
-            @Parameter(name = "postId", description = "게시물 작성한 사람 ID", required = true),
-            @Parameter(name = "commentNo", description = "부모댓글 번호", required = true),
-            @Parameter(name = "ChildNo", description = "대 댓글 번호", required = true),
-            @Parameter(name = "CommentUpdateRequestDto", description = "댓글내용 수정", required = true),
-
-    })
-    @PutMapping("/{commentNo}/children/{ChildNo}")
-    public ApiResponse updateChildComment(@PathVariable Long postId, @PathVariable Long commentNo,@PathVariable Long ChildNo,
-                                          @RequestBody @Valid CommentRequestDTO.CommentUpdateRequestDto request) {
-
-        CommenResponseDTO.CommentChildReadResponseDto dto=  CommenResponseDTO.CommentChildReadResponseDto.builder().build();
-
-        return ApiResponse.onSuccess(dto);
-    }
-
-
-    @Operation(summary = "게시글의 댓글  전부 삭제", description = "댓글 전부 삭제 API")
-
-    @ApiResponses({
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "OK, 성공")
-    })
-    @Parameters({
-            @Parameter(name = "postId", description = "게시물 작성한 사람 ID", required = true),
-            @Parameter(name = "commentNo", description = "부모댓글 번호", required = true),
-    })
     /**
      * 댓글 삭제 (댓글과 대댓글 모두 포함) 부모댓글 삭제 만 포함시켰음
      */
+    @Operation(summary = "게시글의 댓글  전부 삭제", description = "댓글 전부 삭제 API")
+
+    @ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200", description = "OK, 성공"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMENT_TYPE4003", description = "댓글을 지울 수 없습니다.", content = @Content(schema = @Schema(implementation = ApiResponse.class)))
+    })
+    @Parameters({
+            @Parameter(name = "postId", description = "게시물 작성한 사람 ID", required = true),
+            @Parameter(name = "commentId", description = "부모댓글 번호", required = true),
+    })
     @DeleteMapping("/{commentNo}")
-    public ApiResponse deleteComment(@PathVariable Long postId, @PathVariable Long commentNo) {
+    public ApiResponse deleteComment(@PathVariable Long postId, @PathVariable Long commentId) {
 
         String resultcode = SuccessStatus._OK.getCode();
 
