@@ -5,10 +5,11 @@ import com.backend.farmon.domain.enums.Role;
 import com.backend.farmon.dto.user.ExchangeResponse;
 
 public class UserConverter {
-    public static ExchangeResponse toExchangeResponse(Long userId, Role role, Expert expert) {
+    public static ExchangeResponse toExchangeResponse(Long userId, String role, Expert expert, String token) {
         ExchangeResponse.ExchangeResponseBuilder responseBuilder = ExchangeResponse.builder()
                 .userId(userId)
-                .exchangeRole(role.name());
+                .exchangeRole(role)
+                .token(token);
 
         // 전문가로 등록되어 있는 사용자라면 전문가 아이디도 반환
         if (expert != null) {

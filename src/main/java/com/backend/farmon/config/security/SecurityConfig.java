@@ -39,7 +39,7 @@ public class SecurityConfig { // 애플리케이션의 보안 정책을 정의
 //                        .requestMatchers("/").authenticated()
 
                         // 공용 접근 허용 (누구나 접근 가능)
-                        .requestMatchers("/**","/api/login","/api/user/join","/api/expert/join").permitAll()
+                        .requestMatchers("/**","/api/login","/api/user/join","/api/expert/join", "/api/home/community", "/api/home/popular").permitAll()
                         .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/swagger-ui.html").permitAll() // Swagger 경로 허용
                         .anyRequest().authenticated()
                 )

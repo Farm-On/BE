@@ -9,17 +9,15 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 
-// 전체 게시글 3개씩 조회
+// Q&A, 전문가 칼럼 게시글 3개씩 조회
 @Slf4j
 @RequiredArgsConstructor
 @Component
-public class AllPostFetchStrategy implements PostFetchStrategy {
-
+public class CategoryPostFetchStrategy implements PostFetchStrategy{
     private final PostRepository postRepository;
-
     @Override
     public List<Post> fetchPosts(PostType postType) {
         log.info("홈 화면 {} 게시글 조회", postType.name());
-        return postRepository.findTop3Posts();
+        return postRepository.findTop3PostsByPostTYpe(postType);
     }
 }

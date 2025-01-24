@@ -3,6 +3,7 @@ package com.backend.farmon.config.security;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
 import org.springframework.stereotype.Component;
@@ -64,5 +65,24 @@ public class JWTUtil {
         }catch (Exception e){
             throw new AuthenticationCredentialsNotFoundException("JWT 토큰이 만료되었거나 잘못되었습니다.");
         }
+    }
+
+    // 농업인 - 전문가 전환을 위해 역할이 변경된 새로운 토큰을 생성
+    public String updateRoleInToken(String token, String newRole) {
+        Claims claims = extractAllClaims(token); // 기존 토큰에서 클레임 추출
+        String email = claims.getSubject();     // 기존 이메일
+        Long userId = claims.get("userId", Long.class); // 기존 userId
+
+        // 새 Role로 새로운 토큰 생성
+        return generateToken(email, userId, newRole);
+    }
+
+    // HTTP 요청에서 JWT 토큰 추출
+    public String extractTokenFromRequest(HttpServletRequest request) {
+        String header = request.getHeader("Authorization");
+        if (header != null && header.startsWith("Bearer ")) {
+            return header.substring(7); // "Bearer " 이후의 토큰 반환
+        }
+        throw new AuthenticationCredentialsNotFoundException("JWT 토큰이 요청 헤더에 없습니다.");
     }
 }
