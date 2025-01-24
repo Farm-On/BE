@@ -372,7 +372,7 @@ public class PostController {
             @Parameter(name = "postId", description = "게시글 작성한 사람 Id", required = false)
     })
     @GetMapping("popular/list/{postId}/detail")
-    public ApiResponse<PostResponseDTO.PostSummary> getPopularPostById(@PathVariable  String postId) {
+    public ApiResponse<PostResponseDTO.PostSummary> getPopularPostById(@PathVariable  Long postId) {
 
         // Post 객체를 PostResponseDTO.PostSummary로 변환
         PostResponseDTO.PostSummary postSummary = PostResponseDTO.PostSummary.builder()
@@ -396,7 +396,7 @@ public class PostController {
             @Parameter(name = "postId", description = "게시글 작성한 사람 Id", required = false)
     })
     @GetMapping("all/list/{postId}/detail")
-    public ApiResponse<PostResponseDTO.PostSummary> getAllPostById(@PathVariable String postId) {
+    public ApiResponse<PostResponseDTO.PostSummary> getAllPostById(@PathVariable Long postId) {
 
 
         // Post 객체를 PostResponseDTO.PostSummary로 변환
@@ -421,7 +421,7 @@ public class PostController {
             @Parameter(name = "postId", description = "게시글 작성한 사람 Id", required = false)
     })
     @GetMapping("free/list/{postId}/detail")
-    public ApiResponse<PostResponseDTO.PostSummary> getFreePostById(@PathVariable String postId) {
+    public ApiResponse<PostResponseDTO.PostSummary> getFreePostById(@PathVariable Long postId) {
         // Post 객체를 PostResponseDTO.PostSummary로 변환
         PostResponseDTO.PostSummary postSummary = PostResponseDTO.PostSummary.builder()
                 .build();
@@ -445,7 +445,7 @@ public class PostController {
             @Parameter(name = "postId", description = "게시글 작성한 사람 Id", required = false)
     })
     @GetMapping("qna/list/{postId}/detail")
-    public ApiResponse<PostResponseDTO.PostSummary> getQnaPostById(@PathVariable  String postId) {
+    public ApiResponse<PostResponseDTO.PostSummary> getQnaPostById(@PathVariable  Long postId) {
         // Post 객체를 PostResponseDTO.PostSummary로 변환
         PostResponseDTO.PostSummary postSummary = PostResponseDTO.PostSummary.builder()
                 .build();
@@ -470,7 +470,7 @@ public class PostController {
             @Parameter(name = "postId", description = "게시글 작성한 사람 Id", required = false)
     })
     @GetMapping("expertCol/list/{postId}/detail")
-    public ApiResponse<PostResponseDTO.PostSummary> getExpertColumnPostById(@PathVariable String postId) {
+    public ApiResponse<PostResponseDTO.PostSummary> getExpertColumnPostById(@PathVariable Long postId) {
         // Post 객체를 PostResponseDTO.PostSummary로 변환
         PostResponseDTO.PostSummary postSummary = PostResponseDTO.PostSummary.builder()
                 .build();
