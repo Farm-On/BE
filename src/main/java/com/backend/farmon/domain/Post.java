@@ -5,9 +5,12 @@ import com.backend.farmon.domain.Comment;
 import com.backend.farmon.domain.LikeCount;
 import com.backend.farmon.domain.User;
 import com.backend.farmon.domain.commons.BaseEntity;
+import com.backend.farmon.dto.Filter.FieldCategory;
+import com.backend.farmon.dto.post.PostType;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -18,6 +21,7 @@ import java.util.List;
 @Entity
 @Getter
 @Setter
+@Builder
 public class Post extends BaseEntity {
 
     @Id
@@ -29,7 +33,7 @@ public class Post extends BaseEntity {
 
     private String postContent;
 
-    private int postLike;
+    private PostType postType;
 
     @ManyToOne
     @JoinColumn(name="board_id")
@@ -40,12 +44,20 @@ public class Post extends BaseEntity {
     @JsonBackReference
     private User user;
 
+    private int poslikes;
+
+    @Enumerated(EnumType.STRING)
+    private FieldCategory fieldCategory;
+
+    // 좋아요 순(Qureydsl로 가져오는걸로 가능)
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<LikeCount> postlikes = new ArrayList<>();
 
+    //댓글 갯수 저장
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Comment> comments = new ArrayList<>();
 
+    // 답변 가져오기
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Answer> answers = new ArrayList<>();
 
@@ -53,21 +65,20 @@ public class Post extends BaseEntity {
     @JsonManagedReference
     private List<PostImg> postImgs = new ArrayList<>();
 
+    public Post() {
 
+    }
 
-//
-//    public void addLike(User user) {
-//        LikeCount likeCount = new LikeCount(this, user);
-//        this.postlikes.add(likeCount);
-//    }
-//
-//    public void removeLike(User user) {
-//        this.postlikes.removeIf(like -> like.getUser().equals(user));
-//    }
-//
-//    public int getLikeCount() {
-//        return this.postlikes.size();
-//    }
+    public void increaseLikes() {
+        this.poslikes++;
+    }
 
+    public void decreaseLikes() {
+        this.poslikes--;
+    }
+
+    public int getLikeCount() {
+        return this.postlikes.size();
+    }
 
 }

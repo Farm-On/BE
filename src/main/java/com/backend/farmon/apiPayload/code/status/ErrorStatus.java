@@ -37,7 +37,11 @@ public enum ErrorStatus implements BaseErrorCode {
     EMAIL_ALREADY_EXIST(HttpStatus.BAD_REQUEST, "PAGE4001", "이미 가입된 이메일주소입니다."),
 
     // 커뮤니티 게시판
-    POST_TYPE_NOT_FOUND(HttpStatus.BAD_REQUEST, "POST_TYPE4001", "지원되지 않는 게시판 타입 입니다.");
+    POST_TYPE_NOT_FOUND(HttpStatus.BAD_REQUEST, "POST_TYPE4001", "지원되지 않는 게시판 타입 입니다."),
+    POST_NOT_FOUND(HttpStatus.BAD_REQUEST, "POST_TYPE4001", "지원되지 않는 게시판입니다."),
+    BOARD_NOT_FOUND(HttpStatus.BAD_REQUEST, "POST_TYPE4001", "게시판을 찾을수 없습니다. ")
+
+    ;
 
     private final HttpStatus httpStatus;
     private final String code;

@@ -22,7 +22,7 @@ public class LikeServiceImpl {
     private final LikeCountRepository likeCountRepository;
 
 
-    // 좋아요 추가하는 로직
+    // 좋아요 추가
     @Transactional
     public void postLikeUp(Long userId, Long postId) throws IllegalAccessException {
         User user = userRepository.findById(userId)
@@ -45,7 +45,7 @@ public class LikeServiceImpl {
         postRepository.save(post);
     }
 
-    // 좋아요 취소 로직
+    // 좋아요 감소
     @Transactional
     public void postLikeDown(Long userId, Long postId) throws IllegalAccessException {
         User user = userRepository.findById(userId)

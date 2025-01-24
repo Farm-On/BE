@@ -73,7 +73,7 @@ public class S3Service {
         img.changePost(post); // 게시글과 연결
         return img;
     }
-
+// Amazon S3에서 다운로드 가능한 URL로 변환해 반환합니다. 반환된 URL을 통해 사용자는 이미지를 직접 다운로드할 수 있습니다.
     public List<ResponseEntity<UrlResource>> downloadImg(Long postId) {
         // boardId에 해당하는 게시글이 없으면 null return
         Post post = postRepository.findById(postId).orElseThrow(()->new RuntimeException("게시글이 확인되지 않습니다."));

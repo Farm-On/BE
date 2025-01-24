@@ -25,13 +25,11 @@ public class BoardRequestDto {
         private String postContent; // 게시글 내용
 
         @Schema(description = "작성자 ID (userNo)", example = "12345")
-        private Long userNo;        // 작성자 ID (userNo)
+        private Long userId;        // 작성자 ID (userNo)
 
         @Schema(description = "게시판 ID (boardNo)", example = "67890")
-        private Long boardNo;       // 게시판 ID (boardNo)
+        private Long boardId;       // 게시판 ID (boardNo)
 
-        @Schema(description = "게시글에 대한 좋아요 수", example = "10")
-        private int like;           // 좋아요 수
 
         @Schema(description = "게시글에 대한 댓글 수", example = "5")
         private int comment;        // 댓글 수
