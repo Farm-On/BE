@@ -41,6 +41,9 @@ public class LoginService {
         // 응답 DTO 생성
         return LoginResponseDTO.builder()
                 .userId(user.getId())
+                .role(user.getRole())
+                .email(user.getEmail())
+                .userName(user.getUserName())
                 .token(token)
                 .build();
     }

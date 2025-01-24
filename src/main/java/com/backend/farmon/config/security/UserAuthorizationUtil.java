@@ -16,7 +16,6 @@ public class UserAuthorizationUtil {
 
     // 현재 로그인한 유저의 userId 반환해주는 메서드
     public Long getCurrentUserId() {
-
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
         if (authentication == null || authentication.getPrincipal() == null) {
@@ -28,7 +27,6 @@ public class UserAuthorizationUtil {
 
     // 현재 로그인한 유저의 role 반환해주는 메서드
     public String getCurrentUserRole() {
-
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
         if (authentication == null || authentication.getPrincipal() == null) {
@@ -39,6 +37,39 @@ public class UserAuthorizationUtil {
                 .orElseThrow(() -> new AuthenticationCredentialsNotFoundException("No roles found for the authenticated user"));
 
         return authority.getAuthority();
+    }
+
+    // 현재 로그인한 유저의 ID가 입력받은 ID와 일치하는지 확인
+    public boolean isCurrentUserIdMatching(Long userId) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        if (authentication == null || authentication.getPrincipal() == null) {
+            throw new AuthenticationCredentialsNotFoundException("Authentication or principal is null");
+        }
+
+        Long currentUserId = (Long) authentication.getPrincipal();
+        return currentUserId.equals(userId);
+    }
+
+    // 현재 로그인한 유저의 role이 입력받은 role과 일치하는지 확인
+    public boolean isCurrentUserRoleMatching(String role) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        if (authentication == null || authentication.getPrincipal() == null) {
+            throw new AuthenticationCredentialsNotFoundException("Authentication or principal is null");
+        }
+
+        GrantedAuthority authority = authentication.getAuthorities().stream()
+                .findFirst()
+                .orElseThrow(() -> new AuthenticationCredentialsNotFoundException("No roles found for the authenticated user"));
+
+        String currentUserRole = authority.getAuthority();
+        return currentUserRole.equals(role);
+    }
+
+    // 현재 로그인한 유저의 ID와 role이 입력받은 값과 일치하는지 확인
+    public boolean isCurrentUserMatching(Long userId, String role) {
+        return isCurrentUserIdMatching(userId) && isCurrentUserRoleMatching(role);
     }
 
 }
