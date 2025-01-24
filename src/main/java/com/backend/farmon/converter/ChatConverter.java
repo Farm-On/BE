@@ -124,7 +124,7 @@ public class ChatConverter {
                 .applyName(estimate.getUser().getUserName())
                 .estimateCategory(estimate.getCategory())
                 .areaName(area.getAreaName())
-                .areaName(area.getAreaNameDetail())
+                .areaDetail(area.getAreaNameDetail())
                 .budget(estimate.getBudget())
                 .estimateContent(estimate.getBody())
                 // map을 사용하여 imageUrl 리스트로 변환
