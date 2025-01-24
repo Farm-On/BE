@@ -53,7 +53,7 @@ public class PostController {
     })
     @PostMapping("/popular/save")
     public ApiResponse save_Popular_Post(
-            @RequestParam("userId") String userId, // userId를 추가
+            @RequestParam("userId") Long userId, // userId를 추가
             @RequestParam(name = "posting") BoardRequestDto.PopularPost request,
             @RequestBody PostRequestDTO postRequestDTO,
             @RequestPart(value = "imgList", required = false) List<MultipartFile> imgList) {
@@ -85,7 +85,7 @@ public class PostController {
     })
     @PostMapping("/all/save")
     public ApiResponse save_All_Post(
-            @RequestParam("userId") String userId, // userId를 추가
+            @RequestParam("userId") Long userId, // userId를 추가
             @RequestPart(value = "posting") @Valid BoardRequestDto.AllPost request,
             @RequestBody PostRequestDTO postRequestDTO,
             @RequestPart(value = "imgList", required = false) List<MultipartFile> imgList) {
@@ -120,7 +120,7 @@ public class PostController {
     })
     @PostMapping("/free/save")
     public ApiResponse save_Free_Post(
-            @RequestParam("userId") String userId, // userId를 추가
+            @RequestParam("userId") Long userId, // userId를 추가
             @RequestParam(name = "posting") BoardRequestDto.FreePost request,
             @RequestBody PostRequestDTO postRequestDTO,
             @RequestPart(value = "imgList", required = false) List<MultipartFile> imgList) {
@@ -153,7 +153,7 @@ public class PostController {
     })
     @PostMapping("/qna/save")
     public ApiResponse save_QnA_Post(
-            @RequestParam("userId") String userId, // userId를 추가
+            @RequestParam("userId") Long userId, // userId를 추가
             @RequestParam(name = "posting") BoardRequestDto.QnaPost request,
             @RequestBody PostRequestDTO postRequestDTO,
             @RequestPart(value = "imgList", required = false) List<MultipartFile> imgList,
@@ -182,7 +182,7 @@ public class PostController {
     })
     @PostMapping("/qna/answer/save")
     public ApiResponse saveQnAAnswer(
-            @RequestParam("userId") String userId, // 답변자의 ID
+            @RequestParam("userId") Long userId, // 답변자의 ID
             @RequestParam("questionId") Long questionId, // 질문 ID
             @RequestBody AnswerRequestDTO answerRequestDTO // 답변 데이터
     ) {
@@ -216,7 +216,7 @@ public class PostController {
     })
     @PostMapping("/expertCol/save")
     public ApiResponse save_exper_Post(
-            @RequestParam("userId") String userId, // userId를 추가
+            @RequestParam("userId") Long userId, // userId를 추가
             @RequestParam(name = "posting") BoardRequestDto.ExpertColumn request,
             @RequestBody PostRequestDTO postRequestDTO,
             @RequestPart(value = "imgList", required = false) List<MultipartFile> imgList,
