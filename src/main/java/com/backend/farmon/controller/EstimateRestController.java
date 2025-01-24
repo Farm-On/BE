@@ -218,7 +218,7 @@ public class EstimateRestController {
      *     9개 페이징/최신순
      */
     @Operation(
-            summary = "전문가용 내 견적 모두 보기 API",
+            summary = "전문가용 내 견적 모두 보기 API(9개 페이징, 최신순)",
             description = "전문가(expertId)에 해당하는 견적서 목록을 모두 조회합니다." +
                     "최신순으로 9개씩 페이징"
     )
@@ -248,7 +248,7 @@ public class EstimateRestController {
      *     9개 페이징/최신순
      */
     @Operation(
-            summary = "전문가용 완료된 견적 API",
+            summary = "전문가용 완료된 견적 API(9개 페이징, 최신순)",
             description = "전문가(expertId)가 완료된(1) 견적서 목록을 조회합니다." +
                     "최신순으로 9개씩 페이징"
     )
@@ -278,7 +278,7 @@ public class EstimateRestController {
      *     30개 페이징/최신순
      */
     @Operation(
-            summary = "농업인용 내 견적 모두 보기 API",
+            summary = "농업인용 내 견적 모두 보기 API(30개 페이징, 최신순)",
             description = "농업인(userId)에 해당하는 견적서 목록을 모두 조회합니다." +
                     "최신순으로 30개씩 페이징"
     )
@@ -308,7 +308,7 @@ public class EstimateRestController {
      *     30개 페이징/최신순
      */
     @Operation(
-            summary = "농업인용 완료된 견적 API",
+            summary = "농업인용 완료된 견적 API(30개 페이징, 최신순)",
             description = "농업인(userId)가 완료된(1) 견적서 목록을 조회합니다." +
                     "최신순으로 30개씩 페이징"
     )
