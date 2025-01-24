@@ -3,14 +3,29 @@ services:
   backend:
     container_name: spring-app
     image: mmije0ng/farmon-backend-dev:latest
+    # 접근 포트 설정(컨테이너 외부:컨테이너 내부)
     ports:
       - "8080:8080"  # 호스트 8080 -> 컨테이너 8080
     networks:
       - app-network
 
+  redis:
+    container_name: redis-container
+    image: redis:latest
+    ports:
+      - "6379:6379"
+    networks:
+      - app-network
+    volumes:
+      - ./redis/data:/data
+      - ./redis.conf:/usr/local/etc/redis/redis.conf
+    command: [ "redis-server", "/usr/local/etc/redis/redis.conf" ]
+    depends_on:
+      - backend
+
   nginx:
-    image: nginx:latest
     container_name: nginx-container
+    image: nginx:latest
     ports:
       - "80:80"   # HTTP 요청 처리
       - "443:443" # HTTPS 요청 처리    networks:
@@ -26,6 +41,7 @@ networks:
   app-network:
     driver: bridge
 
-# Nginx가 Docker 네트워크에 연결되지 않았다면 추가
+# Docker 네트워크에 연결되지 않았다면 추가
 #sudo docker network connect app-network nginx-container
 #sudo docker network connect app-network spring-app
+#sudo docker network connect app-network redis-container

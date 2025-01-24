@@ -48,9 +48,9 @@ public class ChatRoomCommandServiceImpl implements ChatRoomCommandService{
                 .orElseThrow(()-> new UserHandler(ErrorStatus.USER_NOT_FOUND));
 
         ChatRoom chatRoom = ChatConverter.toChatRoom(expert, estimate, farmer);
-//        chatRoom.setExpert(expert);
-//        cahtRoom.setFarmer(farmer);
-//        chatRoom.setEstimate(estimate);
+        chatRoom.setExpert(expert);
+        chatRoom.setFarmer(farmer);
+        chatRoom.setEstimate(estimate);
 
         chatRoomRepository.save(chatRoom);
 
