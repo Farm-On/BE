@@ -33,4 +33,7 @@ public class Crop extends BaseEntity {
     @OneToMany(mappedBy = "crop", cascade = CascadeType.ALL)
     private List<Estimate> estimateList = new ArrayList<>();
 
+    @OneToMany(mappedBy = "crop", cascade = CascadeType.ALL)
+    private List<Expert> expertList = new ArrayList<>();
+
 }

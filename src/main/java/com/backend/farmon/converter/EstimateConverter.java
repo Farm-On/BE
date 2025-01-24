@@ -6,7 +6,11 @@ import com.backend.farmon.domain.Estimate;
 import com.backend.farmon.domain.User;
 import com.backend.farmon.dto.estimate.EstimateRequestDTO;
 import com.backend.farmon.dto.estimate.EstimateResponseDTO;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Component;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Component
 public class EstimateConverter {
@@ -16,7 +20,6 @@ public class EstimateConverter {
         return Estimate.builder()
                 .category(requestDTO.getCategory())
                 .area(area)
-                .address(requestDTO.getAddressDetail())
                 .budget(requestDTO.getBudget())
                 .title(requestDTO.getTitle())
                 .body(requestDTO.getBody())
@@ -59,11 +62,61 @@ public class EstimateConverter {
                 .cropName(estimate.getCrop().getName())
                 .cropCategory(estimate.getCrop().getCategory())
                 .category(estimate.getCategory())
-                .address(estimate.getAddress())
+                .areaName(estimate.getArea().getAreaName())
+                .areaNameDetail(estimate.getArea().getAreaNameDetail())
                 .budget(estimate.getBudget())
                 .title(estimate.getTitle())
                 .body(estimate.getBody())
                 .createDate(estimate.getCreatedAt().toLocalDate())
+                .build();
+    }
+
+    //Page<Estimate> -> ListDTO
+    public EstimateResponseDTO.ListDTO toListDTO(Page<Estimate> estimatePage){
+        // 미리보기 리스트로 변환
+        List<EstimateResponseDTO.PreviewDTO> previewDTOList = estimatePage.getContent().stream()
+                .map(this::toPreviewDTO)
+                .collect(Collectors.toList());
+
+        // ListDTO 구성
+        return EstimateResponseDTO.ListDTO.builder()
+                .listSize(previewDTOList.size())
+                .totalPage(estimatePage.getTotalPages())
+                .totalElements(estimatePage.getTotalElements())
+                .currentPage(estimatePage.getNumber() + 1)
+                .isFirst(estimatePage.isFirst())
+                .isLast(estimatePage.isLast())
+                .estimateList(previewDTOList)
+                .build();
+    }
+
+    //List<Estimate> -> ListDTO
+    public EstimateResponseDTO.ListDTO toListDTO(List<Estimate> estimateList){
+        // 미리보기 리스트로 변환
+        List<EstimateResponseDTO.PreviewDTO> previewDTOList = estimateList.stream()
+                .map(this::toPreviewDTO)
+                .collect(Collectors.toList());
+
+        // ListDTO 구성
+        return EstimateResponseDTO.ListDTO.builder()
+                .listSize(previewDTOList.size())
+                .estimateList(previewDTOList)
+                .build();
+    }
+
+    //Estimate 엔티티 -> PreviewDTO
+    private EstimateResponseDTO.PreviewDTO toPreviewDTO(Estimate estimate) {
+        return EstimateResponseDTO.PreviewDTO.builder()
+                .estimateId(estimate.getId())
+                .title(estimate.getTitle())
+                .cropName(estimate.getCrop().getName())
+                .cropCategory(estimate.getCrop().getCategory())
+                .estimateCategory(estimate.getCategory())
+                .areaName(estimate.getArea().getAreaName())
+                .areaNameDetail(estimate.getArea().getAreaNameDetail())
+                .budget(estimate.getBudget())
+                .status(estimate.getStatus())
+                .createdAt(estimate.getCreatedAt().toLocalDate())
                 .build();
     }
 

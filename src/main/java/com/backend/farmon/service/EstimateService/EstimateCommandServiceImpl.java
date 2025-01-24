@@ -1,4 +1,4 @@
-package com.backend.farmon.service.EstimateRepository;
+package com.backend.farmon.service.EstimateService;
 
 import com.backend.farmon.converter.EstimateConverter;
 import com.backend.farmon.domain.Area;
@@ -7,6 +7,7 @@ import com.backend.farmon.domain.Estimate;
 import com.backend.farmon.domain.User;
 import com.backend.farmon.dto.estimate.EstimateRequestDTO;
 import com.backend.farmon.dto.estimate.EstimateResponseDTO;
+import com.backend.farmon.repository.AreaRepository.AreaRepository;
 import com.backend.farmon.repository.CropRepository.CropRepository;
 import com.backend.farmon.repository.EstimateRepository.EstimateRepository;
 import com.backend.farmon.repository.UserRepository.UserRepository;
@@ -21,7 +22,7 @@ public class EstimateCommandServiceImpl implements EstimateCommandService {
     private final UserRepository userRepository;
     private final EstimateRepository estimateRepository;
     private final CropRepository cropRepository;
-    //private final AreaRepository areaRepository;
+    private final AreaRepository areaRepository;
     private final EstimateConverter estimateConverter;
     /**
      * Create(견적서 작성)
@@ -34,7 +35,8 @@ public class EstimateCommandServiceImpl implements EstimateCommandService {
                 .orElseThrow(() -> new IllegalArgumentException("유효하지 않은 사용자 ID 입니다."));
         Crop crop = cropRepository.findById(requestDTO.getCropId())
                 .orElseThrow(() -> new IllegalArgumentException("유호하지 않은 작물 ID 입니다."));
-        Area area = Area.builder().build();
+        Area area = areaRepository.findById(requestDTO.getAreaId())
+                .orElseThrow(() -> new IllegalArgumentException("유효하지 않은 지역 ID 입니다."));
 
         Estimate estimate = estimateConverter.toEntity(requestDTO, user, crop, area);
 
@@ -60,7 +62,7 @@ public class EstimateCommandServiceImpl implements EstimateCommandService {
         // 2) 변경 (실제 수정 필드만 변경)
         if (requestDTO.getCategory() != null) estimate.setCategory(requestDTO.getCategory());
 
-        if (requestDTO.getAddressDetail() != null) estimate.setAddress(requestDTO.getAddressDetail());
+        if (requestDTO.getAreaId() != null) estimate.setArea(Area.builder().build());
 
         if (requestDTO.getBudget() != null) estimate.setBudget(requestDTO.getBudget());
 

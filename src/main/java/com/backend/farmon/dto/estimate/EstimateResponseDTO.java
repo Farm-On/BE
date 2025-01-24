@@ -35,7 +35,8 @@ public class EstimateResponseDTO {
         String cropCategory;
         String userName;
         String category;
-        String address;
+        String areaName;
+        String areaNameDetail;
         String budget;
         String title;
         String body;
@@ -66,7 +67,7 @@ public class EstimateResponseDTO {
         Boolean deleted;
     }
     // 5) ReadListDto
-    @Schema(description = "전문가-견적찾기 농사 견적서 리스트 응답 DTO")
+    @Schema(description = "견적찾기 농사 견적서 리스트 응답 DTO")
     @Getter
     @Setter
     @AllArgsConstructor
@@ -83,8 +84,9 @@ public class EstimateResponseDTO {
         List<PreviewDTO> estimateList; // 실제로는 List<SomeEstimateData> 형태
     }
 
+
     // 6) ListDTO를 위한 Preview dto
-    @Schema(description = "전문가-견적찾기 농사 견적서 목록용 미리보기 DTO")
+    @Schema(description = "농사 견적서 목록용 미리보기 DTO")
     @Getter
     @Setter
     @AllArgsConstructor
@@ -92,15 +94,18 @@ public class EstimateResponseDTO {
     @Builder
     public static class PreviewDTO {
         Long estimateId;
+        String title;
         String cropName;
         String cropCategory;
         String estimateCategory;
         String areaName;
         String areaNameDetail;
         String budget;
+        Integer status;
         LocalDate createdAt;
-        Integer isComplete;
     }
+
+
 
 
 

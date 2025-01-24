@@ -31,8 +31,8 @@ public class Estimate extends BaseEntity {
     @JoinColumn(name = "area_id", nullable = false)
     private Area area;
 
-    @Column(nullable = false)
-    private String address;
+//    @Column(nullable = false)
+//    private String address;
 
     @Column(nullable = false)
     @ColumnDefault("'50만원 ~ 100만원'")

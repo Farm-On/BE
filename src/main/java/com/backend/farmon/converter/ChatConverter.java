@@ -106,7 +106,7 @@ public class ChatConverter {
 //                .profileImage(user.getProfileImageUrl())
                 .estimateBudget(chatRoom.getEstimate().getBudget())
                 .estimateCategory(chatRoom.getEstimate().getCategory())
-                .estimateAddress(chatRoom.getEstimate().getAddress())
+                //.estimateAddress(chatRoom.getEstimate().getAddress())
                 .unreadMessageCount(unReadMessageCount)
                 .lastMessageContent(chatMessage != null ? chatMessage.getContent() : null) // null-safe 처리
                 .lastMessageDate(chatMessage != null ? ConvertTime.convertToYearMonthDay(chatMessage.getCreatedAt()) : null) // null-safe 처리
@@ -119,7 +119,7 @@ public class ChatConverter {
                 .cropName(estimate.getCrop().getName())
                 .applyName(estimate.getUser().getUserName())
                 .estimateCategory(estimate.getCategory())
-                .address(estimate.getAddress())
+                //.address(estimate.getAddress())
                 .budget(estimate.getBudget())
                 .content(estimate.getBody())
                 // map을 사용하여 imageUrl 리스트로 변환
