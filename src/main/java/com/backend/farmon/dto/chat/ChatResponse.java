@@ -128,9 +128,6 @@ public class ChatResponse {
 
         @Schema(description = "채팅 상대 역할, 농업인 또는 전문가", example = "농업인")
         String type;
-
-        @Schema(description = "채팅 상대의 평균 메시지 응답 시간, 정보가 없는 사용자이면 null", example = "1시간")
-        String averageResponseTime;
     }
 
     @Getter
@@ -138,8 +135,8 @@ public class ChatResponse {
     @NoArgsConstructor
     @AllArgsConstructor
     @Builder
-    @Schema(description = "채팅방 입장 성공")
-    public static class ChatRoomEnterDTO {
+    @Schema(description = "채팅방 정보")
+    public static class ChatRoomDataDTO {
 
         @Schema(description = "채팅 중인 상대방 이름", example = "김팜온")
         String name;
@@ -155,6 +152,15 @@ public class ChatResponse {
 
         @Schema(description = "채팅 상대의 평균 메시지 응답 시간, 정보가 없는 사용자이면 null", example = "1시간")
         String averageResponseTime;
+
+        @Schema(description = "채팅 상대의 컨설팅 완료 여부", example = "true")
+        Boolean isOtherComplete;
+
+        @Schema(description = "사용자의 컨설팅 완료 여부", example = "true")
+        Boolean isComplete;
+
+        @Schema(description = "견적 완료 여부, 농업인 전문가 모두 컨설팅 완료 시 true", example = "true")
+        Boolean isEstimateComplete;
     }
 
     @Getter

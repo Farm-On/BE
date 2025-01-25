@@ -59,34 +59,6 @@ public class ChatRoomCommandServiceImpl implements ChatRoomCommandService{
         return ChatConverter.toChatRoomCreateDTO(chatRoom, farmer);
     }
 
-    // 채팅방 입장
-    @Transactional
-    @Override
-    public ChatResponse.ChatRoomEnterDTO updateLastEnterTime(Long userId, Long chatRoomId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new UserHandler(ErrorStatus.USER_NOT_FOUND));
-
-        ChatRoom chatRoom = chatRoomRepository.findById(chatRoomId)
-                .orElseThrow(() -> new ChatRoomHandler(ErrorStatus.CHATROOM_NOT_FOUND));
-
-        boolean isExpert = chatRoom.getExpert().getId().equals(userId);
-        LocalDateTime now = LocalDateTime.now();
-
-        // 마지막 채팅방 접속 시간 변경
-        if (isExpert) {
-            chatRoom.setExpertLastEnter(now);
-        } else {
-            chatRoom.setFarmerLastEnter(now);
-        }
-
-        // 안 읽은 메시지들을 읽음 처리
-        chatMessageRepository.updateMessagesToReadByChatRoomId(chatRoomId, userId);
-        log.info("안 읽은 메시지들 읽음 처리 완료 - 채팅방 아아디: {}", chatRoomId);
-
-        String userType = isExpert ? "전문가" : "농업인";
-        return ChatConverter.toChatRoomEnterDTO(chatRoom, userType);
-    }
-
     // 채팅방 삭제
     @Transactional
     @Override

@@ -66,7 +66,7 @@ public class ChatRoomQueryServiceImpl implements ChatRoomQueryService {
                     .findFirstByChatRoomIdOrderByCreatedAtDesc(chatRoom.getId())
                     .orElse(null);
 
-            log.info("채팅방과 일치하는 최신 메시지 조회 완료 - userId: {}, 내용: {}", userId, lastMessage.getContent());
+            log.info("채팅방과 일치하는 최신 메시지 조회 완료 - userId: {}", userId);
 
             // 채팅방의 견적과 연관된 지역
             Area area = chatRoom.getEstimate().getArea();
@@ -77,6 +77,26 @@ public class ChatRoomQueryServiceImpl implements ChatRoomQueryService {
 
         // 최종 채팅방 목록 정보 DTO 생성 및 반환
         return ChatConverter.toChatRoomListDTO(chatRoomPage, chatRoomInfoList);
+    }
+
+    // 채팅방 정보 조회 & 안 읽은 메시지 읽음 처리
+    @Transactional
+    @Override
+    public ChatResponse.ChatRoomDataDTO findChatRoomDataAndChangeUnreadMessage(Long userId, Long chatRoomId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserHandler(ErrorStatus.USER_NOT_FOUND));
+
+        ChatRoom chatRoom = chatRoomRepository.findById(chatRoomId)
+                .orElseThrow(() -> new ChatRoomHandler(ErrorStatus.CHATROOM_NOT_FOUND));
+
+        boolean isExpert = chatRoom.getExpert().getId().equals(userId);
+
+        // 안 읽은 메시지들을 읽음 처리
+        chatMessageRepository.updateMessagesToReadByChatRoomId(chatRoomId, userId);
+        log.info("안 읽은 메시지들 읽음 처리 완료 - 채팅방 아아디: {}", chatRoomId);
+
+        String userType = isExpert ? "전문가" : "농업인";
+        return ChatConverter.toChatRoomDataDTO(chatRoom, userType);
     }
 
     // 채팅방의 견적 조회

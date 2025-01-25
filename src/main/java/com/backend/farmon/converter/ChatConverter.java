@@ -24,7 +24,6 @@ public class ChatConverter {
                 .name(chatRoom.getFarmer().getUserName())
 //                .profileImage(chatRoom.getFarmer().getProfileImageUrl())
                 .type("농업인")
-                .averageResponseTime(farmer.getChatAverageResponseTime())
                 .build();
     }
 
@@ -34,25 +33,32 @@ public class ChatConverter {
                 .build();
     }
 
-    public static ChatResponse.ChatRoomEnterDTO toChatRoomEnterDTO(ChatRoom chatRoom, String userType) {
+    public static ChatResponse.ChatRoomDataDTO toChatRoomDataDTO(ChatRoom chatRoom, String userType) {
         boolean isExpert = userType.equals("전문가");
 
+        // 내가 전문가
         if (isExpert) {
-            return ChatResponse.ChatRoomEnterDTO.builder()
+            return ChatResponse.ChatRoomDataDTO.builder()
                     .name(chatRoom.getFarmer().getUserName())
 //                    .profileImage(chatRoom.getFarmer().getProfileImageUrl())
                     .type("농업인")
                     .lastEnterTime(ConvertTime.convertLocalDatetimeToTime(chatRoom.getFarmerLastEnter()))
                     .averageResponseTime(chatRoom.getFarmer().getChatAverageResponseTime())
+                    .isComplete(chatRoom.getIsExpertComplete())
+                    .isOtherComplete(chatRoom.getIsFarmerComplete())
+                    .isEstimateComplete(chatRoom.getEstimate().getStatus().equals(1))
                     .build();
         }
 
-        return ChatResponse.ChatRoomEnterDTO.builder()
+        return ChatResponse.ChatRoomDataDTO.builder()
                 .name(chatRoom.getExpert().getUser().getUserName())
 //                .profileImage(chatRoom.getExpert().getUser().getProfileImageUrl())
                 .type("전문가")
                 .lastEnterTime(ConvertTime.convertLocalDatetimeToTime(chatRoom.getExpertLastEnter()))
                 .averageResponseTime(chatRoom.getExpert().getUser().getChatAverageResponseTime())
+                .isComplete(chatRoom.getIsFarmerComplete())
+                .isOtherComplete(chatRoom.getIsExpertComplete())
+                .isEstimateComplete(chatRoom.getEstimate().getStatus().equals(1))
                 .build();
     }
 
