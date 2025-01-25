@@ -54,8 +54,11 @@ public class ChatResponse {
         @Schema(description = "신청 견적 종류", example = "스마트팜")
         String estimateCategory;
 
-        @Schema(description = "신청 견적 주소", example = "경기 이천시 마장면")
-        String estimateAddress;
+        @Schema(description = "신청 견적 주소", example = "경기")
+        String estimateAreaName;
+
+        @Schema(description = "신청 견적 주소 디테일", example = "이천시")
+        String estimateAreaDetail;
 
         @Schema(description = "안 읽은 채팅 개수", example = "3")
         Integer unreadMessageCount;
@@ -123,16 +126,10 @@ public class ChatResponse {
         @Schema(description = "채팅 중인 상대방 이름", example = "김팜온")
         String name;
 
-        @Schema(description = "채팅 중인 상대방 프로필 이미지")
-        String profileImage;
-
         @Schema(description = "채팅 상대 역할, 농업인 또는 전문가", example = "농업인")
         String type;
 
-        @Schema(description = "채팅 상대의 마지막 채팅방 접속 시간, 채팅방 생성시에는 null", example = "28분")
-        String lastEnterTime;
-
-        @Schema(description = "채팅 상대의 평균 메시지 응답 시간, 채팅방 생성시에는 null", example = "1시간")
+        @Schema(description = "채팅 상대의 평균 메시지 응답 시간, 정보가 없는 사용자이면 null", example = "1시간")
         String averageResponseTime;
     }
 
@@ -156,7 +153,7 @@ public class ChatResponse {
         @Schema(description = "채팅 상대의 마지막 채팅방 접속 시간", example = "28분")
         String lastEnterTime;
 
-        @Schema(description = "채팅 상대의 평균 메시지 응답 시간", example = "1시간")
+        @Schema(description = "채팅 상대의 평균 메시지 응답 시간, 정보가 없는 사용자이면 null", example = "1시간")
         String averageResponseTime;
     }
 
@@ -178,26 +175,29 @@ public class ChatResponse {
     @Builder
     @Schema(description = "채팅방 견적 응답 정보")
     public static class ChatRoomEstimateDTO {
-        @Schema(description = "작물 카테고리", example = "곡물, 채소작물, 과일 등")
-        String cropCategory;
+        @Schema(description = "견적 작물 카테고리", example = "곡물, 채소작물, 과일 등")
+        String estimateCropCategory;
 
-        @Schema(description = "작물 이름", example = "쌀, 고구마, 사과 등")
-        String cropName;
+        @Schema(description = "견적 작물 이름", example = "쌀, 고구마, 사과 등")
+        String estimateCropName;
 
         @Schema(description = "견적 신청자")
-        String applyName;
+        String estimateApplyName;
 
         @Schema(description = "견적 카테고리", example = "작물 관리, 스마트팜 등")
         String estimateCategory;
 
-        @Schema(description = "견적 주소", example = "서울 강동구")
-        String address;
+        @Schema(description = "신청 견적 주소", example = "경기")
+        String estimateAreaName;
+
+        @Schema(description = "신청 견적 주소 디테일", example = "이천시")
+        String estimateAreaDetail;
 
         @Schema(description = "견적 예산", example = "50만원 ~ 100만원")
-        String budget;
+        String estimateBudget;
 
         @Schema(description = "컨설팅 내용")
-        String content;
+        String estimateContent;
 
         @Schema(description = "견적 이미지 리스트")
         List<String> estimateImageList;

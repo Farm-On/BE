@@ -54,6 +54,7 @@ public class ChatRoomQueryServiceImpl implements ChatRoomQueryService {
 
         // 채팅 대화방 세부 정보 목록 생성
         List<ChatResponse.ChatRoomDetailDTO> chatRoomInfoList = chatRoomPage.stream().map(chatRoom -> {
+            // 전문가 여부
             boolean isExpert = chatRoom.getExpert().getId().equals(userId);
 
             // 안 읽은 채팅 메시지 개수 조회
@@ -67,8 +68,11 @@ public class ChatRoomQueryServiceImpl implements ChatRoomQueryService {
 
             log.info("채팅방과 일치하는 최신 메시지 조회 완료 - userId: {}, 내용: {}", userId, lastMessage.getContent());
 
+            // 채팅방의 견적과 연관된 지역
+            Area area = chatRoom.getEstimate().getArea();
+
             // 채팅방 대화방 세부 정보를 dto로 변환
-            return ChatConverter.toChatRoomDetailDTO(chatRoom, lastMessage, isExpert, unReadMessageCount);
+            return ChatConverter.toChatRoomDetailDTO(chatRoom, lastMessage, area, isExpert, unReadMessageCount);
         }).toList();
 
         // 최종 채팅방 목록 정보 DTO 생성 및 반환
