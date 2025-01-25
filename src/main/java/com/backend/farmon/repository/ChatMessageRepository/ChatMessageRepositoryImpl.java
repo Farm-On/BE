@@ -25,7 +25,7 @@ public class ChatMessageRepositoryImpl implements ChatMessageRepositoryCustom {
         List<ChatMessage> content = queryFactory.selectFrom(chatMessage)
                 .where(
                         chatMessage.chatRoom.id.eq(chatRoomId),
-                        chatMessage.type.notIn(ChatMessageType.EXIT, ChatMessageType.COMPLETE)
+                        chatMessage.type.notIn(ChatMessageType.EXIT)
                 )
                 .orderBy(chatMessage.createdAt.desc())
                 .offset(pageable.getOffset())
