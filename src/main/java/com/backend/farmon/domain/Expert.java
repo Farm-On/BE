@@ -51,11 +51,16 @@ public class Expert extends BaseEntity {
     @JoinColumn(name = "crop_id")
     private Crop crop; // 전문가와 작물은 1:N관계
 
+    // 매핑 테이블없이 바로 지역 테이블과 매핑되도록 수정
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "area_id")
+    private Area area; // 전문가와 지역은 1:N관계
+
     @OneToMany(mappedBy = "expert", cascade = CascadeType.ALL)
     private List<Estimate> estimateList = new ArrayList<>();
 
-    @OneToMany(mappedBy = "expert", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<ExpertArea> expertAreaList = new ArrayList<>();
+//    @OneToMany(mappedBy = "expert", cascade = CascadeType.ALL, orphanRemoval = true)
+//    private List<ExpertArea> expertAreaList = new ArrayList<>();
 
     @OneToMany(mappedBy = "expert", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Portfolio> portfolioList = new ArrayList<>();
@@ -66,9 +71,33 @@ public class Expert extends BaseEntity {
     @OneToMany(mappedBy = "expert", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ExpertCareer> expertCareerList = new ArrayList<>();
 
-//    @OneToMany(mappedBy = "expert", cascade = CascadeType.ALL, orphanRemoval = true)
-//    private List<Estimate> estimateList = new ArrayList<>();
-
     @OneToMany(mappedBy = "expert", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ChatRoom> chatRoomList = new ArrayList<>();
+
+    public void setCrop(Crop crop) {
+        if(this.crop != null) {
+            crop.getExpertList().remove(this);
+        }
+        this.crop = crop;
+        crop.getExpertList().add(this);
+    }
+
+    public void setArea(Area area) {
+        if (this.area != null) {
+            area.getExpertList().remove(this);
+        }
+        this.area = area;
+        area.getExpertList().add(this);
+    }
+
+    // 유저엔티티와 양방향 매핑
+    public void setUser(User user) {
+        if (this.user != null) {
+            this.user.setExpert(null); // 기존 관계 제거
+        }
+        this.user = user;
+        if (user != null) {
+            user.setExpert(this);  // 반대편도 설정
+        }
+    }
 }

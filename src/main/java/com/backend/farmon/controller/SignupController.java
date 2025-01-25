@@ -2,9 +2,11 @@ package com.backend.farmon.controller;
 
 import com.backend.farmon.apiPayload.ApiResponse;
 import com.backend.farmon.converter.SignupConverter;
+import com.backend.farmon.domain.Expert;
 import com.backend.farmon.domain.User;
 import com.backend.farmon.dto.user.SignupRequest;
 import com.backend.farmon.dto.user.SignupResponse;
+import com.backend.farmon.service.ExpertService.ExpertCommandService;
 import com.backend.farmon.service.UserService.UserCommandService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -20,6 +22,7 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class SignupController {
     private final UserCommandService userCommandService;
+    private final ExpertCommandService expertCommandService;
 
     @PostMapping("/api/user/join")
     @Operation(summary = "농업인 회원가입 API")
@@ -36,9 +39,9 @@ public class SignupController {
     @ApiResponses({
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200",description = "OK, 성공")
     })
-    public ApiResponse<SignupResponse.JoinResultDTO> expertJoin(@RequestBody SignupRequest.ExpertJoinDto expertJoinDto){
-
-        return null;
+    public ApiResponse<SignupResponse.ExpertJoinResultDTO> expertJoin(@RequestBody SignupRequest.ExpertJoinDto expertJoinDto){
+        SignupResponse.ExpertJoinResultDTO resultDTO = expertCommandService.joinExpert(expertJoinDto);
+        return ApiResponse.onSuccess(resultDTO);
     }
 
     @PatchMapping("/api/withdraw/{id}")

@@ -46,4 +46,13 @@ public class ExpertCareer extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "expert_id")
     private Expert expert;
+
+    public void setExpert(Expert expert) {
+        if(this.expert != null) {
+            expert.getExpertCareerList().remove(this);
+        }
+        this.expert = expert;
+        expert.getExpertCareerList().add(this);
+    }
+
 }
