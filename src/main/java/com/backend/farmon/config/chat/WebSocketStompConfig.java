@@ -1,5 +1,7 @@
-package com.backend.farmon.config;
+package com.backend.farmon.config.chat;
 
+import com.backend.farmon.config.chat.FilterChannelInterceptor;
+import com.backend.farmon.config.chat.StompHandshakeInterceptor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Configuration;
@@ -22,7 +24,7 @@ public class WebSocketStompConfig implements WebSocketMessageBrokerConfigurer {
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry){
         // 웹소켓이 handshake를 하기 위해 연결하는 endpoint
-        registry.addEndpoint("/ws")
+        registry.addEndpoint("/ws-stomp")
                 .setAllowedOriginPatterns("*")
                 .addInterceptors(new StompHandshakeInterceptor()) // StompHandshakeInterceptor 추가
                 .withSockJS();

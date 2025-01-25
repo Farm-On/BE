@@ -12,4 +12,7 @@ public interface ChatRoomCommandService {
 
     // 채팅방 컨설팅 완료
     ChatResponse.ChatRoomCompleteDTO exchangeChatRoomUserComplete(Long userId, Long chatRoomId);
+
+    // 사용자 여부에 따른 채팅 입장 시간 변경
+    void changeChatRoomEnterTime(Long userId, Long chatRoomId, Boolean isExpert);
 }

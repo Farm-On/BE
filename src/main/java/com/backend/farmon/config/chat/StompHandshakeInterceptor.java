@@ -1,4 +1,4 @@
-package com.backend.farmon.config;
+package com.backend.farmon.config.chat;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

@@ -6,6 +6,7 @@ import com.backend.farmon.apiPayload.exception.handler.EstimateHandler;
 import com.backend.farmon.apiPayload.exception.handler.ExpertHandler;
 import com.backend.farmon.apiPayload.exception.handler.UserHandler;
 import com.backend.farmon.converter.ChatConverter;
+import com.backend.farmon.converter.ConvertTime;
 import com.backend.farmon.domain.*;
 import com.backend.farmon.dto.chat.ChatResponse;
 import com.backend.farmon.repository.ChatMessageRepository.ChatMessageRepository;
@@ -17,6 +18,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDateTime;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -110,5 +113,19 @@ public class ChatRoomCommandServiceImpl implements ChatRoomCommandService{
         log.info("채팅방 컨설팅 완료 - 유저 아이디: {}, 채팅방 아아디: {}", userId, chatRoomId);
 
         return ChatConverter.toChatRoomCompleteDTO(chatRoom, isOtherComplete, isEstimateComplete);
+    }
+
+    // 사용자 여부에 따른 채팅 입장 시간 변경
+    @Transactional
+    @Override
+    public void changeChatRoomEnterTime(Long userId, Long chatRoomId, Boolean isExpert) {
+        ChatRoom chatRoom = chatRoomRepository.findById(chatRoomId)
+                .orElseThrow(()-> new ChatRoomHandler(ErrorStatus.CHATROOM_NOT_FOUND));
+
+        // 전문가라면 전문가 접속 시간 뱐걍
+        if(isExpert && chatRoom.getExpert().getUser().getId().equals(userId))
+            chatRoom.setExpertLastEnter(LocalDateTime.now());
+        else
+            chatRoom.setFarmerLastEnter(LocalDateTime.now());
     }
 }
