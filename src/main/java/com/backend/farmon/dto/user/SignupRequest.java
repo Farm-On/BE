@@ -60,7 +60,7 @@ public class SignupRequest {
         LocalDate birth;
 
         @Schema(description = "성별 (MALE,FEMALE) ", example = "MALE")
-        String gender; // String으로 받되, 후에 Enum으로 변환
+        Gender gender;
 
         @Schema(description = "이메일 주소", example = "umc@gmail.com")
         String email;
@@ -71,10 +71,10 @@ public class SignupRequest {
         @Schema(description = "휴대전화번호", example = "01012345678")
         String phone;
 
-        @Schema(description = "전문가 전문 분야 카테고리 리스트")
-        List<Long> expertCrops; // 전문가 전문 분야 카테고리 리스트
+        @Schema(description = "전문가 전문 분야 카테고리(세부 카테고리로 전달 ex.쌀, 옥수수)")
+        String expertCrop;
 
-        @Schema(description = "전문가 활동 위치 카테고리 리스트")
-        List<Long> expertLocations; // 전문가 활동 위치 카테고리 리스트
+        @Schema(description = "전문가 활동 위치 카테고리(세부 카테고리로 전달 ex.강남구, 남양주시)")
+        String expertLocation;
     }
 }
