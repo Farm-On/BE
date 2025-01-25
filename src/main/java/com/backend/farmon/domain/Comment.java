@@ -8,7 +8,7 @@ import lombok.Setter;
 import java.util.ArrayList;
 import java.util.List;
 
-@Table(name="Comment_Table")
+@Table(name="comment")
 @Entity
 @Setter
 @Getter
@@ -17,7 +17,7 @@ public class Comment extends BaseEntity {
 
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name="comment_id")
     private Long id;
     //id로 통일
