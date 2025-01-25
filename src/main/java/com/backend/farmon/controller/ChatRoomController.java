@@ -6,6 +6,7 @@ import com.backend.farmon.service.ChatMessageService.ChatMessageQueryService;
 import com.backend.farmon.service.ChatRoomService.ChatRoomCommandService;
 import com.backend.farmon.service.ChatRoomService.ChatRoomQueryService;
 import com.backend.farmon.validaton.annotation.CheckPage;
+import com.backend.farmon.validaton.annotation.EqualsUserId;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
@@ -39,6 +40,7 @@ public class ChatRoomController {
     @ApiResponses({
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200",description = "OK, 성공"),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "USER4001", description = "아이디와 일치하는 사용자가 없습니다.", content = @Content(schema = @Schema(implementation = ApiResponse.class))),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "AUTHORIZATION_4031", description = "인증된 사용자 정보와 요청된 리소스의 사용자 정보가 다릅니다. (userId 불일치)", content = @Content(schema = @Schema(implementation = ApiResponse.class))),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "PAGE4001", description = "페이지 번호는 1 이상이어야 합니다.", content = @Content(schema = @Schema(implementation = ApiResponse.class))),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON400", description = "잘못된 요청입니다.", content = @Content(schema = @Schema(implementation = ApiResponse.class))),
     })
@@ -48,7 +50,7 @@ public class ChatRoomController {
             @Parameter(name = "page", description = "페이지 번호, 1부터 시작입니다.", example = "1", required = true)
     })
     @GetMapping("/rooms/all")
-    public ApiResponse<ChatResponse.ChatRoomListDTO> getChatRoomPage (@RequestParam(name = "userId") Long userId,
+    public ApiResponse<ChatResponse.ChatRoomListDTO> getChatRoomPage (@RequestParam(name = "userId") @EqualsUserId Long userId,
                                                                       @RequestParam(name = "read") Integer read,
                                                                       @CheckPage Integer page){
 
@@ -67,6 +69,7 @@ public class ChatRoomController {
     @ApiResponses({
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200", description = "OK, 성공"),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "USER4001", description = "아이디와 일치하는 사용자가 없습니다.", content = @Content(schema = @Schema(implementation = ApiResponse.class))),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "AUTHORIZATION_4031", description = "인증된 사용자 정보와 요청된 리소스의 사용자 정보가 다릅니다. (userId 불일치)", content = @Content(schema = @Schema(implementation = ApiResponse.class))),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "PAGE4001", description = "페이지 번호는 1 이상이어야 합니다.", content = @Content(schema = @Schema(implementation = ApiResponse.class))),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON400", description = "잘못된 요청입니다.", content = @Content(schema = @Schema(implementation = ApiResponse.class))),
     })
@@ -77,7 +80,7 @@ public class ChatRoomController {
             @Parameter(name = "page", description = "페이지 번호, 1부터 시작입니다.", example = "1", required = true)
     })
     @GetMapping("/rooms/name")
-    public ApiResponse<ChatResponse.ChatRoomListDTO> getChatRoomPageByExpertName (@RequestParam(name = "userId") Long userId,
+    public ApiResponse<ChatResponse.ChatRoomListDTO> getChatRoomPageByExpertName (@RequestParam(name = "userId") @EqualsUserId Long userId,
                                                                                   @RequestParam(name = "read") String read,
                                                                                   @RequestParam(name = "expertName") String expertName,
                                                                                   @CheckPage Integer page) {
@@ -96,6 +99,7 @@ public class ChatRoomController {
     @ApiResponses({
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200",description = "OK, 성공"),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "USER4001", description = "아이디와 일치하는 사용자가 없습니다.", content = @Content(schema = @Schema(implementation = ApiResponse.class))),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "AUTHORIZATION_4031", description = "인증된 사용자 정보와 요청된 리소스의 사용자 정보가 다릅니다. (userId 불일치)", content = @Content(schema = @Schema(implementation = ApiResponse.class))),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "PAGE4001", description = "페이지 번호는 1 이상이어야 합니다.", content = @Content(schema = @Schema(implementation = ApiResponse.class))),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON400", description = "잘못된 요청입니다.", content = @Content(schema = @Schema(implementation = ApiResponse.class))),
     })
@@ -106,7 +110,7 @@ public class ChatRoomController {
             @Parameter(name = "page", description = "페이지 번호, 1부터 시작입니다.", example = "1", required = true)
     })
     @GetMapping("/rooms/crops")
-    public ApiResponse<ChatResponse.ChatRoomListDTO> getChatRoomPageByCropsName (@RequestParam(name = "userId") Long userId,
+    public ApiResponse<ChatResponse.ChatRoomListDTO> getChatRoomPageByCropsName (@RequestParam(name = "userId") @EqualsUserId Long userId,
                                                                                  @RequestParam(name = "read") String read,
                                                                                  @RequestParam(name = "cropsName") String cropsName,
                                                                                  @CheckPage Integer page) {
@@ -125,6 +129,7 @@ public class ChatRoomController {
     @ApiResponses({
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200",description = "OK, 성공"),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "EXPERT4001", description = "아이디와 일치하는 전문가가 없습니다.", content = @Content(schema = @Schema(implementation = ApiResponse.class))),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "AUTHORIZATION_4031", description = "인증된 사용자 정보와 요청된 리소스의 사용자 정보가 다릅니다. (userId 불일치)", content = @Content(schema = @Schema(implementation = ApiResponse.class))),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "ESTIMATE4001", description = "견적 아이디와 일치하는 견적이 없습니다.", content = @Content(schema = @Schema(implementation = ApiResponse.class))),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON400", description = "잘못된 요청입니다.", content = @Content(schema = @Schema(implementation = ApiResponse.class))),
     })
@@ -133,7 +138,7 @@ public class ChatRoomController {
             @Parameter(name = "estimateId", description = "채팅하려는 견적의 아이디", example = "1", required = true),
     })
     @PostMapping("/room")
-    public ApiResponse<ChatResponse.ChatRoomCreateDTO> postChatRoom (@RequestParam(name = "userId") Long userId,
+    public ApiResponse<ChatResponse.ChatRoomCreateDTO> postChatRoom (@RequestParam(name = "userId") @EqualsUserId Long userId,
                                                                      @RequestParam(name = "estimateId") Long estimateId) {
 
         ChatResponse.ChatRoomCreateDTO response = chatRoomCommandService.addChatRoom(userId, estimateId);
@@ -151,6 +156,7 @@ public class ChatRoomController {
     @ApiResponses({
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200",description = "OK, 성공"),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "USER4001", description = "아이디와 일치하는 사용자가 없습니다.", content = @Content(schema = @Schema(implementation = ApiResponse.class))),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "AUTHORIZATION_4031", description = "인증된 사용자 정보와 요청된 리소스의 사용자 정보가 다릅니다. (userId 불일치)", content = @Content(schema = @Schema(implementation = ApiResponse.class))),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "CHATROOM4001", description = "채팅방 아이디와 일치하는 채팅방이 없습니다.", content = @Content(schema = @Schema(implementation = ApiResponse.class))),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON400", description = "잘못된 요청입니다.", content = @Content(schema = @Schema(implementation = ApiResponse.class))),
     })
@@ -159,7 +165,7 @@ public class ChatRoomController {
             @Parameter(name = "chatRoomId", description = "입장하려는 채팅방의 아이디", example = "1", required = true),
     })
     @PatchMapping("/room")
-    public ApiResponse<ChatResponse.ChatRoomEnterDTO> enterChatRoom (@RequestParam(name = "userId") Long userId,
+    public ApiResponse<ChatResponse.ChatRoomEnterDTO> enterChatRoom (@RequestParam(name = "userId") @EqualsUserId  Long userId,
                                                                        @RequestParam(name = "chatRoomId") Long chatRoomId) {
         ChatResponse.ChatRoomEnterDTO response = chatRoomCommandService.updateLastEnterTime(userId, chatRoomId);
 
@@ -176,6 +182,7 @@ public class ChatRoomController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200",description = "OK, 성공"),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "USER4001", description = "아이디와 일치하는 사용자가 없습니다.", content = @Content(schema = @Schema(implementation = ApiResponse.class))),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "CHATROOM4001", description = "채팅방 아이디와 일치하는 채팅방이 없습니다.", content = @Content(schema = @Schema(implementation = ApiResponse.class))),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "AUTHORIZATION_4031", description = "인증된 사용자 정보와 요청된 리소스의 사용자 정보가 다릅니다. (userId 불일치)", content = @Content(schema = @Schema(implementation = ApiResponse.class))),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "PAGE4001", description = "페이지 번호는 1 이상이어야 합니다.", content = @Content(schema = @Schema(implementation = ApiResponse.class))),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON400", description = "잘못된 요청입니다.", content = @Content(schema = @Schema(implementation = ApiResponse.class))),
     })
@@ -185,7 +192,7 @@ public class ChatRoomController {
             @Parameter(name = "page", description = "페이지 번호, 1부터 시작입니다.", example = "1", required = true)
     })
     @GetMapping("/room")
-    public ApiResponse<ChatResponse.ChatMessageListDTO> getChatMessageList (@RequestParam(name = "userId") Long userId,
+    public ApiResponse<ChatResponse.ChatMessageListDTO> getChatMessageList (@RequestParam(name = "userId") @EqualsUserId Long userId,
                                                                             @RequestParam(name = "chatRoomId") Long chatRoomId,
                                                                             @CheckPage Integer page) {
         ChatResponse.ChatMessageListDTO response = chatMessageQueryService.findChatMessageList(userId, chatRoomId, page);
@@ -203,6 +210,7 @@ public class ChatRoomController {
     @ApiResponses({
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200", description = "OK, 성공"),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "USER4001", description = "아이디와 일치하는 사용자가 없습니다.", content = @Content(schema = @Schema(implementation = ApiResponse.class))),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "AUTHORIZATION_4031", description = "인증된 사용자 정보와 요청된 리소스의 사용자 정보가 다릅니다. (userId 불일치)", content = @Content(schema = @Schema(implementation = ApiResponse.class))),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "CHATROOM4001", description = "채팅방 아이디와 일치하는 채팅방이 없습니다.", content = @Content(schema = @Schema(implementation = ApiResponse.class))),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON400", description = "잘못된 요청입니다.", content = @Content(schema = @Schema(implementation = ApiResponse.class))),
     })
@@ -211,7 +219,7 @@ public class ChatRoomController {
             @Parameter(name = "chatRoomId", description = "삭제하려는 채팅방의 아이디", example = "1", required = true),
     })
     @DeleteMapping("/room")
-    public ApiResponse<ChatResponse.ChatRoomDeleteDTO> deleteChatRoom (@RequestParam(name = "userId") Long userId,
+    public ApiResponse<ChatResponse.ChatRoomDeleteDTO> deleteChatRoom (@RequestParam(name = "userId") @EqualsUserId Long userId,
                                                                          @RequestParam(name = "chatRoomId") Long chatRoomId) {
         ChatResponse.ChatRoomDeleteDTO response = chatRoomCommandService.removeChatRoom(userId, chatRoomId);
 
@@ -228,6 +236,7 @@ public class ChatRoomController {
     @ApiResponses({
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200", description = "OK, 성공"),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "USER4001", description = "아이디와 일치하는 사용자가 없습니다.", content = @Content(schema = @Schema(implementation = ApiResponse.class))),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "AUTHORIZATION_4031", description = "인증된 사용자 정보와 요청된 리소스의 사용자 정보가 다릅니다. (userId 불일치)", content = @Content(schema = @Schema(implementation = ApiResponse.class))),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "CHATROOM4001", description = "채팅방 아이디와 일치하는 채팅방이 없습니다.", content = @Content(schema = @Schema(implementation = ApiResponse.class))),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON400", description = "잘못된 요청입니다.", content = @Content(schema = @Schema(implementation = ApiResponse.class))),
     })
@@ -236,7 +245,7 @@ public class ChatRoomController {
             @Parameter(name = "chatRoomId", description = "채팅방의 아이디", example = "1", required = true)
     })
     @GetMapping("/room/estimate")
-    public ApiResponse<ChatResponse.ChatRoomEstimateDTO> getChatRoomEstimate (@RequestParam(name = "userId") Long userId,
+    public ApiResponse<ChatResponse.ChatRoomEstimateDTO> getChatRoomEstimate (@RequestParam(name = "userId") @EqualsUserId  Long userId,
                                                                               @RequestParam(name = "chatRoomId") Long chatRoomId) {
         ChatResponse.ChatRoomEstimateDTO response = chatRoomQueryService.findChatRoomEstimate(userId, chatRoomId);
 

@@ -48,15 +48,15 @@ public class ChatRoomCommandServiceImpl implements ChatRoomCommandService{
                 .orElseThrow(()-> new UserHandler(ErrorStatus.USER_NOT_FOUND));
 
         ChatRoom chatRoom = ChatConverter.toChatRoom(expert, estimate, farmer);
-//        chatRoom.setExpert(expert);
-//        cahtRoom.setFarmer(farmer);
-//        chatRoom.setEstimate(estimate);
+        chatRoom.setExpert(expert);
+        chatRoom.setFarmer(farmer);
+        chatRoom.setEstimate(estimate);
 
         chatRoomRepository.save(chatRoom);
 
         log.info("채팅방 생성 완료 - 채팅방 아아디: {}, 생성한 전문가 expertId: {}", chatRoom.getId(), expert.getId());
 
-        return ChatConverter.toChatRoomCreateDTO(chatRoom);
+        return ChatConverter.toChatRoomCreateDTO(chatRoom, farmer);
     }
 
     // 채팅방 입장

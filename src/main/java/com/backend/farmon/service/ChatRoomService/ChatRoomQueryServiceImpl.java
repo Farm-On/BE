@@ -4,8 +4,10 @@ import com.backend.farmon.apiPayload.code.status.ErrorStatus;
 import com.backend.farmon.apiPayload.exception.handler.ChatRoomHandler;
 import com.backend.farmon.apiPayload.exception.handler.EstimateHandler;
 import com.backend.farmon.apiPayload.exception.handler.UserHandler;
+import com.backend.farmon.config.security.UserAuthorizationUtil;
 import com.backend.farmon.converter.ChatConverter;
 import com.backend.farmon.domain.*;
+import com.backend.farmon.domain.enums.Role;
 import com.backend.farmon.dto.chat.ChatResponse;
 import com.backend.farmon.repository.ChatMessageRepository.ChatMessageRepository;
 import com.backend.farmon.repository.ChatRoomReposiotry.ChatRoomRepository;
@@ -31,6 +33,7 @@ public class ChatRoomQueryServiceImpl implements ChatRoomQueryService {
     private final ChatMessageRepository chatMessageRepository;
     private final UserRepository userRepository;
     private final EstimateRepository estimateRepository;
+    private final UserAuthorizationUtil userAuthorizationUtil;
 
     private static final Integer PAGE_SIZE=10;
 
@@ -54,7 +57,8 @@ public class ChatRoomQueryServiceImpl implements ChatRoomQueryService {
 
         // 채팅 대화방 세부 정보 목록 생성
         List<ChatResponse.ChatRoomDetailDTO> chatRoomInfoList = chatRoomPage.stream().map(chatRoom -> {
-            boolean isExpert = chatRoom.getExpert().getId().equals(userId);
+            // 전문가 여부
+            boolean isExpert = userAuthorizationUtil.isCurrentUserRoleMatching(Role.EXPERT.toString());
 
             // 안 읽은 채팅 메시지 개수 조회
             int unReadMessageCount = chatMessageRepository.findByChatRoomIdAndIsReadFalse(chatRoom.getId()).size();
@@ -67,8 +71,11 @@ public class ChatRoomQueryServiceImpl implements ChatRoomQueryService {
 
             log.info("채팅방과 일치하는 최신 메시지 조회 완료 - userId: {}, 내용: {}", userId, lastMessage.getContent());
 
+            // 채팅방의 견적과 연관된 지역
+            Area area = chatRoom.getEstimate().getArea();
+
             // 채팅방 대화방 세부 정보를 dto로 변환
-            return ChatConverter.toChatRoomDetailDTO(chatRoom, lastMessage, isExpert, unReadMessageCount);
+            return ChatConverter.toChatRoomDetailDTO(chatRoom, lastMessage, area, isExpert, unReadMessageCount);
         }).toList();
 
         // 최종 채팅방 목록 정보 DTO 생성 및 반환
