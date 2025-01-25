@@ -153,7 +153,7 @@ public class ChatResponse {
         @Schema(description = "채팅 상대의 마지막 채팅방 접속 시간", example = "28분")
         String lastEnterTime;
 
-        @Schema(description = "채팅 상대의 평균 메시지 응답 시간", example = "1시간")
+        @Schema(description = "채팅 상대의 평균 메시지 응답 시간, 정보가 없는 사용자이면 null", example = "1시간")
         String averageResponseTime;
     }
 
