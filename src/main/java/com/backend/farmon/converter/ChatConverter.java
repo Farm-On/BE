@@ -112,7 +112,7 @@ public class ChatConverter {
                 .estimateBudget(chatRoom.getEstimate().getBudget())
                 .estimateCategory(chatRoom.getEstimate().getCategory())
                 .estimateAreaName(area.getAreaName())
-                .estimateAreaName(area.getAreaNameDetail())
+                .estimateAreaDetail(area.getAreaNameDetail())
                 .unreadMessageCount(unReadMessageCount)
                 .lastMessageContent(chatMessage != null ? chatMessage.getContent() : null) // null-safe 처리
                 .lastMessageDate(chatMessage != null ? ConvertTime.convertToYearMonthDay(chatMessage.getCreatedAt()) : null) // null-safe 처리
