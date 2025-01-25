@@ -164,7 +164,6 @@ public class BoardServiceImpl implements BoardService {
         return Post.builder()
                 .postTitle(postDTO.getPostTitle())
                 .postContent(postDTO.getPostContent())
-                .postType(postDTO.getPostType())
                 .user(user)
                 .board(board)
                 .build();
@@ -174,7 +173,6 @@ public class BoardServiceImpl implements BoardService {
         return Post.builder()
                 .postTitle(postDTO.getPostTitle())
                 .postContent(postDTO.getPostContent())
-                .postType(postDTO.getPostType())
                 .user(user)
                 .board(board)
                 .build();
@@ -184,7 +182,6 @@ public class BoardServiceImpl implements BoardService {
         return Post.builder()
                 .postTitle(postDTO.getPostTitle())
                 .postContent(postDTO.getPostContent())
-                .postType(postDTO.getPostType())
                 .user(user)
                 .board(board)
                 .build();
@@ -194,7 +191,6 @@ public class BoardServiceImpl implements BoardService {
         return Post.builder()
                 .postTitle(postDTO.getPostTitle())
                 .postContent(postDTO.getPostContent())
-                .postType(postDTO.getPostType())
                 .fieldCategory(postDTO.getFieldCategory())
                 .user(user)
                 .board(board)
@@ -205,7 +201,6 @@ public class BoardServiceImpl implements BoardService {
         return Post.builder()
                 .postTitle(postDTO.getPostTitle())
                 .postContent(postDTO.getPostContent())
-                .postType(postDTO.getPostType())
                 .fieldCategory(postDTO.getFieldCategory())
                 .user(user)
                 .board(board)
