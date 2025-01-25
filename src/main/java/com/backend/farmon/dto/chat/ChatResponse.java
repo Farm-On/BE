@@ -126,9 +126,6 @@ public class ChatResponse {
         @Schema(description = "채팅 중인 상대방 이름", example = "김팜온")
         String name;
 
-        @Schema(description = "채팅 중인 상대방 프로필 이미지")
-        String profileImage;
-
         @Schema(description = "채팅 상대 역할, 농업인 또는 전문가", example = "농업인")
         String type;
 
