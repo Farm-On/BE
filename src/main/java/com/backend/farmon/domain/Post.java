@@ -18,7 +18,7 @@ import lombok.Setter;
 import java.util.ArrayList;
 import java.util.List;
 
-@Table(name="Post_Table")
+@Table(name="post")
 @Entity
 @Getter
 @Setter
