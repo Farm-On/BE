@@ -18,14 +18,13 @@ public class ChatConverter {
                 .build();
     }
 
-    public static ChatResponse.ChatRoomCreateDTO toChatRoomCreateDTO(ChatRoom chatRoom){
+    public static ChatResponse.ChatRoomCreateDTO toChatRoomCreateDTO(ChatRoom chatRoom, User farmer){
         return ChatResponse.ChatRoomCreateDTO.builder()
                 .chatRoomId(chatRoom.getId())
                 .name(chatRoom.getFarmer().getUserName())
 //                .profileImage(chatRoom.getFarmer().getProfileImageUrl())
                 .type("농업인")
-                .lastEnterTime(null)
-                .averageResponseTime(null)
+                .averageResponseTime(farmer.getChatAverageResponseTime())
                 .build();
     }
 
@@ -106,8 +105,8 @@ public class ChatConverter {
 //                .profileImage(user.getProfileImageUrl())
                 .estimateBudget(chatRoom.getEstimate().getBudget())
                 .estimateCategory(chatRoom.getEstimate().getCategory())
-                .areaName(area.getAreaName())
-                .areaName(area.getAreaNameDetail())
+                .estimateAreaName(area.getAreaName())
+                .estimateAreaName(area.getAreaNameDetail())
                 .unreadMessageCount(unReadMessageCount)
                 .lastMessageContent(chatMessage != null ? chatMessage.getContent() : null) // null-safe 처리
                 .lastMessageDate(chatMessage != null ? ConvertTime.convertToYearMonthDay(chatMessage.getCreatedAt()) : null) // null-safe 처리
@@ -119,13 +118,13 @@ public class ChatConverter {
         Area area = estimate.getArea();
 
         return ChatResponse.ChatRoomEstimateDTO.builder()
-                .cropCategory(estimate.getCrop().getCategory())
-                .cropName(estimate.getCrop().getName())
-                .applyName(estimate.getUser().getUserName())
+                .estimateCropCategory(estimate.getCrop().getCategory())
+                .estimateCropName(estimate.getCrop().getName())
+                .estimateApplyName(estimate.getUser().getUserName())
                 .estimateCategory(estimate.getCategory())
-                .areaName(area.getAreaName())
-                .areaDetail(area.getAreaNameDetail())
-                .budget(estimate.getBudget())
+                .estimateAreaName(area.getAreaName())
+                .estimateAreaDetail(area.getAreaNameDetail())
+                .estimateBudget(estimate.getBudget())
                 .estimateContent(estimate.getBody())
                 // map을 사용하여 imageUrl 리스트로 변환
                 .estimateImageList(

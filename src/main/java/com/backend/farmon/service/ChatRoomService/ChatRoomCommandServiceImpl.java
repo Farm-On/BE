@@ -56,7 +56,7 @@ public class ChatRoomCommandServiceImpl implements ChatRoomCommandService{
 
         log.info("채팅방 생성 완료 - 채팅방 아아디: {}, 생성한 전문가 expertId: {}", chatRoom.getId(), expert.getId());
 
-        return ChatConverter.toChatRoomCreateDTO(chatRoom);
+        return ChatConverter.toChatRoomCreateDTO(chatRoom, farmer);
     }
 
     // 채팅방 입장
