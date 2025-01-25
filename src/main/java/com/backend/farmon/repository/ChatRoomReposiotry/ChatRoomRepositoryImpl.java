@@ -21,9 +21,18 @@ public class ChatRoomRepositoryImpl implements ChatRoomRepositoryCustom {
 
     // userId와 연관된 채팅방 페이징 조회
     @Override
-    public Page<ChatRoom> findChatRoomsByUserId(Long userId, Pageable pageable) {
+    public Page<ChatRoom> findChatRoomsByUserIdAndRole(Long userId, String role, Pageable pageable) {
         BooleanBuilder builder = new BooleanBuilder();
         builder.and(chatRoom.farmer.id.eq(userId).or(chatRoom.expert.user.id.eq(userId)));
+
+        // role에 따른 조건 추가
+        if ("FARMER".equalsIgnoreCase(role)) {
+            builder.and(chatRoom.farmer.id.eq(userId));
+        } else if ("EXPERT".equalsIgnoreCase(role)) {
+            builder.and(chatRoom.expert.user.id.eq(userId));
+        } else {
+            throw new IllegalArgumentException("Invalid role: " + role);
+        }
 
         // 데이터 조회 쿼리
         QueryResults<ChatRoom> results = queryFactory
@@ -40,9 +49,18 @@ public class ChatRoomRepositoryImpl implements ChatRoomRepositoryCustom {
 
     // userId와 연관된 채팅방 중 안 읽음 메시지가 존재하는 채팅방만 페이징 조회
     @Override
-    public Page<ChatRoom> findUnReadChatRoomsByUserId(Long userId, Pageable pageable) {
+    public Page<ChatRoom> findUnReadChatRoomsByUserIdAndRole(Long userId, String role, Pageable pageable) {
         BooleanBuilder builder = new BooleanBuilder();
-        builder.and(chatRoom.farmer.id.eq(userId).or(chatRoom.expert.user.id.eq(userId)));
+
+        // role에 따른 조건 추가
+        if ("FARMER".equalsIgnoreCase(role)) {
+            builder.and(chatRoom.farmer.id.eq(userId));
+        } else if ("EXPERT".equalsIgnoreCase(role)) {
+            builder.and(chatRoom.expert.user.id.eq(userId));
+        } else {
+            throw new IllegalArgumentException("Invalid role: " + role);
+        }
+
         builder.and(chatMessage.isRead.isFalse());
 
         // 데이터 조회 쿼리

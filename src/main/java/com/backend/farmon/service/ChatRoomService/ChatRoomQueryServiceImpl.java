@@ -4,6 +4,7 @@ import com.backend.farmon.apiPayload.code.status.ErrorStatus;
 import com.backend.farmon.apiPayload.exception.handler.ChatRoomHandler;
 import com.backend.farmon.apiPayload.exception.handler.EstimateHandler;
 import com.backend.farmon.apiPayload.exception.handler.UserHandler;
+import com.backend.farmon.config.security.UserAuthorizationUtil;
 import com.backend.farmon.converter.ChatConverter;
 import com.backend.farmon.domain.*;
 import com.backend.farmon.dto.chat.ChatResponse;
@@ -31,6 +32,7 @@ public class ChatRoomQueryServiceImpl implements ChatRoomQueryService {
     private final ChatMessageRepository chatMessageRepository;
     private final UserRepository userRepository;
     private final EstimateRepository estimateRepository;
+    private final UserAuthorizationUtil userAuthorizationUtil;
 
     private static final Integer PAGE_SIZE=10;
 
@@ -45,10 +47,13 @@ public class ChatRoomQueryServiceImpl implements ChatRoomQueryService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserHandler(ErrorStatus.USER_NOT_FOUND));
 
+        // 현재 로그인한 사용자의 역할
+        String role = userAuthorizationUtil.getCurrentUserRole();
+
         // 안 읽음 필터링에 따른 유저의 모든 채팅방 목록을 페이지네이션으로 조회
         Page<ChatRoom> chatRoomPage = read.equals(1)
-                ? chatRoomRepository.findUnReadChatRoomsByUserId(userId, pageRequest(pageNumber))
-                : chatRoomRepository.findChatRoomsByUserId(userId, pageRequest(pageNumber));
+                ? chatRoomRepository.findUnReadChatRoomsByUserIdAndRole(userId, role, pageRequest(pageNumber))
+                : chatRoomRepository.findChatRoomsByUserIdAndRole(userId, role, pageRequest(pageNumber));
 
         log.info("안 읽음 필터링에 따른 유저의 모든 채팅방 목록 페이지네이션 조회 완료 - userId: {}", userId);
 

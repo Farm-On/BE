@@ -87,9 +87,7 @@ public class ChatRoomCommandServiceImpl implements ChatRoomCommandService{
         // 채팅방에서의 전문가 여부
         boolean isExpert = chatRoom.getExpert().getId().equals(userId);
 
-
         boolean isOtherComplete = false;
-
         // 컨설팅 완료 여부 변경 및 상대 거래 완료 여부 조회
         if(isExpert){
             chatRoom.setIsExpertComplete(true);
@@ -108,6 +106,8 @@ public class ChatRoomCommandServiceImpl implements ChatRoomCommandService{
             estimate.setStatus(1);
             isEstimateComplete = true;
         }
+
+        log.info("채팅방 컨설팅 완료 - 유저 아이디: {}, 채팅방 아아디: {}", userId, chatRoomId);
 
         return ChatConverter.toChatRoomCompleteDTO(chatRoom, isOtherComplete, isEstimateComplete);
     }
