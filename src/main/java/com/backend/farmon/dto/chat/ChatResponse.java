@@ -208,4 +208,21 @@ public class ChatResponse {
         @Schema(description = "견적 이미지 리스트")
         List<String> estimateImageList;
     }
+
+    @Getter
+    @Setter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Builder
+    @Schema(description = "채팅방 컨설팅 완료 정보")
+    public static class ChatRoomCompleteDTO {
+        @Schema(description = "사용자의 컨설팅 완료 여부", example = "true")
+        Boolean isComplete;
+
+        @Schema(description = "채팅 상대의 컨설팅 완료 여부", example = "true")
+        Boolean isOtherComplete;
+
+        @Schema(description = "견적 완료 여부, 농업인 전문가 모두 컨설팅 완료 시 true", example = "true")
+        Boolean isEstimateComplete;
+    }
 }

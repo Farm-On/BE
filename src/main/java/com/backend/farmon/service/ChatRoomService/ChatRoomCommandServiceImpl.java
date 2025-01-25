@@ -18,8 +18,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
-
 @Slf4j
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -74,5 +72,43 @@ public class ChatRoomCommandServiceImpl implements ChatRoomCommandService{
         log.info("채팅방 삭제 완료 - 채팅방 아아디: {}", chatRoomId);
 
         return ChatConverter.toChatRoomDeleteDTO();
+    }
+
+    // 채팅방 컨설팅 완료
+    @Transactional
+    @Override
+    public ChatResponse.ChatRoomCompleteDTO exchangeChatRoomUserComplete(Long userId, Long chatRoomId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(()-> new UserHandler(ErrorStatus.USER_NOT_FOUND));
+
+        ChatRoom chatRoom = chatRoomRepository.findById(chatRoomId)
+                .orElseThrow(()-> new ChatRoomHandler(ErrorStatus.CHATROOM_NOT_FOUND));
+
+        // 채팅방에서의 전문가 여부
+        boolean isExpert = chatRoom.getExpert().getId().equals(userId);
+
+
+        boolean isOtherComplete = false;
+
+        // 컨설팅 완료 여부 변경 및 상대 거래 완료 여부 조회
+        if(isExpert){
+            chatRoom.setIsExpertComplete(true);
+            isOtherComplete = chatRoom.getIsFarmerComplete();
+        }
+        else{
+            chatRoom.setIsFarmerComplete(true);
+            isOtherComplete = chatRoom.getIsExpertComplete();
+        }
+
+        boolean isEstimateComplete = false;
+
+        // 농업인, 전문가 둘 다 컨설팅 완료 일 시 견적 상태 변경
+        if(chatRoom.getIsFarmerComplete() && chatRoom.getIsExpertComplete()){
+            Estimate estimate = chatRoom.getEstimate();
+            estimate.setStatus(1);
+            isEstimateComplete = true;
+        }
+
+        return ChatConverter.toChatRoomCompleteDTO(chatRoom, isOtherComplete, isEstimateComplete);
     }
 }

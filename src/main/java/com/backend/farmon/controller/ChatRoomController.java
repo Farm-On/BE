@@ -136,7 +136,7 @@ public class ChatRoomController {
     })
     @GetMapping("/room")
     public ApiResponse<ChatResponse.ChatRoomDataDTO> getChatRoomData (@RequestParam(name = "userId") @EqualsUserId  Long userId,
-                                                                      @RequestParam(name = "chatRoomId") Long chatRoomId) {
+                                                                          @RequestParam(name = "chatRoomId") Long chatRoomId) {
         ChatResponse.ChatRoomDataDTO response = chatRoomQueryService.findChatRoomDataAndChangeUnreadMessage(userId, chatRoomId);
 
         return ApiResponse.onSuccess(response);
@@ -222,4 +222,28 @@ public class ChatRoomController {
         return ApiResponse.onSuccess(response);
     }
 
+    // 채팅방 컨설팅 완료
+    @Operation(
+            summary = "채팅방 컨설팅 완료",
+            description = "채팅방에서 현재 로그인한 사용자가 컨설팅 완료를 진행하는 API 입니다." +
+                    "유저 아이디, 채팅방 아이디를 쿼리 스트링으로 입력해주세요."
+    )
+    @ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200", description = "OK, 성공"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "USER4001", description = "아이디와 일치하는 사용자가 없습니다.", content = @Content(schema = @Schema(implementation = ApiResponse.class))),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "AUTHORIZATION_4031", description = "인증된 사용자 정보와 요청된 리소스의 사용자 정보가 다릅니다. (userId 불일치)", content = @Content(schema = @Schema(implementation = ApiResponse.class))),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "CHATROOM4001", description = "채팅방 아이디와 일치하는 채팅방이 없습니다.", content = @Content(schema = @Schema(implementation = ApiResponse.class))),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON400", description = "잘못된 요청입니다.", content = @Content(schema = @Schema(implementation = ApiResponse.class))),
+    })
+    @Parameters({
+            @Parameter(name = "userId", description = "로그인한 유저의 아이디(pk)", example = "1", required = true),
+            @Parameter(name = "chatRoomId", description = "채팅방의 아이디", example = "1", required = true)
+    })
+    @PatchMapping("/room/complete")
+    public ApiResponse<ChatResponse.ChatRoomCompleteDTO> patchChatRoomUserComplete (@RequestParam(name = "userId") @EqualsUserId  Long userId,
+                                                                                    @RequestParam(name = "chatRoomId") Long chatRoomId) {
+        ChatResponse.ChatRoomCompleteDTO response = chatRoomCommandService.exchangeChatRoomUserComplete(userId, chatRoomId);
+
+        return ApiResponse.onSuccess(response);
+    }
 }

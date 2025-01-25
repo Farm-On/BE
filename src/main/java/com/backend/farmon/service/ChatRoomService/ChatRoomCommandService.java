@@ -9,4 +9,7 @@ public interface ChatRoomCommandService {
 
     // 채팅방 삭제
     ChatResponse.ChatRoomDeleteDTO removeChatRoom(Long userId, Long chatRoomId);
+
+    // 채팅방 컨설팅 완료
+    ChatResponse.ChatRoomCompleteDTO exchangeChatRoomUserComplete(Long userId, Long chatRoomId);
 }
