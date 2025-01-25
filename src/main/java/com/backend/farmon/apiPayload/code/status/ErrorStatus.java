@@ -37,7 +37,7 @@ public enum ErrorStatus implements BaseErrorCode {
     EMAIL_ALREADY_EXIST(HttpStatus.BAD_REQUEST, "PAGE4001", "이미 가입된 이메일주소입니다."),
 
     // 커뮤니티 게시판
-    POST_TYPE_NOT_FOUND(HttpStatus.BAD_REQUEST, "POST_TYPE4001", "게시글을 찾을 수 없습니다"),
+   
     POST_NOT_SAVED(HttpStatus.BAD_REQUEST, "POST_TYPE4002", "게시글이 저장되지 않았습니다."),
     POST_NOT_FOUND(HttpStatus.BAD_REQUEST, "POST_TYPE4003", "게시글을 찾을 수 없습니다."),
 
