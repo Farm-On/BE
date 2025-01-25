@@ -6,7 +6,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 
-@Table(name="Answer_Table")
+@Table(name="answer")
 @Entity
 @Setter
 @Getter
