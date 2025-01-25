@@ -35,7 +35,7 @@ public class Post extends BaseEntity {
 
     private String postContent;
 
-    private PostType postType;
+  //  private PostType postType;
 
     @ManyToOne
     @JoinColumn(name="board_id")
