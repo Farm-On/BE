@@ -9,7 +9,7 @@ import lombok.Setter;
 
 import java.time.LocalDateTime;
 
-@Table(name = "Like_count")
+@Table(name = "likecount")
 @Entity
 @Getter
 @Setter
