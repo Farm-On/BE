@@ -47,7 +47,7 @@ public class PostController {
 
     @Parameters({
             @Parameter(name = "userId", description = "로그인한 유저의 아이디(pk)", required = true),
-            @Parameter(name = "BoardRequestDTO", description = "게시판 유형"),
+            @Parameter(name = "BoardRequestDTO", description = "게시판 유형", required = true),
             @Parameter(name = "postRequestDTO", description = "게시글 정보", required = true),
             @Parameter(name = "imgList", description = "첨부된 이미지 목록 (optional)", required = false)
     })
@@ -78,7 +78,7 @@ public class PostController {
     })
     @Parameters({
             @Parameter(name = "userId", description = "로그인한 유저의 아이디(pk)", required = true),
-            @Parameter(name = "BoardRequestDTO", description = "게시판 유형"),
+            @Parameter(name = "BoardRequestDTO", description = "게시판 유형", required = true),
             @Parameter(name = "postRequestDTO", description = "게시글 정보", required = true),
             @Parameter(name = "imgList", description = "첨부된 이미지 목록 (optional)", required = false)
 
@@ -114,7 +114,7 @@ public class PostController {
 
     @Parameters({
             @Parameter(name = "userId", description = "로그인한 유저의 아이디(pk)", required = true),
-            @Parameter(name = "BoardRequestDTO", description = "게시판 유형"),
+            @Parameter(name = "BoardRequestDTO", description = "게시판 유형", required = true),
             @Parameter(name = "postRequestDTO", description = "게시글 정보", required = true),
             @Parameter(name = "imgList", description = "첨부된 이미지 목록 (optional)", required = false)
     })
@@ -146,7 +146,7 @@ public class PostController {
 
     @Parameters({
             @Parameter(name = "userId", description = "로그인한 유저의 아이디(pk)", required = true),
-            @Parameter(name = "postRequestDTO", description = "게시글 정보", required = true),
+            @Parameter(name = "BoardRequestDTO", description = "게시판 유형", required = true),
             @Parameter(name = "postRequestDTO", description = "게시글 정보", required = true),
             @Parameter(name = "imgList", description = "첨부된 이미지 목록 (optional)", required = false),
             @Parameter(name="Filter" ,description = "분야(필터)",required = true)
@@ -209,7 +209,7 @@ public class PostController {
 
     @Parameters({
             @Parameter(name = "userId", description = "로그인한 유저의 아이디(pk)", required = true),
-            @Parameter(name = "postRequestDTO", description = "게시글 정보", required = true),
+            @Parameter(name = "BoardRequestDTO", description = "게시판 유형", required = true),
             @Parameter(name = "postRequestDTO", description = "게시글 정보", required = true),
             @Parameter(name = "imgList", description = "첨부된 이미지 목록 (optional)", required = false),
             @Parameter(name="Filter" ,description = "분야(필터)",required = true)
