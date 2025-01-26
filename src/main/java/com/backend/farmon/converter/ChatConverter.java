@@ -1,6 +1,8 @@
 package com.backend.farmon.converter;
 
 import com.backend.farmon.domain.*;
+import com.backend.farmon.domain.enums.ChatMessageType;
+import com.backend.farmon.dto.chat.ChatRequest;
 import com.backend.farmon.dto.chat.ChatResponse;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Slice;
@@ -9,6 +11,17 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 public class ChatConverter {
+
+    public static ChatMessage toChatMessage(ChatRequest.ChatMessageDTO dto, ChatRoom chatRoom){
+        return ChatMessage.builder()
+                .senderId(dto.getSenderId())
+                .type(ChatMessageType.valueOf(dto.getMessageType()))
+                .content(dto.getMessageContent()!=null ? dto.getMessageContent() : null)
+                .isRead(false) // 일단 읽음 여부 false로 리턴, 추후에 다시 구현
+                .chatRoom(chatRoom)
+                .build();
+    }
+
     public static ChatRoom toChatRoom(Expert expert, Estimate estimate, User farmer){
         return ChatRoom.builder()
                 .expertLastEnter(LocalDateTime.now())

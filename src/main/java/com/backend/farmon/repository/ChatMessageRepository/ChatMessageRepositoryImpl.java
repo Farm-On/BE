@@ -25,7 +25,7 @@ public class ChatMessageRepositoryImpl implements ChatMessageRepositoryCustom {
         List<ChatMessage> content = queryFactory.selectFrom(chatMessage)
                 .where(
                         chatMessage.chatRoom.id.eq(chatRoomId),
-                        chatMessage.type.notIn(ChatMessageType.COMPLETE, ChatMessageType.EXIT)
+                        chatMessage.type.in(ChatMessageType.TEXT, ChatMessageType.IMAGE)
                 )
                 .orderBy(chatMessage.createdAt.desc())
                 .offset(pageable.getOffset())
@@ -41,7 +41,7 @@ public class ChatMessageRepositoryImpl implements ChatMessageRepositoryCustom {
         return new SliceImpl<>(content, pageable, hasNext);
     }
 
-    // 채팅방 아이디와 일치하는 채팅 메시지 중, 상대방이 보낸 메시지 중 안 읽은 메시지를 읽음 처리
+    // 채팅방 아이디와 일치하는 채팅 메시지 중, 상대방이 보낸 메시지 중 TEXT, IMAGE 메시지를 읽음 처리
     @Transactional
     @Override
     public void updateMessagesToReadByChatRoomId(Long chatRoomId, Long userId) {
@@ -51,7 +51,7 @@ public class ChatMessageRepositoryImpl implements ChatMessageRepositoryCustom {
                         chatMessage.chatRoom.id.eq(chatRoomId),
                         chatMessage.senderId.notIn(userId),
                         chatMessage.isRead.isFalse(),
-                        chatMessage.type.notIn(ChatMessageType.COMPLETE, ChatMessageType.EXIT)
+                        chatMessage.type.in(ChatMessageType.TEXT, ChatMessageType.IMAGE)
                 )
                 .execute();
     }

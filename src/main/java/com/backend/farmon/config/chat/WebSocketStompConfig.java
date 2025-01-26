@@ -38,10 +38,10 @@ public class WebSocketStompConfig implements WebSocketMessageBrokerConfigurer {
     //메세지 브로커에 관한 설정
     @Override
     public void configureMessageBroker(MessageBrokerRegistry registry){
-        registry.enableSimpleBroker("/send"); // 메시지 송신
+        registry.enableSimpleBroker("/receive"); // 메시지 수신, 구독 sub
 
         // 도착 경로에 대한 prefix 설정
-        registry.setApplicationDestinationPrefixes("/receive"); // 메시지 수신, 구독
+        registry.setApplicationDestinationPrefixes("/send"); // 메시지 송신, pub
     }
 
     @Override

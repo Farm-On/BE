@@ -80,7 +80,7 @@ public class ChatRoomCommandServiceImpl implements ChatRoomCommandService{
     // 채팅방 컨설팅 완료
     @Transactional
     @Override
-    public ChatResponse.ChatRoomCompleteDTO exchangeChatRoomUserComplete(Long userId, Long chatRoomId) {
+    public void exchangeChatRoomUserComplete(Long userId, Long chatRoomId, Boolean isEstimateComplete) {
         User user = userRepository.findById(userId)
                 .orElseThrow(()-> new UserHandler(ErrorStatus.USER_NOT_FOUND));
 
@@ -88,7 +88,7 @@ public class ChatRoomCommandServiceImpl implements ChatRoomCommandService{
                 .orElseThrow(()-> new ChatRoomHandler(ErrorStatus.CHATROOM_NOT_FOUND));
 
         // 채팅방에서의 전문가 여부
-        boolean isExpert = chatRoom.getExpert().getId().equals(userId);
+        boolean isExpert = chatRoom.getExpert().getUser().getId().equals(userId);
 
         boolean isOtherComplete = false;
         // 컨설팅 완료 여부 변경 및 상대 거래 완료 여부 조회
@@ -101,29 +101,24 @@ public class ChatRoomCommandServiceImpl implements ChatRoomCommandService{
             isOtherComplete = chatRoom.getIsExpertComplete();
         }
 
-        boolean isEstimateComplete = false;
-
         // 농업인, 전문가 둘 다 컨설팅 완료 일 시 견적 상태 변경
         if(chatRoom.getIsFarmerComplete() && chatRoom.getIsExpertComplete()){
             Estimate estimate = chatRoom.getEstimate();
-            estimate.setStatus(1);
+            estimate.setStatus(1); // 견적 상태 진행 완료로 변경
+            estimate.setExpert(chatRoom.getExpert()); // 견적 전문가를 채팅방의 전문가로 변경
+
             isEstimateComplete = true;
         }
 
         log.info("채팅방 컨설팅 완료 - 유저 아이디: {}, 채팅방 아아디: {}", userId, chatRoomId);
-
-        return ChatConverter.toChatRoomCompleteDTO(chatRoom, isOtherComplete, isEstimateComplete);
     }
 
     // 사용자 여부에 따른 채팅 입장 시간 변경
     @Transactional
     @Override
-    public void changeChatRoomEnterTime(Long userId, Long chatRoomId, Boolean isExpert) {
-        ChatRoom chatRoom = chatRoomRepository.findById(chatRoomId)
-                .orElseThrow(()-> new ChatRoomHandler(ErrorStatus.CHATROOM_NOT_FOUND));
-
+    public void changeChatRoomEnterTime(Long userId, ChatRoom chatRoom) {
         // 전문가라면 전문가 접속 시간 뱐걍
-        if(isExpert && chatRoom.getExpert().getUser().getId().equals(userId))
+        if(chatRoom.getExpert().getUser().getId().equals(userId))
             chatRoom.setExpertLastEnter(LocalDateTime.now());
         else
             chatRoom.setFarmerLastEnter(LocalDateTime.now());

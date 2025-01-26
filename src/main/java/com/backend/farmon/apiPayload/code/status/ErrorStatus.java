@@ -51,7 +51,10 @@ public enum ErrorStatus implements BaseErrorCode {
     Like_TYPE_NOT_SAVED(HttpStatus.BAD_REQUEST, "LIKE_TYPE4001", "좋아요가 눌리지 않았습니다."),
 
     // 사용자 인증 정보
-    AUTHORIZATION_NOT_EQUALS(HttpStatus.FORBIDDEN, "AUTHORIZATION4031", "인증된 사용자 정보와 요청된 리소스의 사용자 정보가 다릅니다. (userId 불일치)");
+    AUTHORIZATION_NOT_EQUALS(HttpStatus.FORBIDDEN, "AUTHORIZATION4031", "인증된 사용자 정보와 요청된 리소스의 사용자 정보가 다릅니다. (userId 불일치)"),
+
+    // 채팅 메시지 타입
+    MESSAGE_TYPE_NOT_FOUND(HttpStatus.BAD_REQUEST, "MESSAGE_TYPE4001", "지원되지 않는 채팅 메시지 타입입니다.");
 
     private final HttpStatus httpStatus;
     private final String code;

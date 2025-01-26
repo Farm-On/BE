@@ -17,9 +17,6 @@ public class ChatRequest {
         @Schema(description = "보낸 사람 아이디, 현재 로그인한 사용자의 userId와 동일", example = "1")
         Long senderId;
 
-        @Schema(description = "보낸 사람 타입", example = "농업인")
-        String senderType;
-
         @Schema(description = "메시지 내용, 이미지일 경우 클라이언트에서 이미지 파일을 Base64로 인코딩하여 전송 필요", example = "안녕하세요. 견적 신청하셨나요?")
         String messageContent;
 
@@ -27,11 +24,14 @@ public class ChatRequest {
                 "텍스트 메시지 전송이라면 TEXT, 이미지 전송이라면 IMAGE, 컨설팅 완료라면 COMPLETE, 채팅방 퇴장이라면 EXIT", example = "TEXT")
         String messageType;
 
-        @Schema(description = "보낸 시간", example = "2025-01-10")
+        @Schema(description = "보낸 시간", example = "오후 5:22")
         String sendTime;
 
         @Schema(description = "내가 보낸 메시지인지 여부, 내가 보낸 메시지라면 true, 받은 메시지라면 false", example = "true")
         Boolean isMine;
+
+        @Schema(description = "견적 완료 여부, 농업인 전문가 모두 컨설팅 완료 시 true", example = "true")
+        Boolean isEstimateComplete;
     }
 
     @ToString

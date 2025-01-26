@@ -8,6 +8,7 @@ import com.backend.farmon.config.chat.WebSocketSessionManager;
 import com.backend.farmon.config.security.UserAuthorizationUtil;
 import com.backend.farmon.converter.ChatConverter;
 import com.backend.farmon.domain.*;
+import com.backend.farmon.domain.enums.ChatMessageType;
 import com.backend.farmon.dto.chat.ChatResponse;
 import com.backend.farmon.repository.ChatMessageRepository.ChatMessageRepository;
 import com.backend.farmon.repository.ChatRoomReposiotry.ChatRoomRepository;
@@ -22,6 +23,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Slf4j
@@ -60,6 +62,9 @@ public class ChatRoomQueryServiceImpl implements ChatRoomQueryService {
 
         log.info("안 읽음 필터링에 따른 유저의 모든 채팅방 목록 페이지네이션 조회 완료 - userId: {}", userId);
 
+        // 최신 메시지 타입 (썸네일에서는 텍스트만)
+        List<ChatMessageType> targetTypes = List.of(ChatMessageType.TEXT);
+
         // 채팅 대화방 세부 정보 목록 생성
         List<ChatResponse.ChatRoomDetailDTO> chatRoomInfoList = chatRoomPage.stream().map(chatRoom -> {
             // 전문가 여부
@@ -71,7 +76,7 @@ public class ChatRoomQueryServiceImpl implements ChatRoomQueryService {
 
             // 채팅방과 일치하는 최신 메시지 조회
             ChatMessage lastMessage = chatMessageRepository
-                    .findFirstByChatRoomIdOrderByCreatedAtDesc(chatRoom.getId())
+                    .findLatestMessageByTypes(chatRoom.getId(), targetTypes)
                     .orElse(null);
 
             log.info("채팅방과 일치하는 최신 메시지 조회 완료 - userId: {}", userId);

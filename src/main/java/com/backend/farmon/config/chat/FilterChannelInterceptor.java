@@ -52,7 +52,6 @@ public class FilterChannelInterceptor implements ChannelInterceptor {
                 return handleStompConnect(message, headerAccessor);
             case DISCONNECT: // 연결 해제
                 return handleStompDisconnect(message, headerAccessor);
-
             default:
                 return message;
         }

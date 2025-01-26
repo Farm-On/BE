@@ -33,7 +33,6 @@ public class WebSocketSessionManager {
             boolean isExpert = sessionInfo.getRole().equals("EXPERT");
 
             // 채팅방 입장 시간 변경
-            chatRoomCommandService.changeChatRoomEnterTime(userId, chatRoomId, isExpert);
             sessionToUserMap.remove(sessionId); // 세션 제거
             log.info("세션 제거 성공");
             log.info("stomp 연결 해제된 사용자 정보 - role: {}, userId: {}, chatRoomId: {}", role, userId, chatRoomId);
