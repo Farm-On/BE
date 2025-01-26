@@ -34,6 +34,7 @@ public class ChatMessageQueryServiceImpl implements ChatMessageQueryService{
     }
 
     // 채팅 메시지 내역 조회
+    @Transactional
     @Override
     public ChatResponse.ChatMessageListDTO findChatMessageList(Long userId, Long chatRoomId, Integer pageNumber) {
         User user = userRepository.findById(userId)
