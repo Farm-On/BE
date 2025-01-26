@@ -8,6 +8,7 @@ import com.backend.farmon.apiPayload.exception.handler.UserHandler;
 import com.backend.farmon.aws.s3.AmazonS3Manager;
 import com.backend.farmon.aws.s3.UuidRepository;
 import com.backend.farmon.converter.ChatConverter;
+import com.backend.farmon.converter.ConvertTime;
 import com.backend.farmon.domain.ChatMessage;
 import com.backend.farmon.domain.ChatRoom;
 import com.backend.farmon.domain.User;
@@ -22,6 +23,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.*;
+import java.time.LocalDateTime;
 import java.util.Base64;
 import java.util.UUID;
 
@@ -75,6 +77,9 @@ public class ChatMessageCommandServiceImpl implements ChatMessageCommandService 
 
         ChatMessage chatMessage = ChatConverter.toChatMessage(dto, chatRoom);
         chatMessageRepository.save(chatMessage);
+
+        dto.setSendTime(ConvertTime.convertLocalDatetimeToTime(chatMessage.getCreatedAt())); // 전송 시간 변경
+        dto.setIsMine(false); // 내가 보낸 메시지 여부 변경
 
         log.info("채팅 메시지 저장 완료 - chatMessageId: {}, senderId: {}, messageType: {}, chatRoomId: {}",
                 chatMessage.getId(), dto.getSenderId(), dto
