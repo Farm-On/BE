@@ -33,6 +33,7 @@ public class ChatRoomQueryServiceImpl implements ChatRoomQueryService {
     private final UserRepository userRepository;
     private final EstimateRepository estimateRepository;
     private final UserAuthorizationUtil userAuthorizationUtil;
+    private final ChatRoomCommandService chatRoomCommandService;
 
     private static final Integer PAGE_SIZE=10;
 
@@ -94,14 +95,12 @@ public class ChatRoomQueryServiceImpl implements ChatRoomQueryService {
         ChatRoom chatRoom = chatRoomRepository.findById(chatRoomId)
                 .orElseThrow(() -> new ChatRoomHandler(ErrorStatus.CHATROOM_NOT_FOUND));
 
+        // 채팅방 입장 시 접속 시간 수정
         boolean isExpert = chatRoom.getExpert().getId().equals(userId);
+        chatRoomCommandService.changeChatRoomEnterTime(userId, chatRoomId, isExpert);
+        log.info("채팅방 입장 접속 시간 변경 - userId: {}, chatRoomId: {}, 전문가 여부: {}", userId, chatRoomId, isExpert);
 
-        // 안 읽은 메시지들을 읽음 처리
-        chatMessageRepository.updateMessagesToReadByChatRoomId(chatRoomId, userId);
-        log.info("안 읽은 메시지들 읽음 처리 완료 - 채팅방 아아디: {}", chatRoomId);
-
-        String userType = isExpert ? "전문가" : "농업인";
-        return ChatConverter.toChatRoomDataDTO(chatRoom, userType);
+        return ChatConverter.toChatRoomDataDTO(chatRoom, isExpert);
     }
 
     // 채팅방의 견적 조회

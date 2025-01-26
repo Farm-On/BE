@@ -69,10 +69,6 @@ public class FilterChannelInterceptor implements ChannelInterceptor {
             Long chatRoomId = extractChatRoomId(headerAccessor);
             log.info("stomp 연결된 사용자 정보 - role: {}, userId: {}, chatRoomId: {}", role, userId, chatRoomId);
 
-            boolean isExpert = role.equals("EXPERT");
-            // 채팅방 입장 시간 변경
-            chatRoomCommandService.changeChatRoomEnterTime(userId, chatRoomId, isExpert);
-
             webSocketSessionManager.storeUserSession(headerAccessor.getSessionId(), token, role , userId, chatRoomId);
 
             return message; // 메시지 전달

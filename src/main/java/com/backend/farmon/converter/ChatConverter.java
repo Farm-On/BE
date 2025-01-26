@@ -33,9 +33,7 @@ public class ChatConverter {
                 .build();
     }
 
-    public static ChatResponse.ChatRoomDataDTO toChatRoomDataDTO(ChatRoom chatRoom, String userType) {
-        boolean isExpert = userType.equals("전문가");
-
+    public static ChatResponse.ChatRoomDataDTO toChatRoomDataDTO(ChatRoom chatRoom, Boolean isExpert) {
         // 내가 전문가
         if (isExpert) {
             return ChatResponse.ChatRoomDataDTO.builder()
