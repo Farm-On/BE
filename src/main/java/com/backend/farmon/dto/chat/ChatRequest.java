@@ -24,7 +24,7 @@ public class ChatRequest {
         String messageContent;
 
         @Schema(description = "메시지 타입, " +
-                "텍스트 메시지 전송이라면 TEXT, 이미지 전송이라면 IMAGE, 채팅방 퇴장이라면 EXIT", example = "TEXT")
+                "텍스트 메시지 전송이라면 TEXT, 이미지 전송이라면 IMAGE, 컨설팅 완료라면 COMPLETE, 채팅방 퇴장이라면 EXIT", example = "TEXT")
         String messageType;
 
         @Schema(description = "보낸 시간", example = "2025-01-10")
@@ -32,9 +32,6 @@ public class ChatRequest {
 
         @Schema(description = "내가 보낸 메시지인지 여부, 내가 보낸 메시지라면 true, 받은 메시지라면 false", example = "true")
         Boolean isMine;
-
-        @Schema(description = "상대방이 메시지 읽음 여부", example = "false")
-        Boolean isOtherRead;
     }
 
     @ToString

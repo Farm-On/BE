@@ -22,7 +22,6 @@ public class ChatConverter {
         return ChatResponse.ChatRoomCreateDTO.builder()
                 .chatRoomId(chatRoom.getId())
                 .name(chatRoom.getFarmer().getUserName())
-//                .profileImage(chatRoom.getFarmer().getProfileImageUrl())
                 .type("농업인")
                 .build();
     }
@@ -50,7 +49,9 @@ public class ChatConverter {
 
         return ChatResponse.ChatRoomDataDTO.builder()
                 .name(chatRoom.getExpert().getUser().getUserName())
-//                .profileImage(chatRoom.getExpert().getUser().getProfileImageUrl())
+                .profileImage(chatRoom.getExpert().getProfileImageUrl() != null
+                        ? chatRoom.getExpert().getProfileImageUrl()
+                        : null)
                 .type("전문가")
                 .lastEnterTime(ConvertTime.convertLocalDatetimeToTime(chatRoom.getExpertLastEnter()))
                 .averageResponseTime(chatRoom.getExpert().getUser().getChatAverageResponseTime())
@@ -106,7 +107,9 @@ public class ChatConverter {
         return ChatResponse.ChatRoomDetailDTO.builder()
                 .chatRoomId(chatRoom.getId())
                 .name(user.getUserName())
-//                .profileImage(user.getProfileImageUrl())
+                .profileImage(isExpert && user.getExpert() != null && user.getExpert().getProfileImageUrl() != null
+                        ? user.getExpert().getProfileImageUrl()
+                        : null)
                 .estimateBudget(chatRoom.getEstimate().getBudget())
                 .estimateCategory(chatRoom.getEstimate().getCategory())
                 .estimateAreaName(area.getAreaName())

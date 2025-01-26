@@ -97,7 +97,10 @@ public class ChatRoomQueryServiceImpl implements ChatRoomQueryService {
         ChatRoom chatRoom = chatRoomRepository.findById(chatRoomId)
                 .orElseThrow(() -> new ChatRoomHandler(ErrorStatus.CHATROOM_NOT_FOUND));
 
+        // 채팅방 입장 시 접속 시간 수정
         boolean isExpert = chatRoom.getExpert().getId().equals(userId);
+//        chatRoomCommandService.changeChatRoomEnterTime(userId, chatRoomId, isExpert);
+//        log.info("채팅방 입장 접속 시간 변경 - userId: {}, chatRoomId: {}, 전문가 여부: {}", userId, chatRoomId, isExpert);
 
         return ChatConverter.toChatRoomDataDTO(chatRoom, isExpert);
     }

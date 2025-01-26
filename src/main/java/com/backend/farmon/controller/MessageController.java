@@ -21,6 +21,14 @@ public class MessageController {
                                  ChatRequest.ChatMessageDTO dto) {
         log.info("전송할 메시지 내용: {}", dto);
 
+        switch (dto.getMessageType()){
+            case "ENTER": // 입장 - 접속시간 변경
+            case "TEXT": // 텍스트 로직
+            case "IMAGE": // 이미지 로직
+            case "COMPLETE": // 컨설팅 완료 -> 견적에서 estimateId 도 업데이트 되도록 수정
+            case "EXIT": // 퇴장 - 접속시간 변경
+        }
+
         // 메시지 저장 로직
 
         // 구독자들에게 메시지 전달

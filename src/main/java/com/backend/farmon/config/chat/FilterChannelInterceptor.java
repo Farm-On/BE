@@ -67,16 +67,7 @@ public class FilterChannelInterceptor implements ChannelInterceptor {
             String token = getToken(headerAccessor);
             String role = jwtUtil.extractRole(getToken(headerAccessor));
             Long userId = jwtUtil.extractUserId(token);
-            Long chatRoomId = extractChatRoomId(headerAccessor);
-            log.info("stomp 연결된 사용자 정보 - role: {}, userId: {}, chatRoomId: {}", role, userId, chatRoomId);
-
-            boolean isExpert = role.equals("EXPERT");
-
-            // 채팅방 입장 시간 변경
-            chatRoomCommandService.changeChatRoomEnterTime(userId, chatRoomId, isExpert);
-
-            // 세션 정보 저장
-            webSocketSessionManager.storeUserSession(headerAccessor.getSessionId(), token, role , userId, chatRoomId, true);
+            log.info("stomp 연결된 사용자 정보 - role: {}, userId: {}", role, userId);
 
             return message; // 메시지 전달
         } catch (Exception e) {
@@ -88,9 +79,6 @@ public class FilterChannelInterceptor implements ChannelInterceptor {
     // stomp 연결 해제 시
     private Message<?> handleStompDisconnect(Message<?> message, StompHeaderAccessor headerAccessor) {
         try {
-            // 연결 해제 시 세션 정보 삭제
-            webSocketSessionManager.handleSessionDisconnect(message);
-
             log.info("stomp 연결 해제 성공");
 
             return message; // 메시지 전달
@@ -113,15 +101,6 @@ public class FilterChannelInterceptor implements ChannelInterceptor {
         }
 
         return authorizationHeader.substring(BEARER_PREFIX.length());
-    }
-
-    // 연결 헤더에서 채팅방 아이디 추출
-    private Long extractChatRoomId(StompHeaderAccessor headerAccessor) {
-        List<String> chatRoomHeaders = headerAccessor.getNativeHeader("ChatRoomId");
-        if (chatRoomHeaders == null || chatRoomHeaders.isEmpty()) {
-            throw new IllegalArgumentException("stomp 연결 헤더에 ChatRoomId 토큰 없음");
-        }
-        return Long.parseLong(chatRoomHeaders.get(0));
     }
 
     private Message<?> buildErrorMessage(String sessionId, String errorMessage) {
