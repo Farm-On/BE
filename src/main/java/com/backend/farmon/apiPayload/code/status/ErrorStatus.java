@@ -53,6 +53,18 @@ public enum ErrorStatus implements BaseErrorCode {
     // 사용자 인증 정보
     AUTHORIZATION_NOT_EQUALS(HttpStatus.FORBIDDEN, "AUTHORIZATION4031", "인증된 사용자 정보와 요청된 리소스의 사용자 정보가 다릅니다. (userId 불일치)"),
 
+    // 작물 관련 에러
+    CROP_NOT_FOUND(HttpStatus.BAD_REQUEST, "CROP4001", "해당 작물 카테고리가 존재하지 않습니다."),
+
+    // 지역 관련 에러
+    AREA_NOT_FOUND(HttpStatus.BAD_REQUEST, "AREA4001", "해당 위치 카테고리가 존재하지 않습니다."),
+
+    // 전문가 경력 관련 에러
+    EXPERT_CAREER_NOT_FOUND(HttpStatus.BAD_REQUEST, "EXPERT_CAREER4001", "해당 경력 아이디와 일치하는 경력이 존재하지 않습니다."),
+
+    // 전문가 추가정보 관련 에러
+    EXPERT_DETAIL_NOT_FOUND(HttpStatus.BAD_REQUEST, "EXPERT_DETAIL4001", "해당 추가정보 아이디와 일치하는 추가정보가 존재하지 않습니다."),
+
     // 채팅 메시지 타입
     MESSAGE_TYPE_NOT_FOUND(HttpStatus.BAD_REQUEST, "MESSAGE_TYPE4001", "지원되지 않는 채팅 메시지 타입입니다.");
 
