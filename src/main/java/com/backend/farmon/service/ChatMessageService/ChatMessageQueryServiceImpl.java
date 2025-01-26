@@ -33,7 +33,7 @@ public class ChatMessageQueryServiceImpl implements ChatMessageQueryService{
         return PageRequest.of(pageNumber, PAGE_SIZE, Sort.by("createdAt").descending());
     }
 
-    // 채팅 메시지 내역 조회
+    // 채팅 메시지 내역 조회 & 안 읽은 메시지 읽음 처리
     @Transactional
     @Override
     public ChatResponse.ChatMessageListDTO findChatMessageList(Long userId, Long chatRoomId, Integer pageNumber) {

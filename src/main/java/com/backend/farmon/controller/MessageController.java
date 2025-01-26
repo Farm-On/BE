@@ -18,7 +18,7 @@ public class MessageController {
     // /send/chat/message/{chatRoomId}
     @MessageMapping(value="/chat/message/{chatRoomId}")
     public void sendChatMessage (@DestinationVariable("chatRoomId") Long chatRoomId,
-                                 ChatRequest.TestDTO dto) {
+                                 ChatRequest.ChatMessageDTO dto) {
         log.info("전송할 메시지 내용: {}", dto);
 
         // 메시지 저장 로직

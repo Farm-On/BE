@@ -48,10 +48,11 @@ public class FilterChannelInterceptor implements ChannelInterceptor {
         }
 
         switch (command) {
-            case CONNECT:
+            case CONNECT: // 연결
                 return handleStompConnect(message, headerAccessor);
-            case DISCONNECT:
+            case DISCONNECT: // 연결 해제
                 return handleStompDisconnect(message, headerAccessor);
+
             default:
                 return message;
         }
@@ -69,7 +70,13 @@ public class FilterChannelInterceptor implements ChannelInterceptor {
             Long chatRoomId = extractChatRoomId(headerAccessor);
             log.info("stomp 연결된 사용자 정보 - role: {}, userId: {}, chatRoomId: {}", role, userId, chatRoomId);
 
-            webSocketSessionManager.storeUserSession(headerAccessor.getSessionId(), token, role , userId, chatRoomId);
+            boolean isExpert = role.equals("EXPERT");
+
+            // 채팅방 입장 시간 변경
+            chatRoomCommandService.changeChatRoomEnterTime(userId, chatRoomId, isExpert);
+
+            // 세션 정보 저장
+            webSocketSessionManager.storeUserSession(headerAccessor.getSessionId(), token, role , userId, chatRoomId, true);
 
             return message; // 메시지 전달
         } catch (Exception e) {

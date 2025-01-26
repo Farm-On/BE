@@ -17,8 +17,8 @@ public class ChatRequest {
         @Schema(description = "보낸 사람 아이디, 현재 로그인한 사용자의 userId와 동일", example = "1")
         Long senderId;
 
-        @Schema(description = "메시지를 보낸 사람의 프로필 이미지")
-        String profileImage;
+        @Schema(description = "보낸 사람 타입", example = "농업인")
+        String senderType;
 
         @Schema(description = "메시지 내용, 이미지일 경우 클라이언트에서 이미지 파일을 Base64로 인코딩하여 전송 필요", example = "안녕하세요. 견적 신청하셨나요?")
         String messageContent;
@@ -26,9 +26,6 @@ public class ChatRequest {
         @Schema(description = "메시지 타입, " +
                 "텍스트 메시지 전송이라면 TEXT, 이미지 전송이라면 IMAGE, 채팅방 퇴장이라면 EXIT", example = "TEXT")
         String messageType;
-
-        @Schema(description = "보낸 사람 타입", example = "농업인")
-        String senderType;
 
         @Schema(description = "보낸 시간", example = "2025-01-10")
         String sendTime;
