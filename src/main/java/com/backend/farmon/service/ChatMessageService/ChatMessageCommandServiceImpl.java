@@ -1,9 +1,12 @@
 package com.backend.farmon.service.ChatMessageService;
 
+import com.amazonaws.services.s3.model.CannedAccessControlList;
 import com.backend.farmon.apiPayload.code.status.ErrorStatus;
 import com.backend.farmon.apiPayload.exception.handler.ChatMessageHandler;
 import com.backend.farmon.apiPayload.exception.handler.ChatRoomHandler;
 import com.backend.farmon.apiPayload.exception.handler.UserHandler;
+import com.backend.farmon.aws.s3.AmazonS3Manager;
+import com.backend.farmon.aws.s3.UuidRepository;
 import com.backend.farmon.converter.ChatConverter;
 import com.backend.farmon.domain.ChatMessage;
 import com.backend.farmon.domain.ChatRoom;
@@ -18,6 +21,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.*;
+import java.util.Base64;
+import java.util.UUID;
+
 @Slf4j
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -28,6 +35,8 @@ public class ChatMessageCommandServiceImpl implements ChatMessageCommandService 
     private final UserRepository userRepository;
     private final ChatRoomRepository chatRoomRepository;
     private final ChatMessageRepository chatMessageRepository;
+    private final AmazonS3Manager amazonS3Manager;
+    private final UuidRepository uuidRepository;
 
     // 메시지 저장
     @Transactional
@@ -54,7 +63,7 @@ public class ChatMessageCommandServiceImpl implements ChatMessageCommandService 
                 break;
             case "COMPLETE": // 컨설팅 완료
                 log.info("채팅방 컨설팅 완료 COMPLETE - chatRoomId: {}", chatRoomId);
-                chatRoomCommandService.exchangeChatRoomUserComplete(userId, chatRoomId, dto.getIsEstimateComplete());
+                chatRoomCommandService.exchangeChatRoomUserComplete(userId, chatRoomId, dto);
                 break;
             case "EXIT": // 퇴장 - 접속시간 변경
                 log.info("채팅방 퇴장 EXIT - chatRoomId: {}", chatRoomId);

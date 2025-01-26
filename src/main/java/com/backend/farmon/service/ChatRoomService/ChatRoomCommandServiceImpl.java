@@ -8,6 +8,7 @@ import com.backend.farmon.apiPayload.exception.handler.UserHandler;
 import com.backend.farmon.converter.ChatConverter;
 import com.backend.farmon.converter.ConvertTime;
 import com.backend.farmon.domain.*;
+import com.backend.farmon.dto.chat.ChatRequest;
 import com.backend.farmon.dto.chat.ChatResponse;
 import com.backend.farmon.repository.ChatMessageRepository.ChatMessageRepository;
 import com.backend.farmon.repository.ChatRoomReposiotry.ChatRoomRepository;
@@ -80,7 +81,7 @@ public class ChatRoomCommandServiceImpl implements ChatRoomCommandService{
     // 채팅방 컨설팅 완료
     @Transactional
     @Override
-    public void exchangeChatRoomUserComplete(Long userId, Long chatRoomId, Boolean isEstimateComplete) {
+    public void exchangeChatRoomUserComplete(Long userId, Long chatRoomId, ChatRequest.ChatMessageDTO dto) {
         User user = userRepository.findById(userId)
                 .orElseThrow(()-> new UserHandler(ErrorStatus.USER_NOT_FOUND));
 
@@ -107,7 +108,7 @@ public class ChatRoomCommandServiceImpl implements ChatRoomCommandService{
             estimate.setStatus(1); // 견적 상태 진행 완료로 변경
             estimate.setExpert(chatRoom.getExpert()); // 견적 전문가를 채팅방의 전문가로 변경
 
-            isEstimateComplete = true;
+            dto.setIsEstimateComplete(true);
         }
 
         log.info("채팅방 컨설팅 완료 - 유저 아이디: {}, 채팅방 아아디: {}", userId, chatRoomId);
