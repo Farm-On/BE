@@ -78,7 +78,7 @@ public class ChatMessageCommandServiceImpl implements ChatMessageCommandService 
         ChatMessage chatMessage = ChatConverter.toChatMessage(dto, chatRoom);
         chatMessageRepository.save(chatMessage);
 
-        dto.setSendTime(ConvertTime.convertLocalDatetimeToTime(chatMessage.getCreatedAt())); // 전송 시간 변경
+        dto.setSendTime(ConvertTime.convertToAmPmFormat(chatMessage.getCreatedAt())); // 전송 시간 변경
         dto.setIsMine(false); // 내가 보낸 메시지 여부 변경
 
         log.info("채팅 메시지 저장 완료 - chatMessageId: {}, senderId: {}, messageType: {}, chatRoomId: {}",
