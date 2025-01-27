@@ -2,9 +2,11 @@ package com.backend.farmon.service.ExpertService;
 
 import com.backend.farmon.apiPayload.code.status.ErrorStatus;
 import com.backend.farmon.apiPayload.exception.handler.*;
+import com.backend.farmon.config.security.UserAuthorizationUtil;
 import com.backend.farmon.converter.ExpertConverter;
 import com.backend.farmon.converter.SignupConverter;
 import com.backend.farmon.domain.*;
+import com.backend.farmon.domain.enums.Role;
 import com.backend.farmon.dto.expert.ExpertCareerRequest;
 import com.backend.farmon.dto.expert.ExpertCareerResponse;
 import com.backend.farmon.dto.expert.ExpertDetailRequest;
@@ -32,25 +34,26 @@ public class ExpertCommandServiceImpl implements ExpertCommandService {
 
     private final UserRepository userRepository;
     private final ExpertRepository expertRepository;
-    private final PasswordEncoder passwordEncoder;
     private final AreaRepository areaRepository;
     private final CropRepository cropRepository;
     private final ExpertCareerRepository expertCareerRepository;
     private final ExpertDetailRepository expertDetailRepository;
+    private final UserAuthorizationUtil userAuthorizationUtil;
 
-    // 전문가 회원가입 로직
+    // 전문가 등록 로직
     @Override
     @Transactional
-    public SignupResponse.ExpertJoinResultDTO joinExpert(SignupRequest.ExpertJoinDto request) {
-        // User 엔티티 생성 및 저장
-        Boolean emailExists = userRepository.existsByEmail(request.getEmail());
-        if(emailExists) {
-            throw new UserHandler(ErrorStatus.EMAIL_ALREADY_EXIST);
-        }
+    public SignupResponse.ExpertJoinResultDTO joinExpert(Long userId, SignupRequest.ExpertJoinDto request) {
+        // 입력받은 유저 아이디 검증
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserHandler(ErrorStatus.USER_NOT_FOUND));
+        // 토큰 검증(전문가 전환을 하려는 유저는 현재 role이 농업인이어야 함)
+        userAuthorizationUtil.isCurrentUserMatching(userId, Role.FARMER.toString());
 
-        User newUser = SignupConverter.toExpertUser(request);
-        newUser.encodePassword(passwordEncoder.encode(request.getPassword()));
-        userRepository.save(newUser);
+        // 이미 저 유저 아이디로 등록된 전문가 엔티티가 있으면 에러
+        if (expertRepository.existsByUserId(userId)) {
+            throw new ExpertHandler(ErrorStatus.EXPERT_ALREADY_EXISTS);
+        }
 
         // Expert 엔티티 생성 및 저장
         Area area = areaRepository.findByAreaNameDetail(request.getExpertLocation())
@@ -63,11 +66,11 @@ public class ExpertCommandServiceImpl implements ExpertCommandService {
             .build();
         newExpert.setCrop(crop);
         newExpert.setArea(area);
-        newExpert.setUser(newUser);
+        newExpert.setUser(user);
         expertRepository.save(newExpert);
 
         // 전문가 회원가입 응답 DTO생성
-        return SignupConverter.toExpertJoinResultDTO(newUser.getId(), newExpert.getId());
+        return SignupConverter.toExpertJoinResultDTO(user.getId(), newExpert.getId());
     }
 
     // 전문가 경력 등록 로직

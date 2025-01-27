@@ -24,6 +24,7 @@ public enum ErrorStatus implements BaseErrorCode {
     // 전문가 관련 에러
     EXPERT_NOT_FOUND(HttpStatus.BAD_REQUEST, "EXPERT4001", "아이디와 일치하는 전문가가 없습니다."),
     EXPERT_NOT_REGISTER(HttpStatus.BAD_REQUEST, "EXPERT4002", "전문가로 등록되어 있지 않은 농업인 입니다."),
+    EXPERT_ALREADY_EXISTS(HttpStatus.BAD_REQUEST, "EXPERT4003", "이미 전문가로 등록된 농업인 입니다."),
 
     // 견적 관련 에러
     ESTIMATE_NOT_FOUND(HttpStatus.BAD_REQUEST, "ESTIMATE4001", "견적 아이디와 일치하는 견적이 없습니다."),
