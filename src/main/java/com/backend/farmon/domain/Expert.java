@@ -75,6 +75,7 @@ public class Expert extends BaseEntity {
     private List<ChatRoom> chatRoomList = new ArrayList<>();
 
     public void setCrop(Crop crop) {
+        // 기존값이 있으면 crop엔티티의 ExpertList에서 삭제시킴
         if(this.crop != null) {
             crop.getExpertList().remove(this);
         }

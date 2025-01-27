@@ -2,9 +2,11 @@ package com.backend.farmon.service.AWS;
 
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.ObjectMetadata;
-import com.backend.farmon.domain.Post;
-import com.backend.farmon.domain.PostImg;
-import com.backend.farmon.domain.User;
+import com.backend.farmon.apiPayload.code.status.ErrorStatus;
+import com.backend.farmon.apiPayload.exception.handler.ExpertDetailHandler;
+import com.backend.farmon.apiPayload.exception.handler.ExpertHandler;
+import com.backend.farmon.domain.*;
+import com.backend.farmon.repository.ExpertReposiotry.ExpertRepository;
 import com.backend.farmon.repository.PostRepository.PostImgRepository;
 import com.backend.farmon.repository.PostRepository.PostRepository;
 import com.backend.farmon.repository.UserRepository.UserRepository;
@@ -22,6 +24,7 @@ import org.springframework.web.util.UriUtils;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
@@ -34,7 +37,7 @@ public class S3Service {
     private final AmazonS3 amazonS3;
     private final PostImgRepository imgRepository;
     private final PostRepository postRepository;
-    private final UserRepository userRepository;
+    private final ExpertRepository expertRepository;
 
     @Value("${cloud.aws.s3.bucket}")
     private String bucket;
@@ -120,37 +123,47 @@ public class S3Service {
         amazonS3.deleteObject(bucket, img.getStoredFileName());
     }
 
-    // 프로필 이미지
-//    @Transactional
-//    public String putProfImage(Long userNo, MultipartFile multipartFile) throws IOException {
-//
-//        User user = userRepository.findById(userNo).orElseThrow(() -> new RuntimeException("유저를 찾을 수 없습니다"));
-//
-//        // 아무 파일도 받지 못하면 null을 리턴
-//        if (multipartFile.isEmpty()) {
-//            return null;
-//        }
-//
-//        // 이전에 저장된 프로필 사진이 있으면 삭제
-//        if (user.getUserProfImg() != null){
-//            deleteProfImage(userNo);
-//        }
-//
-//        String originalFileName = multipartFile.getOriginalFilename();
-//
-//        // 원본 파일명을 서버에 저장된 파일명으로 변경하여 storedFileName에 저장하기 위함 (중복 비허용)
-//        String storedFileName = "profImg_" + UUID.randomUUID() + "." + extractExt(originalFileName);
-//
-//        ObjectMetadata metadata = new ObjectMetadata();
-//        metadata.setContentLength(multipartFile.getSize());
-//        metadata.setContentType(multipartFile.getContentType());
-//
-//        // S3에 파일 업로드
-//        amazonS3.putObject(bucket, storedFileName, multipartFile.getInputStream(), metadata);
-//        user.updateProfImg(storedFileName);
-//
-//        return getFullPath(storedFileName);
-//    }
+
+    // 전문가 프로필 이미지
+    @Transactional
+    public String putProfImage(Long expertId, MultipartFile multipartFile) throws IOException {
+
+        Expert expert = expertRepository.findById(expertId).orElseThrow(() -> new ExpertHandler(ErrorStatus.EXPERT_NOT_FOUND));
+
+        // 아무 파일도 받지 못하면 null을 리턴
+        if (multipartFile.isEmpty()) {return null;}
+
+        // 허용된 이미지 확장자 목록
+        List<String> allowedExtensions = Arrays.asList("jpg", "jpeg", "png", "gif", "webp");
+
+        // 원본 파일명 추출
+        String originalFileName = multipartFile.getOriginalFilename();
+        // 파일 확장자 추출
+        String fileExtension = extractExt(originalFileName).toLowerCase();
+
+        // 확장자 검사
+        if (!allowedExtensions.contains(fileExtension)) {
+            throw new IllegalArgumentException("지원하지 않는 파일 형식입니다. 이미지 파일(jpg, jpeg, png, gif, webp)만 업로드 가능합니다.");
+        }
+
+        // 이전에 저장된 프로필 사진이 있으면 삭제
+        if (expert.getProfileImageUrl() != null){
+            deleteProfImage(expertId);
+        }
+
+        // 원본 파일명을 서버에 저장된 파일명으로 변경하여 storedFileName에 저장하기 위함 (중복 비허용)
+        String storedFileName = "Profile/" + UUID.randomUUID() + "." + extractExt(originalFileName);
+
+        ObjectMetadata metadata = new ObjectMetadata();
+        metadata.setContentLength(multipartFile.getSize());
+        metadata.setContentType(multipartFile.getContentType());
+
+        // S3에 파일 업로드
+        amazonS3.putObject(bucket, storedFileName, multipartFile.getInputStream(), metadata);
+        expert.setProfileImageUrl(storedFileName);
+
+        return getFullPath(storedFileName);
+    }
 //
 //    // 프로필 이미지의 S3 전체 주소 조회
 //    @Transactional(readOnly = true)
@@ -161,17 +174,12 @@ public class S3Service {
 //        }
 //        return getFullPath(user.getUserProfImg());
 //    }
-//
-//    // 프로필 이미지 삭제
-//    @Transactional
-//    public void deleteProfImage(Long userNo)  {
-//        User user = userRepository.findById(userNo).orElseThrow(() -> new RuntimeException("유저를 찾을 수 없습니다"));
-//        amazonS3.deleteObject(bucket, user.getUserProfImg());
-//        user.deleteProfImg();
-//    }
 
-
-
-
-
+    // 프로필 이미지 삭제
+    @Transactional
+    public void deleteProfImage(Long expertId)  {
+        Expert expert = expertRepository.findById(expertId).orElseThrow(() -> new ExpertHandler(ErrorStatus.EXPERT_NOT_FOUND));
+        amazonS3.deleteObject(bucket, expert.getProfileImageUrl());
+        expert.setProfileImageUrl(null);
+    }
 }
