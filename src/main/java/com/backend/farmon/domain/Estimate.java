@@ -35,7 +35,7 @@ public class Estimate extends BaseEntity {
 //    private String address;
 
     @Column(nullable = false)
-    @ColumnDefault("'50만원 ~ 100만원'")
+    @ColumnDefault("'10만원 ~ 50만원'")
     private String budget;
 
     @Column(nullable = false)
@@ -62,5 +62,10 @@ public class Estimate extends BaseEntity {
 
     @OneToMany(mappedBy = "estimate", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<EstimateImage> estimateImageList = new ArrayList<>();
+
+    public void addEstimateImage(EstimateImage image) {
+        estimateImageList.add(image);
+        image.setEstimate(this);
+    }
 
 }

@@ -40,7 +40,10 @@ public class EstimateResponseDTO {
         String budget;
         String title;
         String body;
-        LocalDate createDate;
+        LocalDate createdDate;
+
+        // 이미지 URL 목록 추가
+        List<String> imageUrls;
     }
 
     // 3) UpdateDto
@@ -84,6 +87,27 @@ public class EstimateResponseDTO {
         List<PreviewDTO> estimateList; // 실제로는 List<SomeEstimateData> 형태
     }
 
+    // 5-1) ReadFilteredListDto
+    @Schema(description = "견적찾기 농사 견적서 필터링된 리스트 응답 DTO")
+    @Getter
+    @Setter
+    @AllArgsConstructor
+    @NoArgsConstructor
+    @Builder
+    public static class FilteredListDTO {
+        Integer listSize;
+        Integer totalPage;
+        Long totalElements;
+        Integer currentPage;
+        Boolean isFirst;
+        Boolean isLast;
+        String estimateCategory;
+        String budget;
+        String areaName;
+        String areaNameDetail;
+
+        List<PreviewDTO> estimateList; // 실제로는 List<SomeEstimateData> 형태
+    }
 
     // 6) ListDTO를 위한 Preview dto
     @Schema(description = "농사 견적서 목록용 미리보기 DTO")

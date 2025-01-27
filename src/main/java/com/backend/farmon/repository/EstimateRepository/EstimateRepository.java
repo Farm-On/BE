@@ -20,6 +20,12 @@ public interface EstimateRepository extends JpaRepository<Estimate, Long>, Estim
             "ORDER BY e.createdAt DESC")
     Page<Estimate> findByCropIdAndStatus(@Param("cropId") Long cropId, Pageable pageable);
 
+    // 1-1) 특정 cropName 에게 매핑된 견적서 목록 - 상태가 0인것만
+    @Query("SELECT e FROM Estimate e " +
+            "WHERE e.crop.name = :cropName AND e.status = 0 " +
+            "ORDER BY e.createdAt DESC")
+    Page<Estimate> findByCropNameAndStatus(@Param("cropName") String cropName, Pageable pageable);
+
     // 2) 특정 cropCategory 에게 매핑된 견적서 목록 - 상태가 0인것만
     @Query("SELECT e FROM Estimate e " +
             "WHERE e.crop.category = :cropCategory AND e.status = 0 " +
