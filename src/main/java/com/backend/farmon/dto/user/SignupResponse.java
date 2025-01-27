@@ -24,7 +24,7 @@ public class SignupResponse {
     @Getter
     @NoArgsConstructor
     @AllArgsConstructor
-    @Schema(description = "전문가 회원가입 성공시 응답 DTO")
+    @Schema(description = "전문가 등록 성공시 응답 DTO")
     public static class ExpertJoinResultDTO{
         Long userId;
         Long expertId;

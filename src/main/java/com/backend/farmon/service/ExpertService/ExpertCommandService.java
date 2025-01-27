@@ -8,7 +8,7 @@ import com.backend.farmon.dto.user.SignupRequest;
 import com.backend.farmon.dto.user.SignupResponse;
 
 public interface ExpertCommandService {
-    SignupResponse.ExpertJoinResultDTO joinExpert(SignupRequest.ExpertJoinDto request);
+    SignupResponse.ExpertJoinResultDTO joinExpert(Long userId, SignupRequest.ExpertJoinDto request);
     ExpertCareer postExpertCareer(Long expertId, ExpertCareerRequest.ExpertCareerPostDTO request);
     ExpertDatail postExpertDetail(Long expertId, ExpertDetailRequest.ExpertDetailPostDTO request);
 }

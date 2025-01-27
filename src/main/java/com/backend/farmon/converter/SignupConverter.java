@@ -32,18 +32,6 @@ public class SignupConverter {
                 .build();
     }
 
-    // 전문가 회원가입시 User 엔티티 생성
-    public static User toExpertUser(SignupRequest.ExpertJoinDto request){
-        return User.builder()
-                .userName(request.getName())
-                .gender(request.getGender())
-                .birthDate(request.getBirth())
-                .email(request.getEmail())
-                .phoneNum(request.getPhone())
-                .role(Role.EXPERT)  // 전문가로 설정
-                .build();
-    }
-
     // 전문가 회원가입시 응답 DTO 생성
     public static SignupResponse.ExpertJoinResultDTO toExpertJoinResultDTO(Long userId, Long expertId){
         return SignupResponse.ExpertJoinResultDTO.builder()
