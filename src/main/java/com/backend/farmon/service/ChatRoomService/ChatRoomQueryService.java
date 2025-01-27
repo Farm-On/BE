@@ -6,6 +6,9 @@ public interface ChatRoomQueryService {
     // 채팅방 목록 조회
     ChatResponse.ChatRoomListDTO findChatRoom(Long userId, Integer read, Integer pageNumber);
 
+    // 채팅방 정보 조회 & 안 읽음 메시지 읽음 처리
+    ChatResponse.ChatRoomDataDTO findChatRoomDataAndChangeUnreadMessage(Long userId, Long chatRoomId);
+
     // 채팅방의 견적 조회
     ChatResponse.ChatRoomEstimateDTO findChatRoomEstimate(Long userId, Long chatRoomId);
 }

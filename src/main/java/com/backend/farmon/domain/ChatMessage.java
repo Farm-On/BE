@@ -27,11 +27,10 @@ public class ChatMessage extends BaseEntity {
     @Column(nullable = false)
     private ChatMessageType type; // 메시지 타입
 
-    @Column(nullable = false)
     private String content; // 메시지 내용
 
     @Column(columnDefinition = "TINYINT(1) DEFAULT 0", nullable = false)
-    private Boolean isRead; // 메시지 읽음 여부
+    private Boolean isRead; // 상대방 메시지 읽음 여부
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "chat_room_id", nullable = false)

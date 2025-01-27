@@ -63,7 +63,10 @@ public enum ErrorStatus implements BaseErrorCode {
     EXPERT_CAREER_NOT_FOUND(HttpStatus.BAD_REQUEST, "EXPERT_CAREER4001", "해당 경력 아이디와 일치하는 경력이 존재하지 않습니다."),
 
     // 전문가 추가정보 관련 에러
-    EXPERT_DETAIL_NOT_FOUND(HttpStatus.BAD_REQUEST, "EXPERT_DETAIL4001", "해당 추가정보 아이디와 일치하는 추가정보가 존재하지 않습니다.");
+    EXPERT_DETAIL_NOT_FOUND(HttpStatus.BAD_REQUEST, "EXPERT_DETAIL4001", "해당 추가정보 아이디와 일치하는 추가정보가 존재하지 않습니다."),
+
+    // 채팅 메시지 타입
+    MESSAGE_TYPE_NOT_FOUND(HttpStatus.BAD_REQUEST, "MESSAGE_TYPE4001", "지원되지 않는 채팅 메시지 타입입니다.");
 
     private final HttpStatus httpStatus;
     private final String code;

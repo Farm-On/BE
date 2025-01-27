@@ -6,8 +6,8 @@ import org.springframework.data.domain.Pageable;
 
 public interface ChatRoomRepositoryCustom {
     // userId와 연관된 채팅방 페이징 조회
-    Page<ChatRoom> findChatRoomsByUserId(Long userId, Pageable pageable);
+    Page<ChatRoom> findChatRoomsByUserIdAndRole(Long userId, String role, Pageable pageable);
 
     // userId와 연관된 채팅방 중 안 읽음 메시지가 존재하는 채팅방만 페이징 조회
-    Page<ChatRoom> findUnReadChatRoomsByUserId(Long userId, Pageable pageable);
+    Page<ChatRoom> findUnReadChatRoomsByUserIdAndRole(Long userId, String role, Pageable pageable);
 }
