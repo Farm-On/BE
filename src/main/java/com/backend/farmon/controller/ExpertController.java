@@ -14,18 +14,22 @@ import com.backend.farmon.dto.expert.*;
 import com.backend.farmon.repository.ExpertCareerRepository.ExpertCareerRepository;
 import com.backend.farmon.repository.ExpertDetailRepository.ExpertDetailRepository;
 import com.backend.farmon.repository.ExpertReposiotry.ExpertRepository;
+import com.backend.farmon.service.AWS.S3Service;
 import com.backend.farmon.service.ExpertService.ExpertCommandService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
+import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 @Tag(name = "전문가 정보", description = "전문가 관련 정보 CRUD API")
 @RestController
@@ -36,6 +40,7 @@ public class ExpertController {
     private final ExpertCareerRepository expertCareerRepository;
     private final ExpertRepository expertRepository;
     private final ExpertDetailRepository expertDetailRepository;
+    private final S3Service s3Service;
 
     // 전문가 내 프로필 페이지 조회
     @GetMapping("/api/expert/{expert-id}")
@@ -195,7 +200,65 @@ public class ExpertController {
         }
     }
 
+    // 전문가 프로필 이미지 설정 API
+    @PutMapping(value = "/api/expert/{expert-id}/profileImg", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
+    @Operation(summary = "전문가 프로필 이미지 설정 API")
+    @ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200", description = "OK, 성공"),
+    })
+    @Parameters({
+            @Parameter(name = "expert-id", description = "프로필 이미지를 등록하려는 전문가의 id", required = true)
+    })
+    public ApiResponse<String> setProfileImage(
+            @RequestPart("file") MultipartFile multipartFile,
+            @PathVariable("expert-id") Long expertId) {
 
+        try {
+            // 전문가의 프로필 이미지 설정
+            String imageUrl = s3Service.putProfImage(expertId, multipartFile);
+
+            // 프로필 이미지 업로드 성공시 응답 반환
+            if (imageUrl != null) {
+                return ApiResponse.onSuccess("프로필 이미지가 성공적으로 업로드되었습니다." + imageUrl);
+            } else {
+                return ApiResponse.onFailure("ERROR_UPLOAD_PROFILE_IMG","프로필 이미지 업로드에 실패하였습니다.",null);
+            }
+        } catch (Exception e) {
+            return ApiResponse.onFailure("ERROR_UPLOAD_PROFILE_IMG","프로필 이미지 업로드에 실패하였습니다.",null);
+        }
+    }
+
+    // 전문가 대표서비스 편집
+    @PatchMapping("/api/expert/{expert-id}/specialty")
+    @Operation(summary = "전문가 대표서비스 편집 API")
+    @ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200", description = "OK, 성공"),
+    })
+    @Parameters({
+            @Parameter(name = "expert-id", description = "대표서비스를 변경하려는 전문가의 id", required = true),
+    })
+    public ApiResponse<ExpertProfileResponse.ResultUpdateSpecialtyDTO> updateExpertSpecialty(
+            @RequestBody ExpertProfileRequest.UpdateSpecialtyDTO updateSpecialtyDTO,
+            @PathVariable(name = "expert-id") Long expertId) {
+        Expert updatedExpert = expertCommandService.updateExpertSpecialty(expertId, updateSpecialtyDTO);
+        return ApiResponse.onSuccess(ExpertConverter.updateSpecialtyDTO(updatedExpert));
+    }
+
+    // 전문가 활동지역 편집
+    @PatchMapping("/api/expert/{expert-id}/area")
+    @Operation(summary = "전문가 활동지역 편집 API")
+    @ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200", description = "OK, 성공"),
+    })
+    @Parameters({
+            @Parameter(name = "expert-id", description = "활동지역을 변경하려는 전문가의 id", required = true),
+    })
+    public ApiResponse<ExpertProfileResponse.ResultUpdateAreaDTO> updateExpertArea(
+            @RequestBody ExpertProfileRequest.UpdateAreaDTO updateAreaDTO,
+            @PathVariable(name = "expert-id") Long expertId) {
+        Expert updatedExpert = expertCommandService.updateExpertArea(expertId, updateAreaDTO);
+        return ApiResponse.onSuccess(ExpertConverter.updateAreaDTO(updatedExpert));
+    }
 
 
     // 전문가 프로필 목록 조회

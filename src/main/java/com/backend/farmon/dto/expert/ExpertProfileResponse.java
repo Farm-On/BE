@@ -65,4 +65,50 @@ public class ExpertProfileResponse {
 
         LocalDate createdAt; // 기본 정렬 생성 날짜순
     }
+
+    @Builder
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class ResultUpdateSpecialtyDTO { // 대표 서비스 변경시 응답 DTO
+        @Schema(description = "전문가 아이디")
+        Long expertId;
+
+        @Schema(description = "작물 카테고리")
+        String cropCategory;
+
+        @Schema(description = "작물 이름")
+        String crop;
+
+        @Schema(description = "대표 서비스 디테일1")
+        String serviceDetail1;
+        @Schema(description = "대표 서비스 디테일2")
+        String serviceDetail2;
+        @Schema(description = "대표 서비스 디테일3")
+        String serviceDetail3;
+        @Schema(description = "대표 서비스 디테일4")
+        String serviceDetail4;
+    }
+
+    @Builder
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class ResultUpdateAreaDTO { // 활동지역 변경시 응답 DTO
+        @Schema(description = "전문가 아이디")
+        Long expertId;
+
+        @Schema(description = "시/도")
+        String areaName;
+
+        @Schema(description = "시/구")
+        String areaNameDetail;
+
+        @Schema(description = "활동 가능 범위")
+        String availableRange;
+        @Schema(description = "전국 어디든 가능 여부")
+        Boolean isAvailableEverywhere;
+        @Schema(description = "도서 지방 제외 여부")
+        Boolean isExcludeIsland;
+    }
 }
