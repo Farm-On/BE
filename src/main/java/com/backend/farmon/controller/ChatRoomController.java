@@ -60,10 +60,10 @@ public class ChatRoomController {
     }
 
 
-    // 이름과 일치하는 채팅 목록 조회
+    // 이름, 작물 이름과 일치하는 채팅 목록 조회
     @Operation(
-            summary = "채팅 상대 이름으로 검색하여 일치하는 상대방과의 채팅 목록 조회 API",
-            description = "채팅 상대방의 이름을 검색하여 일치하는 상대방과의 채팅 목록을 조회하는 API이며, 페이징을 포함합니다. " +
+            summary = "채팅 상대 이름 혹은 작물 이름으로 검색하여 일치하는 채팅 목록 조회 API",
+            description = "채팅 상대 이름 혹은 작물 이름으로 검색하여 일치하는 채팅 목록 조회하는 API이며, 페이징을 포함합니다. " +
                     "유저 아이디, 읽음 여부 필터, 검색할 채팅 상대 이름, 페이지 번호를 쿼리 스트링으로 입력해주세요."
     )
     @ApiResponses({
@@ -76,44 +76,14 @@ public class ChatRoomController {
     @Parameters({
             @Parameter(name = "userId", description = "로그인한 유저의 아이디(pk)", example = "1", required = true),
             @Parameter(name = "read", description = "읽음 여부 필터링. 안 읽은 채팅방만 필터링 시에는 false, 이외에는 true 입니다.", example = "false", required = true),
-            @Parameter(name = "name", description = "검색할 채팅 상대방의 이름입니다.", example = "김팜온", required = true),
+            @Parameter(name = "searchName", description = "검색어", example = "김팜온", required = true),
             @Parameter(name = "page", description = "페이지 번호, 1부터 시작입니다.", example = "1", required = true)
     })
-    @GetMapping("/rooms/name")
-    public ApiResponse<ChatResponse.ChatRoomListDTO> getChatRoomPageByExpertName (@RequestParam(name = "userId") @EqualsUserId Long userId,
-                                                                                  @RequestParam(name = "read") String read,
-                                                                                  @RequestParam(name = "expertName") String expertName,
-                                                                                  @CheckPage Integer page) {
-        ChatResponse.ChatRoomListDTO response = ChatResponse.ChatRoomListDTO.builder().build();
-
-        return ApiResponse.onSuccess(response);
-    }
-
-
-    // 작물 이름으로 검색하여 일치하는 전문가와의 채팅 목록 조회
-    @Operation(
-            summary = "작물 이름으로 검색하여 일치하는 전문가와의 채팅 목록 조회",
-            description = "작물 이름으로 검색하여 일치하는 해당 분야의 전문가와의 채팅 목록을 조회하는 API이며 페이징을 포함합니다. " +
-                    "유저 아이디, 읽음 여부 필터, 검색할 전문가의 작물 이름, 페이지 번호를 쿼리 스트링으로 입력해주세요."
-    )
-    @ApiResponses({
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200",description = "OK, 성공"),
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "USER4001", description = "아이디와 일치하는 사용자가 없습니다.", content = @Content(schema = @Schema(implementation = ApiResponse.class))),
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "AUTHORIZATION_4031", description = "인증된 사용자 정보와 요청된 리소스의 사용자 정보가 다릅니다. (userId 불일치)", content = @Content(schema = @Schema(implementation = ApiResponse.class))),
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "PAGE4001", description = "페이지 번호는 1 이상이어야 합니다.", content = @Content(schema = @Schema(implementation = ApiResponse.class))),
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON400", description = "잘못된 요청입니다.", content = @Content(schema = @Schema(implementation = ApiResponse.class))),
-    })
-    @Parameters({
-            @Parameter(name = "userId", description = "로그인한 유저의 아이디(pk)", example = "1", required = true),
-            @Parameter(name = "read", description = "읽음 여부 필터링. 안 읽은 채팅방만 필터링 시에는 false, 이외에는 true 입니다.", example = "1", required = true),
-            @Parameter(name = "cropsName", description = "검색할 전문가의 작물 이름(쌀, 곡물 등)입니다.", example = "쌀", required = true),
-            @Parameter(name = "page", description = "페이지 번호, 1부터 시작입니다.", example = "1", required = true)
-    })
-    @GetMapping("/rooms/crops")
-    public ApiResponse<ChatResponse.ChatRoomListDTO> getChatRoomPageByCropsName (@RequestParam(name = "userId") @EqualsUserId Long userId,
-                                                                                 @RequestParam(name = "read") String read,
-                                                                                 @RequestParam(name = "cropsName") String cropsName,
-                                                                                 @CheckPage Integer page) {
+    @GetMapping("/rooms/all/search")
+    public ApiResponse<ChatResponse.ChatRoomListDTO> getChatRoomPageBySearch(@RequestParam(name = "userId") @EqualsUserId Long userId,
+                                                                             @RequestParam(name = "read") String read,
+                                                                             @RequestParam(name = "searchName") String searchName,
+                                                                             @CheckPage Integer page) {
         ChatResponse.ChatRoomListDTO response = ChatResponse.ChatRoomListDTO.builder().build();
 
         return ApiResponse.onSuccess(response);
@@ -147,10 +117,10 @@ public class ChatRoomController {
     }
 
 
-    // 채팅방 입장
+    // 채팅 대화 상대의 정보 조회
     @Operation(
-            summary = "채팅방 아이디와 일치하는 채팅방 입장",
-            description = "채팅방 아이디와 일치하는 채팅방 입장에 입장하여 유저의 채팅방 접속 시간을 기록하고, 채팅 대화 상대의 정보를 가져오는 API 입니다. " +
+            summary = " 채팅방의 정보 조회",
+            description = "채팅방 아이디와 일치하는 채팅방 입장에 입장하여 채팅 대화 상대의 정보와 컨설팅 완료 정보를 가져오는 API 입니다. " +
                     "유저 아이디, 채팅방 아이디를 쿼리 스트링으로 입력해주세요."
     )
     @ApiResponses({
@@ -164,17 +134,17 @@ public class ChatRoomController {
             @Parameter(name = "userId", description = "로그인한 유저의 아이디(pk)", example = "1", required = true),
             @Parameter(name = "chatRoomId", description = "입장하려는 채팅방의 아이디", example = "1", required = true),
     })
-    @PatchMapping("/room")
-    public ApiResponse<ChatResponse.ChatRoomEnterDTO> enterChatRoom (@RequestParam(name = "userId") @EqualsUserId  Long userId,
-                                                                       @RequestParam(name = "chatRoomId") Long chatRoomId) {
-        ChatResponse.ChatRoomEnterDTO response = chatRoomCommandService.updateLastEnterTime(userId, chatRoomId);
+    @GetMapping("/room")
+    public ApiResponse<ChatResponse.ChatRoomDataDTO> getChatRoomData (@RequestParam(name = "userId") @EqualsUserId  Long userId,
+                                                                          @RequestParam(name = "chatRoomId") Long chatRoomId) {
+        ChatResponse.ChatRoomDataDTO response = chatRoomQueryService.findChatRoomDataAndChangeUnreadMessage(userId, chatRoomId);
 
         return ApiResponse.onSuccess(response);
     }
 
     // 채팅 메시지 내역 조회
     @Operation(
-            summary = "채팅방 아이디이와 일치하는 채팅방의 대화 내역 조회",
+            summary = "채팅방의 대화 내역 조회",
             description = "채팅방 아이디와 일치하는 채팅방의 채팅 대화 내역을 무한스크롤로 받는 API 입니다. " +
                     "유저 아이디, 채팅방 아이디, 페이지 번호를 쿼리 스트링으로 입력해주세요."
     )
@@ -191,7 +161,7 @@ public class ChatRoomController {
             @Parameter(name = "chatRoomId", description = "대화 내역(메시지)을 조회하려는 채팅방의 아이디", example = "1", required = true),
             @Parameter(name = "page", description = "페이지 번호, 1부터 시작입니다.", example = "1", required = true)
     })
-    @GetMapping("/room")
+    @GetMapping("/room/message")
     public ApiResponse<ChatResponse.ChatMessageListDTO> getChatMessageList (@RequestParam(name = "userId") @EqualsUserId Long userId,
                                                                             @RequestParam(name = "chatRoomId") Long chatRoomId,
                                                                             @CheckPage Integer page) {
@@ -251,5 +221,4 @@ public class ChatRoomController {
 
         return ApiResponse.onSuccess(response);
     }
-
 }

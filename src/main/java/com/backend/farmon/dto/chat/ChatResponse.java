@@ -126,11 +126,8 @@ public class ChatResponse {
         @Schema(description = "채팅 중인 상대방 이름", example = "김팜온")
         String name;
 
-        @Schema(description = "채팅 상대 역할, 농업인 또는 전문가", example = "농업인")
+        @Schema(description = "채팅 상대 역할, 채팅방 생성은 전문가만 가능하므로 항상 농업인 반환", example = "농업인")
         String type;
-
-        @Schema(description = "채팅 상대의 평균 메시지 응답 시간, 정보가 없는 사용자이면 null", example = "1시간")
-        String averageResponseTime;
     }
 
     @Getter
@@ -138,8 +135,8 @@ public class ChatResponse {
     @NoArgsConstructor
     @AllArgsConstructor
     @Builder
-    @Schema(description = "채팅방 입장 성공")
-    public static class ChatRoomEnterDTO {
+    @Schema(description = "채팅방 정보")
+    public static class ChatRoomDataDTO {
 
         @Schema(description = "채팅 중인 상대방 이름", example = "김팜온")
         String name;
@@ -155,6 +152,15 @@ public class ChatResponse {
 
         @Schema(description = "채팅 상대의 평균 메시지 응답 시간, 정보가 없는 사용자이면 null", example = "1시간")
         String averageResponseTime;
+
+        @Schema(description = "채팅 상대의 컨설팅 완료 여부", example = "true")
+        Boolean isOtherComplete;
+
+        @Schema(description = "사용자의 컨설팅 완료 여부", example = "true")
+        Boolean isComplete;
+
+        @Schema(description = "견적 완료 여부, 농업인 전문가 모두 컨설팅 완료 시 true", example = "true")
+        Boolean isEstimateComplete;
     }
 
     @Getter
@@ -201,5 +207,57 @@ public class ChatResponse {
 
         @Schema(description = "견적 이미지 리스트")
         List<String> estimateImageList;
+    }
+
+    @Getter
+    @Setter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Builder
+    @Schema(description = "채팅방 컨설팅 완료 정보")
+    public static class ChatRoomCompleteDTO {
+        @Schema(description = "사용자의 컨설팅 완료 여부", example = "true")
+        Boolean isComplete;
+
+        @Schema(description = "채팅 상대의 컨설팅 완료 여부", example = "true")
+        Boolean isOtherComplete;
+
+        @Schema(description = "견적 완료 여부, 농업인 전문가 모두 컨설팅 완료 시 true", example = "true")
+        Boolean isEstimateComplete;
+    }
+
+    @ToString
+    @Getter
+    @Setter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Builder
+    @Schema(description = "수신할 채팅 메시지 정보")
+    public static class ChatMessageReceiveDTO {
+
+        @Schema(description = "보낸 사람 아이디, 현재 로그인한 사용자의 userId와 동일", example = "1")
+        Long senderId;
+
+        @Schema(description = "보낸 사람 타입", example = "농업인")
+        String senderType;
+
+        @Schema(description = "메시지 내용, 이미지일 경우 클라이언트에서 이미지 파일을 Base64로 인코딩하여 전송 필요", example = "안녕하세요. 견적 신청하셨나요?")
+        String messageContent;
+
+        @Schema(description = "메시지 타입, " +
+                "텍스트 메시지 전송이라면 TEXT, 이미지 전송이라면 IMAGE, 컨설팅 완료라면 COMPLETE, 채팅방 퇴장이라면 EXIT", example = "TEXT")
+        String messageType;
+
+        @Schema(description = "보낸 시간", example = "2025-01-10")
+        String sendTime;
+
+        @Schema(description = "내가 보낸 메시지인지 여부, 내가 보낸 메시지라면 true, 받은 메시지라면 false", example = "true")
+        Boolean isMine;
+
+        @Schema(description = "상대방이 메시지 읽음 여부", example = "false")
+        Boolean isOtherRead;
+
+        @Schema(description = "상대방이 채팅방에 접속해 있는지 여부", example = "false")
+        Boolean isOtherEnter;
     }
 }

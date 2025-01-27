@@ -1,6 +1,8 @@
 package com.backend.farmon.converter;
 
 import com.backend.farmon.domain.*;
+import com.backend.farmon.domain.enums.ChatMessageType;
+import com.backend.farmon.dto.chat.ChatRequest;
 import com.backend.farmon.dto.chat.ChatResponse;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Slice;
@@ -9,6 +11,17 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 public class ChatConverter {
+
+    public static ChatMessage toChatMessage(ChatRequest.ChatMessageDTO dto, ChatRoom chatRoom){
+        return ChatMessage.builder()
+                .senderId(dto.getSenderId())
+                .type(ChatMessageType.valueOf(dto.getMessageType()))
+                .content(dto.getMessageContent()!=null ? dto.getMessageContent() : null)
+                .isRead(false) // 일단 읽음 여부 false로 리턴, 추후에 다시 구현
+                .chatRoom(chatRoom)
+                .build();
+    }
+
     public static ChatRoom toChatRoom(Expert expert, Estimate estimate, User farmer){
         return ChatRoom.builder()
                 .expertLastEnter(LocalDateTime.now())
@@ -22,9 +35,7 @@ public class ChatConverter {
         return ChatResponse.ChatRoomCreateDTO.builder()
                 .chatRoomId(chatRoom.getId())
                 .name(chatRoom.getFarmer().getUserName())
-//                .profileImage(chatRoom.getFarmer().getProfileImageUrl())
                 .type("농업인")
-                .averageResponseTime(farmer.getChatAverageResponseTime())
                 .build();
     }
 
@@ -34,25 +45,32 @@ public class ChatConverter {
                 .build();
     }
 
-    public static ChatResponse.ChatRoomEnterDTO toChatRoomEnterDTO(ChatRoom chatRoom, String userType) {
-        boolean isExpert = userType.equals("전문가");
-
+    public static ChatResponse.ChatRoomDataDTO toChatRoomDataDTO(ChatRoom chatRoom, Boolean isExpert) {
+        // 내가 전문가
         if (isExpert) {
-            return ChatResponse.ChatRoomEnterDTO.builder()
+            return ChatResponse.ChatRoomDataDTO.builder()
                     .name(chatRoom.getFarmer().getUserName())
 //                    .profileImage(chatRoom.getFarmer().getProfileImageUrl())
                     .type("농업인")
                     .lastEnterTime(ConvertTime.convertLocalDatetimeToTime(chatRoom.getFarmerLastEnter()))
                     .averageResponseTime(chatRoom.getFarmer().getChatAverageResponseTime())
+                    .isComplete(chatRoom.getIsExpertComplete())
+                    .isOtherComplete(chatRoom.getIsFarmerComplete())
+                    .isEstimateComplete(chatRoom.getEstimate().getStatus().equals(1))
                     .build();
         }
 
-        return ChatResponse.ChatRoomEnterDTO.builder()
+        return ChatResponse.ChatRoomDataDTO.builder()
                 .name(chatRoom.getExpert().getUser().getUserName())
-//                .profileImage(chatRoom.getExpert().getUser().getProfileImageUrl())
+                .profileImage(chatRoom.getExpert().getProfileImageUrl() != null
+                        ? chatRoom.getExpert().getProfileImageUrl()
+                        : null)
                 .type("전문가")
                 .lastEnterTime(ConvertTime.convertLocalDatetimeToTime(chatRoom.getExpertLastEnter()))
                 .averageResponseTime(chatRoom.getExpert().getUser().getChatAverageResponseTime())
+                .isComplete(chatRoom.getIsFarmerComplete())
+                .isOtherComplete(chatRoom.getIsExpertComplete())
+                .isEstimateComplete(chatRoom.getEstimate().getStatus().equals(1))
                 .build();
     }
 
@@ -102,11 +120,13 @@ public class ChatConverter {
         return ChatResponse.ChatRoomDetailDTO.builder()
                 .chatRoomId(chatRoom.getId())
                 .name(user.getUserName())
-//                .profileImage(user.getProfileImageUrl())
+                .profileImage(isExpert && user.getExpert() != null && user.getExpert().getProfileImageUrl() != null
+                        ? user.getExpert().getProfileImageUrl()
+                        : null)
                 .estimateBudget(chatRoom.getEstimate().getBudget())
                 .estimateCategory(chatRoom.getEstimate().getCategory())
                 .estimateAreaName(area.getAreaName())
-                .estimateAreaName(area.getAreaNameDetail())
+                .estimateAreaDetail(area.getAreaNameDetail())
                 .unreadMessageCount(unReadMessageCount)
                 .lastMessageContent(chatMessage != null ? chatMessage.getContent() : null) // null-safe 처리
                 .lastMessageDate(chatMessage != null ? ConvertTime.convertToYearMonthDay(chatMessage.getCreatedAt()) : null) // null-safe 처리
@@ -132,6 +152,14 @@ public class ChatConverter {
                                 .map(EstimateImage::getImageUrl)
                                 .toList()
                 )
+                .build();
+    }
+
+    public static ChatResponse.ChatRoomCompleteDTO toChatRoomCompleteDTO(ChatRoom chatRoom, Boolean isOtherComplete, Boolean isEstimateComplete) {
+        return ChatResponse.ChatRoomCompleteDTO.builder()
+                .isOtherComplete(isOtherComplete)
+                .isComplete(true)
+                .isEstimateComplete(isEstimateComplete)
                 .build();
     }
 }
