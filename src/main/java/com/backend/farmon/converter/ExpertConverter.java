@@ -5,12 +5,10 @@ import com.backend.farmon.domain.ExpertCareer;
 import com.backend.farmon.domain.ExpertDatail;
 import com.backend.farmon.domain.User;
 import com.backend.farmon.domain.enums.Role;
-import com.backend.farmon.dto.expert.ExpertCareerRequest;
-import com.backend.farmon.dto.expert.ExpertCareerResponse;
-import com.backend.farmon.dto.expert.ExpertDetailRequest;
-import com.backend.farmon.dto.expert.ExpertDetailResponse;
+import com.backend.farmon.dto.expert.*;
 import com.backend.farmon.dto.user.SignupRequest;
 import com.backend.farmon.dto.user.SignupResponse;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import org.springframework.stereotype.Component;
 
@@ -104,5 +102,30 @@ public class ExpertConverter {
         if (expertDetailPostDTO.getContent() != null) {expertDetail.setDetailContent(expertDetailPostDTO.getContent());}
 
         return expertDetail;
+    }
+
+    // 전문가 대표서비스 수정 응답 DTO 생성
+    public static ExpertProfileResponse.ResultUpdateSpecialtyDTO updateSpecialtyDTO(Expert request){
+        return ExpertProfileResponse.ResultUpdateSpecialtyDTO.builder()
+                .expertId(request.getId())
+                .cropCategory(request.getCrop().getCategory())
+                .crop(request.getCrop().getName())
+                .serviceDetail1(request.getServiceDetail1())
+                .serviceDetail2(request.getServiceDetail2())
+                .serviceDetail3(request.getServiceDetail3())
+                .serviceDetail4(request.getServiceDetail4())
+                .build();
+    }
+
+    // 전문가 활동지역 수정 응답 DTO 생성
+    public static ExpertProfileResponse.ResultUpdateAreaDTO updateAreaDTO(Expert request) {
+        return ExpertProfileResponse.ResultUpdateAreaDTO.builder()
+                .expertId(request.getId())
+                .areaName(request.getArea().getAreaName())
+                .areaNameDetail(request.getArea().getAreaNameDetail())
+                .availableRange(request.getAvailableRange())
+                .isAvailableEverywhere(request.getIsAvailableEverywhere())
+                .isExcludeIsland(request.getIsExcludeIsland())
+                .build();
     }
 }

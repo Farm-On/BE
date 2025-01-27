@@ -1,16 +1,14 @@
 package com.backend.farmon.service.ExpertService;
 
 import com.backend.farmon.apiPayload.code.status.ErrorStatus;
-import com.backend.farmon.apiPayload.exception.handler.AreaHandler;
-import com.backend.farmon.apiPayload.exception.handler.CropHandler;
-import com.backend.farmon.apiPayload.exception.handler.ExpertHandler;
-import com.backend.farmon.apiPayload.exception.handler.UserHandler;
+import com.backend.farmon.apiPayload.exception.handler.*;
 import com.backend.farmon.converter.ExpertConverter;
 import com.backend.farmon.converter.SignupConverter;
 import com.backend.farmon.domain.*;
 import com.backend.farmon.dto.expert.ExpertCareerRequest;
 import com.backend.farmon.dto.expert.ExpertCareerResponse;
 import com.backend.farmon.dto.expert.ExpertDetailRequest;
+import com.backend.farmon.dto.expert.ExpertProfileRequest;
 import com.backend.farmon.dto.user.SignupRequest;
 import com.backend.farmon.dto.user.SignupResponse;
 import com.backend.farmon.repository.AreaRepository.AreaRepository;
@@ -96,5 +94,46 @@ public class ExpertCommandServiceImpl implements ExpertCommandService {
         newExpertDetail.setExpert(expert);
 
         return expertDetailRepository.save(newExpertDetail); // 완성된 엔티티 반환
+    }
+
+    // 전문가 대표서비스 변경 로직
+    @Override
+    @Transactional
+    public Expert updateExpertSpecialty(Long expertId, ExpertProfileRequest.UpdateSpecialtyDTO request) {
+        Expert expert = expertRepository.findById(expertId)
+                .orElseThrow(() -> new ExpertHandler(ErrorStatus.EXPERT_NOT_FOUND));
+
+        // 입력받은 카테고리가 있고 기존 것과 다르면 업데이트 수행
+        if (request.getCrop() != null && !expert.getCrop().getName().equals(request.getCrop())) {
+            Crop newCrop = cropRepository.findByName(request.getCrop())
+                    .orElseThrow(() -> new CropHandler(ErrorStatus.CROP_NOT_FOUND));
+            expert.setCrop(newCrop);
+        }
+        if (request.getServiceDetail1() != null) {expert.setServiceDetail1(request.getServiceDetail1());}
+        if (request.getServiceDetail2() != null) {expert.setServiceDetail2(request.getServiceDetail2());}
+        if (request.getServiceDetail3() != null) {expert.setServiceDetail3(request.getServiceDetail3());}
+        if (request.getServiceDetail4() != null) {expert.setServiceDetail4(request.getServiceDetail4());}
+
+        return expertRepository.save(expert);
+    }
+
+    // 전문가 활동지역 변경 로직
+    @Override
+    @Transactional
+    public Expert updateExpertArea(Long expertId, ExpertProfileRequest.UpdateAreaDTO request) {
+        Expert expert = expertRepository.findById(expertId)
+                .orElseThrow(() -> new ExpertHandler(ErrorStatus.EXPERT_NOT_FOUND));
+
+        // 입력받은 카테고리가 있고 기존 것과 다르면 업데이트 수행
+        if (request.getAreaNameDetail() != null && !expert.getArea().getAreaNameDetail().equals(request.getAreaNameDetail())) {
+            Area newArea = areaRepository.findByAreaNameDetail(request.getAreaNameDetail())
+                    .orElseThrow(() -> new AreaHandler(ErrorStatus.AREA_NOT_FOUND));
+            expert.setArea(newArea);
+        }
+        if (request.getAvailableRange() != null) {expert.setAvailableRange(request.getAvailableRange());}
+        if (request.getIsAvailableEverywhere() != null) {expert.setIsAvailableEverywhere(request.getIsAvailableEverywhere());}
+        if (request.getIsExcludeIsland() != null) {expert.setIsExcludeIsland(request.getIsExcludeIsland());}
+
+        return expertRepository.save(expert);
     }
 }
