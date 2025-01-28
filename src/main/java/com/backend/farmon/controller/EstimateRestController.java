@@ -7,14 +7,19 @@ import com.backend.farmon.service.EstimateService.EstimateQueryService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import com.backend.farmon.apiPayload.ApiResponse;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.awt.*;
 import java.util.List;
 
 @Tag(name = "농사 견적서", description = "농사 견적서 관련 API")
@@ -38,10 +43,15 @@ public class EstimateRestController {
             @io.swagger.v3.oas.annotations.responses.
                     ApiResponse(responseCode = "COMMON200", description = "OK, 성공")
     })
-    @PostMapping
+    @PostMapping(consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
     public ApiResponse<EstimateResponseDTO.CreateDTO> createEstimate(
-            @RequestPart EstimateRequestDTO.CreateDTO request,
-            @RequestPart(required = false) List<MultipartFile> imageFiles
+            @RequestPart("request") @Parameter(
+            description = "견적서 생성 요청 데이터",
+            content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
+                    schema = @Schema(implementation = EstimateRequestDTO.CreateDTO.class))) EstimateRequestDTO.CreateDTO request,
+            @RequestPart(value = "imageFiles", required = false)
+            @Parameter(description = "업로드할 이미지 파일들", content = @Content(mediaType = MediaType.MULTIPART_FORM_DATA_VALUE,
+                    array = @ArraySchema(schema = @Schema(type = "string", format = "binary")))) List<MultipartFile> imageFiles
     ) {
         // 실제 로직(저장)은 생략
         // 예시로 작성된 Dto 를 그대로 반환
@@ -172,7 +182,7 @@ public class EstimateRestController {
                     ApiResponse(responseCode = "COMMON200", description = "OK, 성공")
     })
     @Parameters({
-            @Parameter(name = "cropCategory", description = "작물 카테고리 이름", example = "GRAIN", required = true),
+            @Parameter(name = "cropCategory", description = "작물 카테고리 이름", example = "곡물", required = true),
             @Parameter(name = "page", description = "페이지 번호(1부터 시작)", example = "1", required = true)
     })
     @GetMapping("/expert/crop-category")
@@ -205,7 +215,7 @@ public class EstimateRestController {
             @Parameter(name = "cropName", description = "작물 이름", example = "쌀", required = true),
             @Parameter(name = "page", description = "페이지 번호(1부터 시작)", example = "1", required = true)
     })
-    @GetMapping("/expert/crop-id")
+    @GetMapping("/expert/crop-name")
     public ApiResponse<EstimateResponseDTO.ListDTO> getEstimatesByCropId(
             @RequestParam(name = "cropName") String cropName,
             @RequestParam(name = "page") Integer page
@@ -383,7 +393,7 @@ public class EstimateRestController {
             @Parameter(name = "estimateCategory", description = "견적 카테고리", required = false),
             @Parameter(name = "budget", description = "예산 범위(예:50만원 ~ 100만원)", required = false),
             @Parameter(name = "areaName", description = "지역 이름(예: 서울)", required = false),
-            @Parameter(name = "areaNameDetail", description = "지역 이름(예: 강남구)", required = false),
+            @Parameter(name = "areaNameDetail", description = "지역 세부 이름(예: 강남구)", required = false),
             @Parameter(name = "page", description = "페이지 번호", required = true)
     })
     @GetMapping("/expert/filter")
