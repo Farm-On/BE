@@ -64,6 +64,9 @@ public class Estimate extends BaseEntity {
     private List<EstimateImage> estimateImageList = new ArrayList<>();
 
     public void addEstimateImage(EstimateImage image) {
+        if (estimateImageList == null) {
+            estimateImageList = new ArrayList<>(); // null 체크 후 초기화
+        }
         estimateImageList.add(image);
         image.setEstimate(this);
     }
