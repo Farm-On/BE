@@ -30,7 +30,7 @@ public class EstimateConverter {
 
     }
     // Estimate -> CreateResponseDTO
-    public EstimateResponseDTO.CreateDTO toCreateDTO(Estimate estimate) {
+    public EstimateResponseDTO.CreateDTO toCreateResponseDTO(Estimate estimate) {
         return EstimateResponseDTO.CreateDTO.builder()
                 .estimateId(estimate.getId())
                 .userId(estimate.getUser().getId())
@@ -38,7 +38,7 @@ public class EstimateConverter {
     }
 
     // Estimate -> UpdateResponseDTO
-    public EstimateResponseDTO.UpdateDTO toUpdateDTO(Long estimateId, Estimate estimate) {
+    public EstimateResponseDTO.UpdateDTO toUpdateResponseDTO(Long estimateId, Estimate estimate) {
         return EstimateResponseDTO.UpdateDTO.builder()
                 .estimateId(estimateId)
                 .userId(estimate.getUser().getId())
@@ -46,7 +46,7 @@ public class EstimateConverter {
     }
 
     // Estimate -> DeleteResponseDTO
-    public EstimateResponseDTO.DeleteDTO toDeleteDTO(Long estimateId) {
+    public EstimateResponseDTO.DeleteDTO toDeleteResponseDTO(Long estimateId) {
         return EstimateResponseDTO.DeleteDTO.builder()
                 .estimateId(estimateId)
                 .deleted(true)
@@ -67,7 +67,30 @@ public class EstimateConverter {
                 .budget(estimate.getBudget())
                 .title(estimate.getTitle())
                 .body(estimate.getBody())
-                .createDate(estimate.getCreatedAt().toLocalDate())
+                .createdDate(estimate.getCreatedAt().toLocalDate())
+                .build();
+    }
+
+    //Page<Estimate> -> FilteredListDTO
+    public EstimateResponseDTO.FilteredListDTO toFilteredListDTO(Page<Estimate> estimatePage, String estimateCategory, String budget, String areaName, String areaNameDetail){
+        // 미리보기 리스트로 변환
+        List<EstimateResponseDTO.PreviewDTO> previewDTOList = estimatePage.getContent().stream()
+                .map(this::toPreviewDTO)
+                .collect(Collectors.toList());
+
+        // ListDTO 구성
+        return EstimateResponseDTO.FilteredListDTO.builder()
+                .listSize(previewDTOList.size())
+                .totalPage(estimatePage.getTotalPages())
+                .totalElements(estimatePage.getTotalElements())
+                .currentPage(estimatePage.getNumber() + 1)
+                .isFirst(estimatePage.isFirst())
+                .isLast(estimatePage.isLast())
+                .estimateCategory(estimateCategory)
+                .budget(budget)
+                .areaName(areaName)
+                .areaNameDetail(areaNameDetail)
+                .estimateList(previewDTOList)
                 .build();
     }
 
@@ -89,7 +112,6 @@ public class EstimateConverter {
                 .estimateList(previewDTOList)
                 .build();
     }
-
     //List<Estimate> -> ListDTO
     public EstimateResponseDTO.ListDTO toListDTO(List<Estimate> estimateList){
         // 미리보기 리스트로 변환

@@ -7,12 +7,21 @@ import com.backend.farmon.service.EstimateService.EstimateQueryService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import com.backend.farmon.apiPayload.ApiResponse;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.awt.*;
+import java.util.List;
+
 @Tag(name = "농사 견적서", description = "농사 견적서 관련 API")
 @Slf4j
 @RestController
@@ -27,22 +36,28 @@ public class EstimateRestController {
      */
     @Operation(
             summary = "농사 견적서 생성 API",
-            description = "새로운 농사 견적서를 작성하는 API 입니다. " +
-                    "작성자 ID와 견적서 내용(카테고리, 견적, 상세 내용 등)을 RequestBody 등에 담아 보내주세요."
+            description = "새로운 농사 견적서를 작성하는 API 입니다. 여러 이미지 업로드 할 수 있습니다. " +
+                    "작성자 ID와 견적서 내용(카테고리, 견적, 상세 내용, 예산(예: '500만원 ~ 1,000만원') 등)을 Request 에 담아 보내주세요."
     )
     @ApiResponses({
             @io.swagger.v3.oas.annotations.responses.
                     ApiResponse(responseCode = "COMMON200", description = "OK, 성공")
     })
-    @PostMapping
+    @PostMapping(consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
     public ApiResponse<EstimateResponseDTO.CreateDTO> createEstimate(
-            @RequestBody EstimateRequestDTO.CreateDTO request
+            @RequestPart("request") @Parameter(
+            description = "견적서 생성 요청 데이터",
+            content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
+                    schema = @Schema(implementation = EstimateRequestDTO.CreateDTO.class))) EstimateRequestDTO.CreateDTO request,
+            @RequestPart(value = "imageFiles", required = false)
+            @Parameter(description = "업로드할 이미지 파일들", content = @Content(mediaType = MediaType.MULTIPART_FORM_DATA_VALUE,
+                    array = @ArraySchema(schema = @Schema(type = "string", format = "binary")))) List<MultipartFile> imageFiles
     ) {
         // 실제 로직(저장)은 생략
         // 예시로 작성된 Dto 를 그대로 반환
         // 여기서 response 에는 DB 저장 후 생성된 estimateId 등을 담았다고 가정
 
-        EstimateResponseDTO.CreateDTO response =  estimateCommandService.createEstimate(request);
+        EstimateResponseDTO.CreateDTO response = estimateCommandService.createEstimate(request, imageFiles);
 
         return ApiResponse.onSuccess(response);
     }
@@ -167,7 +182,7 @@ public class EstimateRestController {
                     ApiResponse(responseCode = "COMMON200", description = "OK, 성공")
     })
     @Parameters({
-            @Parameter(name = "cropCategory", description = "작물 카테고리 이름", example = "GRAIN", required = true),
+            @Parameter(name = "cropCategory", description = "작물 카테고리 이름", example = "곡물", required = true),
             @Parameter(name = "page", description = "페이지 번호(1부터 시작)", example = "1", required = true)
     })
     @GetMapping("/expert/crop-category")
@@ -189,7 +204,7 @@ public class EstimateRestController {
      */
     @Operation(
             summary = "전문가용 세부 작물별 견적서 조회 API(10개 페이징, 최신순)",
-            description = "지정된 작물(cropId)에 해당하는 견적서를 " +
+            description = "지정된 세부 작물에 해당하는 견적서를 " +
                     "최신순으로 정렬하여 10개씩 페이징으로 제공합니다."
     )
     @ApiResponses({
@@ -197,18 +212,18 @@ public class EstimateRestController {
                     ApiResponse(responseCode = "COMMON200", description = "OK, 성공")
     })
     @Parameters({
-            @Parameter(name = "cropId", description = "작물 id", example = "10", required = true),
+            @Parameter(name = "cropName", description = "작물 이름", example = "쌀", required = true),
             @Parameter(name = "page", description = "페이지 번호(1부터 시작)", example = "1", required = true)
     })
-    @GetMapping("/expert/crop-id")
+    @GetMapping("/expert/crop-name")
     public ApiResponse<EstimateResponseDTO.ListDTO> getEstimatesByCropId(
-            @RequestParam(name = "cropId") Long cropId,
+            @RequestParam(name = "cropName") String cropName,
             @RequestParam(name = "page") Integer page
     ) {
         // 실제 로직 예시:
         //   1) cropCategory 로 해당되는 estimat e만 조회
         //   2) 최신순으로 정렬, 10개씩 페이징
-        EstimateResponseDTO.ListDTO response = estimateQueryService.getEstimateListByCropId(cropId, page);
+        EstimateResponseDTO.ListDTO response = estimateQueryService.getEstimateListByCropName(cropName, page);
 
         return ApiResponse.onSuccess(response);
     }
@@ -266,8 +281,8 @@ public class EstimateRestController {
             @RequestParam(name = "page", defaultValue = "1") Integer page
     ) {
         // 실제 로직 예시:
-        //   1) expertId로 배정된 Estimate 중 status 가 1 인 것만 조회
-        //   2) 최신순 or 원하는 기준으로 페이징
+        //        //   1) expertId로 배정된 Estimate 중 status 가 1 인 것만 조회
+        //        //   2) 최신순 or 원하는 기준으로 페이징
 
         EstimateResponseDTO.ListDTO response = estimateQueryService.getCompletedEstimateListByExpertId(expertId, page);
         return ApiResponse.onSuccess(response);
@@ -360,12 +375,48 @@ public class EstimateRestController {
     }
 
     /**
-     * (9) 필터링(검색/조건) 예시 - 마지막에
+     * (9) 필터링(검색/조건) 예시
      *  - 예: 지역, 예산 범위, 견적 카테고리 를 query param으로 받아서 검색
+     *  - 지역만 데이터를 담고 있을 수도 있고, 범위, 견적 카테고리만 데이터를 담고 있을 수도 있고
+     *  - 지역, 예싼 범위, 견적 카테고리 모두 데이터를 가지고 있을 수도있다.
      *  - 실제 구현에서는 여러 파라미터들을 받아서 동적 쿼리를 구성해야 함.
+     *  - 검색결과는 10개씩, 최신순, 페이징 처리
      */
+    @Operation(
+            summary = "견적서 필터링 검색",
+            description = "지역 ID, 예산 범위, 견적 카테고리 세 조건으로 견적서를 검색합니다."
+    )
+    @ApiResponses(
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200", description = "OK, 성공")
+    )
+    @Parameters({
+            @Parameter(name = "estimateCategory", description = "견적 카테고리", required = false),
+            @Parameter(name = "budget", description = "예산 범위(예:50만원 ~ 100만원)", required = false),
+            @Parameter(name = "areaName", description = "지역 이름(예: 서울)", required = false),
+            @Parameter(name = "areaNameDetail", description = "지역 세부 이름(예: 강남구)", required = false),
+            @Parameter(name = "page", description = "페이지 번호", required = true)
+    })
+    @GetMapping("/expert/filter")
+    public ApiResponse<EstimateResponseDTO.FilteredListDTO> filterEstimates(
+            @RequestParam(name = "estimateCategory", required = false) String estimateCategory,
+            @RequestParam(name = "budget", required = false) String budget,
+            @RequestParam(name = "areaName", required = false) String areaName,
+            @RequestParam(name = "areaNameDetail", required = false) String areaNameDetail,
+            @RequestParam(name = "page", defaultValue = "1") Integer page
+    ) {
+        //필터 DTO 생성
+        EstimateRequestDTO.FilterDTO request = EstimateRequestDTO.FilterDTO.builder()
+                .estimateCategory(estimateCategory)
+                .budget(budget)
+                .areaName(areaName)
+                .areaNameDetail(areaNameDetail)
+                .build();
 
+        EstimateResponseDTO.FilteredListDTO response = estimateQueryService.searchEstimateListByFilter(request, page);
 
+        return ApiResponse.onSuccess(response);
+
+    }
 
 
 
