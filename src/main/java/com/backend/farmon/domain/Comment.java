@@ -2,6 +2,8 @@ package com.backend.farmon.domain;
 
 import com.backend.farmon.domain.commons.BaseEntity;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -12,6 +14,8 @@ import java.util.List;
 @Entity
 @Setter
 @Getter
+@Builder
+@AllArgsConstructor
 public class Comment extends BaseEntity {
     // 수정까지 가능
 
@@ -46,5 +50,7 @@ public class Comment extends BaseEntity {
     private List<Comment> children=new ArrayList<>();
 
 
-
+    public Comment() {
+        
+    }
 }
