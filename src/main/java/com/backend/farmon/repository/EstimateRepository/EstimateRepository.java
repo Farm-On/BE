@@ -1,6 +1,7 @@
 package com.backend.farmon.repository.EstimateRepository;
 
 import com.backend.farmon.domain.Estimate;
+import com.backend.farmon.domain.Expert;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -64,4 +65,6 @@ public interface EstimateRepository extends JpaRepository<Estimate, Long>, Estim
             "ORDER BY e.createdAt DESC")
     List<Estimate> findTop5ByUserIdOrderByCreatedAtDesc(@Param("userId") Long userId);
 
+    // 특정 전문가에 대한 모든 Estimate 수를 반환하는 메서드
+    long countByExpert(Expert expert);
 }
