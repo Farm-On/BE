@@ -24,6 +24,11 @@ public class Expert extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    private String nickName; // 전문가만 가지는 닉네임
+
+    @Column(columnDefinition = "TINYINT(1) DEFAULT 0", nullable = false)
+    private Boolean isNickNameOnly; // 닉네임만 보이기 활성화 여부, true이면 전문가일 시 닉네임만 반환되도록
+
     private String profileImageUrl; // 전문기 프로필 이미지
 
     private String expertDescription; // 전문가 한줄소개
