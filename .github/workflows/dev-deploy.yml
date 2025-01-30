@@ -65,10 +65,10 @@ jobs:
             # Docker Login
             sudo docker login -u "${{ secrets.DOCKER_USERNAME }}" -p "${{ secrets.DOCKER_PASSWORD }}"
             
-            # Stop and Remove All Running Containers
-              if [ "$(sudo docker ps -q)" ]; then
-                sudo docker rm -f $(sudo docker ps -q)
-              fi
+            # Stop and Remove All Running Containers Except redis-container
+            if [ "$(sudo docker ps -q | grep -v $(sudo docker ps -q -f name=redis-container))" ]; then
+              sudo docker rm -f $(sudo docker ps -q | grep -v $(sudo docker ps -q -f name=redis-container))
+            fi
             
             # Pull Latest Docker Image
             sudo docker pull "${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_REPO }}:latest"
