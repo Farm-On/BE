@@ -80,8 +80,6 @@ public class ExpertProfileResponse {
 
         @Schema(description = "포트폴리오 제목")
         String name;
-
-        LocalDate createdAt; // 기본 정렬 생성 날짜순
     }
 
     @Builder
@@ -111,7 +109,6 @@ public class ExpertProfileResponse {
         String detailContent2;
         String detailContent3;
         String detailContent4;
-        LocalDate createdAt;
     }
 
     @Builder
@@ -121,8 +118,6 @@ public class ExpertProfileResponse {
     public static class ExpertDetailDTO {
         @Schema(description = "전문가 추가정보 내용")
         String content;
-
-        LocalDate createdAt;
     }
 
     @Builder
