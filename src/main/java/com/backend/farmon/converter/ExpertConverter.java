@@ -8,16 +8,20 @@ import com.backend.farmon.domain.enums.Role;
 import com.backend.farmon.dto.expert.*;
 import com.backend.farmon.dto.user.SignupRequest;
 import com.backend.farmon.dto.user.SignupResponse;
+import com.backend.farmon.service.AWS.S3Service;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class ExpertConverter {
-
     // 전문가 경력 엔티티 생성
-    public static ExpertCareer toExpertCareer(ExpertCareerRequest.ExpertCareerPostDTO request){
+    public static ExpertCareer toExpertCareer(ExpertCareerRequest.ExpertCareerPostDTO request) {
         return ExpertCareer.builder()
                 .title(request.getTitle())
                 .startYear(request.getStartYear())
@@ -33,7 +37,7 @@ public class ExpertConverter {
     }
 
     // 전문가 경력 POST 응답 DTO 생성
-    public static ExpertCareerResponse.PostExpertCareerResultDTO toExpertCareerPostResultDTO(ExpertCareer expertCareer){
+    public static ExpertCareerResponse.PostExpertCareerResultDTO toExpertCareerPostResultDTO(ExpertCareer expertCareer) {
         return ExpertCareerResponse.PostExpertCareerResultDTO.builder()
                 .expertCareerId(expertCareer.getId())
                 .createdAt(LocalDateTime.now())
@@ -41,7 +45,7 @@ public class ExpertConverter {
     }
 
     // 전문가 경력 GET 응답 DTO 생성
-    public static ExpertCareerResponse.GetExpertCareerResultDTO toExpertCareerGetResultDTO(ExpertCareer request){
+    public static ExpertCareerResponse.GetExpertCareerResultDTO toExpertCareerGetResultDTO(ExpertCareer request) {
         return ExpertCareerResponse.GetExpertCareerResultDTO.builder()
                 .expertId(request.getExpert().getId())
                 .title(request.getTitle())
@@ -58,31 +62,51 @@ public class ExpertConverter {
     }
 
     // 전문가 경력 엔티티 업데이트
-    public static ExpertCareer updateExpertCareer(ExpertCareer expertCareer, ExpertCareerRequest.ExpertCareerPostDTO expertCareerPostDTO){
+    public static ExpertCareer updateExpertCareer(ExpertCareer expertCareer, ExpertCareerRequest.ExpertCareerPostDTO expertCareerPostDTO) {
         // 수정하는거라 빌더가 아니라 기존 엔티티 정보만 수정
-        if (expertCareerPostDTO.getTitle() != null) {expertCareer.setTitle(expertCareerPostDTO.getTitle());}
-        if (expertCareerPostDTO.getStartYear() != null) {expertCareer.setStartYear(expertCareerPostDTO.getStartYear());}
-        if (expertCareerPostDTO.getStartMonth() != null) {expertCareer.setStartMonth(expertCareerPostDTO.getStartMonth());}
-        if (expertCareerPostDTO.getEndYear() != null) {expertCareer.setEndYear(expertCareerPostDTO.getEndYear());}
-        if (expertCareerPostDTO.getEndMonth() != null) {expertCareer.setEndMonth(expertCareerPostDTO.getEndMonth());}
-        if (expertCareerPostDTO.getIsOngoing() != null) {expertCareer.setIsOngoing(expertCareerPostDTO.getIsOngoing());}
-        if (expertCareerPostDTO.getDetailContent1() != null) {expertCareer.setDetailContent1(expertCareerPostDTO.getDetailContent1());}
-        if (expertCareerPostDTO.getDetailContent2() != null) {expertCareer.setDetailContent2(expertCareerPostDTO.getDetailContent2());}
-        if (expertCareerPostDTO.getDetailContent3() != null) {expertCareer.setDetailContent3(expertCareerPostDTO.getDetailContent3());}
-        if (expertCareerPostDTO.getDetailContent4() != null) {expertCareer.setDetailContent4(expertCareerPostDTO.getDetailContent4());}
+        if (expertCareerPostDTO.getTitle() != null) {
+            expertCareer.setTitle(expertCareerPostDTO.getTitle());
+        }
+        if (expertCareerPostDTO.getStartYear() != null) {
+            expertCareer.setStartYear(expertCareerPostDTO.getStartYear());
+        }
+        if (expertCareerPostDTO.getStartMonth() != null) {
+            expertCareer.setStartMonth(expertCareerPostDTO.getStartMonth());
+        }
+        if (expertCareerPostDTO.getEndYear() != null) {
+            expertCareer.setEndYear(expertCareerPostDTO.getEndYear());
+        }
+        if (expertCareerPostDTO.getEndMonth() != null) {
+            expertCareer.setEndMonth(expertCareerPostDTO.getEndMonth());
+        }
+        if (expertCareerPostDTO.getIsOngoing() != null) {
+            expertCareer.setIsOngoing(expertCareerPostDTO.getIsOngoing());
+        }
+        if (expertCareerPostDTO.getDetailContent1() != null) {
+            expertCareer.setDetailContent1(expertCareerPostDTO.getDetailContent1());
+        }
+        if (expertCareerPostDTO.getDetailContent2() != null) {
+            expertCareer.setDetailContent2(expertCareerPostDTO.getDetailContent2());
+        }
+        if (expertCareerPostDTO.getDetailContent3() != null) {
+            expertCareer.setDetailContent3(expertCareerPostDTO.getDetailContent3());
+        }
+        if (expertCareerPostDTO.getDetailContent4() != null) {
+            expertCareer.setDetailContent4(expertCareerPostDTO.getDetailContent4());
+        }
 
         return expertCareer;
     }
 
     // 전문가 추가정보 엔티티 생성
-    public static ExpertDatail toExpertDetail(ExpertDetailRequest.ExpertDetailPostDTO request){
+    public static ExpertDatail toExpertDetail(ExpertDetailRequest.ExpertDetailPostDTO request) {
         return ExpertDatail.builder()
                 .detailContent(request.getContent())
                 .build();
     }
 
     // 전문가 추가정보 POST 응답 DTO 생성
-    public static ExpertDetailResponse.PostExpertDetailResultDTO toExpertDetailPostResultDTO(ExpertDatail request){
+    public static ExpertDetailResponse.PostExpertDetailResultDTO toExpertDetailPostResultDTO(ExpertDatail request) {
         return ExpertDetailResponse.PostExpertDetailResultDTO.builder()
                 .expertDetailId(request.getId())
                 .createdAt(LocalDateTime.now())
@@ -90,7 +114,7 @@ public class ExpertConverter {
     }
 
     // 전문가 추가정보 GET 응답 DTO 생성
-    public static ExpertDetailResponse.GetExpertDetailResultDTO toExpertDetailGetResultDTO(ExpertDatail request){
+    public static ExpertDetailResponse.GetExpertDetailResultDTO toExpertDetailGetResultDTO(ExpertDatail request) {
         return ExpertDetailResponse.GetExpertDetailResultDTO.builder()
                 .expertId(request.getExpert().getId())
                 .content(request.getDetailContent())
@@ -98,14 +122,16 @@ public class ExpertConverter {
     }
 
     // 전문가 추가정보 엔티티 업데이트
-    public static ExpertDatail updateExpertDetail(ExpertDatail expertDetail, ExpertDetailRequest.ExpertDetailPostDTO expertDetailPostDTO){
-        if (expertDetailPostDTO.getContent() != null) {expertDetail.setDetailContent(expertDetailPostDTO.getContent());}
+    public static ExpertDatail updateExpertDetail(ExpertDatail expertDetail, ExpertDetailRequest.ExpertDetailPostDTO expertDetailPostDTO) {
+        if (expertDetailPostDTO.getContent() != null) {
+            expertDetail.setDetailContent(expertDetailPostDTO.getContent());
+        }
 
         return expertDetail;
     }
 
     // 전문가 대표서비스 수정 응답 DTO 생성
-    public static ExpertProfileResponse.ResultUpdateSpecialtyDTO updateSpecialtyDTO(Expert request){
+    public static ExpertProfileResponse.ResultUpdateSpecialtyDTO updateSpecialtyDTO(Expert request) {
         return ExpertProfileResponse.ResultUpdateSpecialtyDTO.builder()
                 .expertId(request.getId())
                 .cropCategory(request.getCrop().getCategory())
@@ -128,4 +154,36 @@ public class ExpertConverter {
                 .isExcludeIsland(request.getIsExcludeIsland())
                 .build();
     }
+
+    // 전문가 프로필 리스트 조회
+    public static ExpertListResponse.ExpertProfileListDTO expertProfileListDTO(Page<Expert> expertList) {
+        List<ExpertListResponse.ExpertProfileViewDTO> expertProfileViewDTOList = expertList.stream()
+                .map(ExpertConverter::expertProfileViewDTO).collect(Collectors.toList());
+
+        return ExpertListResponse.ExpertProfileListDTO.builder()
+                .isLast(expertList.isLast())
+                .isFirst(expertList.isFirst())
+                .totalPage(expertList.getTotalPages())
+                .totalElements(expertList.getTotalElements())
+                .listSize(expertProfileViewDTOList.size())
+                .expertProfileList(expertProfileViewDTOList)
+                .build();
+
+    }
+
+    public static ExpertListResponse.ExpertProfileViewDTO expertProfileViewDTO(Expert expert) {
+        return ExpertListResponse.ExpertProfileViewDTO.builder()
+                .expertId(expert.getId())
+                .profileImg(expert.getProfileImageUrl())
+                .name(expert.getUser().getUserName())
+                .rate(expert.getRating())
+                .career(expert.getCareerYears())
+                .expertDescription(expert.getExpertDescription())
+                .expertCropCategory(expert.getCrop().getCategory())
+                .expertCropDetail(expert.getCrop().getName())
+                .expertLocationCategory(expert.getArea().getAreaName())
+                .expertLocationDetail(expert.getArea().getAreaNameDetail())
+                .build();
+    }
+
 }
