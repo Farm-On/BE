@@ -33,8 +33,8 @@ public class AmazonConfig {
     @Value("${cloud.aws.s3.bucket}")
     private String bucket;
 
-    @Value("${cloud.aws.s3.path.estimate}")
-    private String estimatePath;
+//    @Value("${cloud.aws.s3.path.estimate}")
+//    private String estimatePath;
 
     @PostConstruct
     public void init() {
