@@ -28,6 +28,10 @@ public class Comment extends BaseEntity {
 
     private String commentContent;
 
+    private  String authorName;
+
+    private String expertCategory;
+
     @ManyToOne(fetch=FetchType.LAZY)
     @JoinColumn(name="PARENT_ID")
     private Comment parent;
@@ -51,6 +55,6 @@ public class Comment extends BaseEntity {
 
 
     public Comment() {
-        
+
     }
 }
