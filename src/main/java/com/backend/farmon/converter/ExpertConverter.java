@@ -1,25 +1,32 @@
 package com.backend.farmon.converter;
 
-import com.backend.farmon.domain.Expert;
-import com.backend.farmon.domain.ExpertCareer;
-import com.backend.farmon.domain.ExpertDatail;
-import com.backend.farmon.domain.User;
+import com.backend.farmon.domain.*;
 import com.backend.farmon.domain.enums.Role;
 import com.backend.farmon.dto.expert.*;
 import com.backend.farmon.dto.user.SignupRequest;
 import com.backend.farmon.dto.user.SignupResponse;
+import com.backend.farmon.repository.EstimateRepository.EstimateRepository;
 import com.backend.farmon.service.AWS.S3Service;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
+import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Component
+@RequiredArgsConstructor
 public class ExpertConverter {
+
+    private final EstimateRepository estimateRepository;
+
     // 전문가 경력 엔티티 생성
     public static ExpertCareer toExpertCareer(ExpertCareerRequest.ExpertCareerPostDTO request) {
         return ExpertCareer.builder()
@@ -183,6 +190,77 @@ public class ExpertConverter {
                 .expertCropDetail(expert.getCrop().getName())
                 .expertLocationCategory(expert.getArea().getAreaName())
                 .expertLocationDetail(expert.getArea().getAreaNameDetail())
+                .build();
+    }
+
+    // 특정 전문가 포트폴리오 페이지 조회
+    public ExpertProfileResponse.ExpertProfileDTO getProfilePage(Expert expert) {
+
+        List<ExpertProfileResponse.PortfolioDetailDTO> portfolioDetailDTOList = expert.getPortfolioList().stream()
+                .map(ExpertConverter::portfolioViewDTO).collect(Collectors.toList());
+
+        List<ExpertProfileResponse.ExpertCareerDTO> expertCareerDTOList = expert.getExpertCareerList().stream()
+                .map(ExpertConverter::expertCareerViewDTO).collect(Collectors.toList());
+
+        List<ExpertProfileResponse.ExpertDetailDTO> expertDetailDTOList = expert.getExpertDatailList().stream()
+                .map(ExpertConverter::expertDetailViewDTO).collect(Collectors.toList());
+
+        // Estimate 수를 카운트
+        long consultingCount = estimateRepository.countByExpert(expert);
+
+        return ExpertProfileResponse.ExpertProfileDTO.builder()
+                .profileImg(expert.getProfileImageUrl())
+                .name(expert.getUser().getUserName())
+                 // .nickName(expert.getNickName)  닉네임 항목 추가시 수정
+                .expertDescription(expert.getExpertDescription())
+                .rate(expert.getRating())
+                // .reviewCount() 리뷰 추가시 수정
+                .consultingCount(consultingCount)
+                .careers(expertCareerDTOList)
+                .details(expertDetailDTOList)
+                .expertCropCategory(expert.getCrop().getCategory())
+                .expertCropDetail(expert.getCrop().getName())
+                .serviceDetail1(expert.getServiceDetail1())
+                .serviceDetail2(expert.getServiceDetail2())
+                .serviceDetail3(expert.getServiceDetail3())
+                .serviceDetail4(expert.getServiceDetail4())
+                .portfolio(portfolioDetailDTOList)
+                .expertLocationCategory(expert.getArea().getAreaName())
+                .expertLocationDetail(expert.getArea().getAreaNameDetail())
+                .availableRange(expert.getAvailableRange())
+                .isAvailableEverywhere(expert.getIsAvailableEverywhere())
+                .isExcludeIsland(expert.getIsExcludeIsland())
+                .build();
+    }
+
+
+    public static ExpertProfileResponse.PortfolioDetailDTO portfolioViewDTO(Portfolio portfolio) {
+        return ExpertProfileResponse.PortfolioDetailDTO.builder()
+                .thumbnailImg(portfolio.getThumbnailImg())
+                .name(portfolio.getTitle())
+                .build();
+    }
+
+
+    public static ExpertProfileResponse.ExpertCareerDTO expertCareerViewDTO(ExpertCareer expertCareer) {
+        return ExpertProfileResponse.ExpertCareerDTO.builder()
+                .title(expertCareer.getTitle())
+                .startYear(expertCareer.getStartYear())
+                .startMonth(expertCareer.getStartMonth())
+                .endYear(expertCareer.getEndYear())
+                .endMonth(expertCareer.getEndMonth())
+                .isOngoing(expertCareer.getIsOngoing())
+                .detailContent1(expertCareer.getDetailContent1())
+                .detailContent2(expertCareer.getDetailContent2())
+                .detailContent3(expertCareer.getDetailContent3())
+                .detailContent4(expertCareer.getDetailContent4())
+                .build();
+    }
+
+
+    public static ExpertProfileResponse.ExpertDetailDTO expertDetailViewDTO(ExpertDatail expertDatail) {
+        return ExpertProfileResponse.ExpertDetailDTO.builder()
+                .content(expertDatail.getDetailContent())
                 .build();
     }
 

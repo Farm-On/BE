@@ -1,6 +1,7 @@
 package com.backend.farmon.dto.expert;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.persistence.Column;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -21,35 +22,52 @@ public class ExpertProfileResponse {
         @Schema(description = "이름")
         String name;
 
-        @Schema(description = "본인인증 여부")
-        Boolean isVerified;
-
         @Schema(description = "전문가 한 줄 소개")
         String expertDescription;
 
         @Schema(description = "평점")
         Float rate;
 
+        @Schema(description = "리뷰 개수")
+        Integer reviewCount;
+
         @Schema(description = "진행했던 컨설팅 수")
-        Integer consultingCount;
+        Long consultingCount;
 
-        @Schema(description = "경력")
-        Integer career;
+        @Schema(description = "전문가 경력 목록 리스트")
+        List<ExpertCareerDTO> careers;
 
-        @Schema(description = "추가정보")
-        String extraDetails;
+        @Schema(description = "전문가 추가정보 목록 리스트")
+        List<ExpertDetailDTO> details;
+
+        @Schema(description = "전문가 전문 분야 카테고리")
+        String expertCropCategory;
+
+        @Schema(description = "전문가 전문 분야 세부")
+        String expertCropDetail;
+
+        String serviceDetail1;
+        String serviceDetail2;
+        String serviceDetail3;
+        String serviceDetail4;
 
         @Schema(description = "포트폴리오 목록 리스트")
         List<PortfolioDetailDTO> portfolio;
 
-        @Schema(description = "전문가 전문 분야 카테고리 리스트")
-        List<Long> expertCrops;
+        @Schema(description = "전문가 활동 위치 카테고리")
+        String expertLocationCategory;
 
-        @Schema(description = "전문가 활동 위치 카테고리 리스트")
-        List<Long> expertLocations;
+        @Schema(description = "전문가 활동 위치 세부")
+        String expertLocationDetail;
 
         @Schema(description = "활동 가능 범위")
-        Integer availableRange;
+        String availableRange;
+
+        @Schema(description = "전국 어디든 가능 여부")
+        Boolean isAvailableEverywhere;
+
+        @Schema(description = "도서 지방 제외 여부")
+        Boolean isExcludeIsland;
     }
 
     @Builder
@@ -64,6 +82,47 @@ public class ExpertProfileResponse {
         String name;
 
         LocalDate createdAt; // 기본 정렬 생성 날짜순
+    }
+
+    @Builder
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class ExpertCareerDTO {
+        @Schema(description = "전문가 경력 제목")
+        String title;
+
+        @Schema(description = "시작 일시 년도")
+        Integer startYear;
+
+        @Schema(description = "시작 일시 월")
+        Integer startMonth;
+
+        @Schema(description = "종료 일시 년도")
+        Integer endYear;
+
+        @Schema(description = "종료 일시 년도")
+        Integer endMonth;
+
+        @Schema(description = "진행중 여부")
+        Boolean isOngoing;
+
+        String detailContent1;
+        String detailContent2;
+        String detailContent3;
+        String detailContent4;
+        LocalDate createdAt;
+    }
+
+    @Builder
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class ExpertDetailDTO {
+        @Schema(description = "전문가 추가정보 내용")
+        String content;
+
+        LocalDate createdAt;
     }
 
     @Builder

@@ -40,6 +40,7 @@ public class ExpertController {
 
     private final ExpertCommandService expertCommandService;
     private final ExpertCareerRepository expertCareerRepository;
+    private final ExpertConverter expertConverter;
     private final ExpertRepository expertRepository;
     private final ExpertQueryService expertQueryService;
     private final ExpertDetailRepository expertDetailRepository;
@@ -57,7 +58,7 @@ public class ExpertController {
         Expert expert = expertRepository.findById(expertId)
                 .orElseThrow(() -> new ExpertHandler(ErrorStatus.EXPERT_NOT_FOUND));
 
-        return ApiResponse.onSuccess(ExpertConverter.toExpertCareerGetResultDTO(expertCareer));
+        return ApiResponse.onSuccess(expertConverter.getProfilePage(expert));
     }
 
     // 전문가 경력 등록
