@@ -128,7 +128,7 @@ public class HomeResponse {
     @Schema(description = "홈 페이지 자동 완성 검색어 정보")
     public static class AutoCompleteSearchDTO  {
 
-        @Schema(description = "추천 검색어 리스트")
+        @Schema(description = "자동 완성 검색어 리스트")
         List <String> searchList;
     }
 
