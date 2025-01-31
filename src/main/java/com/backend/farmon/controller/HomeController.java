@@ -17,10 +17,12 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 @Tag(name = "홈 화면", description = "홈 화면에 관한 API")
 @Slf4j
+@Validated
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/home")
@@ -79,12 +81,12 @@ public class HomeController {
     })
     @Parameters({
             @Parameter(name = "userId", description = "로그인한 유저의 아이디(pk)", example = "1"),
-            @Parameter(name = "searchName", description = "검색어", example = "1"),
+            @Parameter(name = "name", description = "검색어", example = "1"),
     })
     @GetMapping("/search")
     public ApiResponse<HomeResponse.AutoCompleteSearchDTO> getHomeAutoCompleteSearchNameList (@RequestParam(name = "userId") @EqualsUserId Long userId,
-                                                                                              @RequestParam(name = "searchName") String searchName){
-        HomeResponse.AutoCompleteSearchDTO response = HomeResponse.AutoCompleteSearchDTO.builder().build();;
+                                                                                              @RequestParam(name = "name") String searchName){
+        HomeResponse.AutoCompleteSearchDTO response = HomeResponse.AutoCompleteSearchDTO.builder().build();
         return ApiResponse.onSuccess(response);
     }
 
@@ -130,8 +132,10 @@ public class HomeController {
             @Parameter(name = "userId", description = "로그인한 유저의 아이디(pk)", example = "1")
     })
     @GetMapping("/search/recent")
-    public ApiResponse<HomeResponse.RecentSearchListDTO> getRecentSearches (@RequestParam(name = "userId") @EqualsUserId Long userId){
+    public ApiResponse<HomeResponse.RecentSearchListDTO> getRecentSearchNameList (@RequestParam(name = "userId") @EqualsUserId Long userId){
         HomeResponse.RecentSearchListDTO response = searchQueryService.findRecentSearchLogs(userId);
+        log.info("최근 검색어 조회 완료 - userId: {}", userId);
+
         return ApiResponse.onSuccess(response);
     }
 
@@ -194,7 +198,7 @@ public class HomeController {
             @Parameter(name = "userId", description = "로그인한 유저의 아이디(pk)", example = "1")
     })
     @GetMapping("/search/recommend")
-    public ApiResponse<HomeResponse.RecommendSearchListDTO> getRecommendSearches (@RequestParam(name = "userId") @EqualsUserId Long userId){
+    public ApiResponse<HomeResponse.RecommendSearchListDTO> getRecommendSearchNameList (@RequestParam(name = "userId") @EqualsUserId Long userId){
         HomeResponse.RecommendSearchListDTO response = HomeResponse.RecommendSearchListDTO.builder().build();;
         return ApiResponse.onSuccess(response);
     }
