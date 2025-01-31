@@ -26,7 +26,7 @@ public class TestController {
             redisTemplate.opsForValue().set(key, "Hello, Redis!");
 
             // Redis에서 데이터 가져오기
-            String value = redisTemplate.opsForValue().get("testKey");
+            String value = redisTemplate.opsForValue().get(key);
 
             // 결과 반환
             return value != null ? "Redis 연결 성공! Value: " + value : "Redis 연결 실패!";
