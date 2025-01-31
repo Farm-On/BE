@@ -1,5 +1,6 @@
 package com.backend.farmon.controller;
 
+import com.backend.farmon.config.security.JWTUtil;
 import com.backend.farmon.dto.estimate.EstimateRequestDTO;
 import com.backend.farmon.dto.estimate.EstimateResponseDTO;
 import com.backend.farmon.service.EstimateService.EstimateCommandService;
@@ -12,14 +13,20 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import com.backend.farmon.apiPayload.ApiResponse;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.awt.*;
+import java.nio.file.attribute.UserPrincipal;
 import java.util.List;
 
 @Tag(name = "농사 견적서", description = "농사 견적서 관련 API")
@@ -31,6 +38,7 @@ public class EstimateRestController {
 
     private final EstimateCommandService estimateCommandService;
     private final EstimateQueryService estimateQueryService;
+    private final JWTUtil jwtUtil;
     /**
      * (1) 견적서 생성 (농업인 전용)
      */
@@ -40,8 +48,8 @@ public class EstimateRestController {
                     "작성자 ID와 견적서 내용(카테고리, 견적, 상세 내용, 예산(예: '500만원 ~ 1,000만원') 등)을 Request 에 담아 보내주세요."
     )
     @ApiResponses({
-            @io.swagger.v3.oas.annotations.responses.
-                    ApiResponse(responseCode = "COMMON200", description = "OK, 성공")
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200", description = "OK, 성공"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON400", description = "잘못된 요청입니다.", content = @Content(schema = @Schema(implementation = ApiResponse.class)))
     })
     @PostMapping(consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
     public ApiResponse<EstimateResponseDTO.CreateDTO> createEstimate(
@@ -53,7 +61,6 @@ public class EstimateRestController {
             @Parameter(description = "업로드할 이미지 파일들", content = @Content(mediaType = MediaType.MULTIPART_FORM_DATA_VALUE,
                     array = @ArraySchema(schema = @Schema(type = "string", format = "binary")))) List<MultipartFile> imageFiles
     ) {
-        // 실제 로직(저장)은 생략
         // 예시로 작성된 Dto 를 그대로 반환
         // 여기서 response 에는 DB 저장 후 생성된 estimateId 등을 담았다고 가정
 
@@ -71,8 +78,8 @@ public class EstimateRestController {
             description = "견적서 id와 일치하는 견적서를 상세조회합니다."
     )
     @ApiResponses({
-            @io.swagger.v3.oas.annotations.responses.
-                    ApiResponse(responseCode = "COMMON200", description = "OK, 성공")
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200", description = "OK, 성공"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON400", description = "잘못된 요청입니다.", content = @Content(schema = @Schema(implementation = ApiResponse.class)))
     })
     @Parameters({
             @Parameter(name = "estimateId", description = "조회하려는 견적서의 id(pk)", example = "100", required = true)
@@ -80,11 +87,29 @@ public class EstimateRestController {
     @GetMapping("/{estimateId}")
     public ApiResponse<EstimateResponseDTO.DetailDTO> getEstimateDetail(
             @PathVariable Long estimateId
+            //HttpServletRequest request
     ) {
-        // 실제 조회 로직 대신 예시
+//        // 요청에서 JWT 토큰 추출
+//        String token =jwtUtil.extractTokenFromRequest(request);
+//
+//
+//        // 토큰이 없거나 유효하지 않다면 401 응답 반환
+//        if (token == null || !jwtUtil.validateToken(token)) {
+//            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid or missing JWT token");
+//        }
+//
+//        // 토큰에서 사용자 정보 추출
+//        Long userId = jwtUtil.extractUserId(token);
+//        String role = jwtUtil.extractRole(token);
+//
+//        // 로그 출력
+//        log.info("Authenticated User ID: {}, Role: {}", userId, role);
+
+        // 견적서 상세 조회
         EstimateResponseDTO.DetailDTO response = estimateQueryService.getEstimateDetail(estimateId);
 
         return ApiResponse.onSuccess(response);
+
     }
 
 
@@ -97,7 +122,9 @@ public class EstimateRestController {
                     "수정할 내용(카테고리, 내용, 주소 등)을 RequestBody 로 보내주세요."
     )
     @ApiResponses({
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200", description = "OK, 성공")
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200", description = "OK, 성공"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON400", description = "잘못된 요청입니다.", content = @Content(schema = @Schema(implementation = ApiResponse.class)))
+
     })
     @Parameters({
             @Parameter(name = "estimatedId", description = "수정할 견적서의 ID(pk)", example = "100", required = true)
@@ -120,7 +147,8 @@ public class EstimateRestController {
             description = "견적서 ID와 일치하는 견적서를 삭제합니다."
     )
     @ApiResponses({
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200", description = "OK, 성공")
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200", description = "OK, 성공"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON400", description = "잘못된 요청입니다.", content = @Content(schema = @Schema(implementation = ApiResponse.class)))
     })
     @Parameters({
             @Parameter(name = "estimateId", description = "삭제할 견적서의 ID(pk)", example = "100", required = true)
@@ -148,8 +176,8 @@ public class EstimateRestController {
             "견적서를 최신순으로 10개 페이징하여 조회합니다."
     )
     @ApiResponses({
-            @io.swagger.v3.oas.annotations.responses.
-                    ApiResponse(responseCode = "COMMON200", description = "OK, 성공")
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200", description = "OK, 성공"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON400", description = "잘못된 요청입니다.", content = @Content(schema = @Schema(implementation = ApiResponse.class)))
     })
     @Parameters({
             @Parameter(name = "expertId", description = "전문가 ID", example = "10", required = true),
@@ -178,8 +206,8 @@ public class EstimateRestController {
                     "최신순으로 정렬하여 10개씩 페이징으로 제공합니다."
     )
     @ApiResponses({
-            @io.swagger.v3.oas.annotations.responses.
-                    ApiResponse(responseCode = "COMMON200", description = "OK, 성공")
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200", description = "OK, 성공"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON400", description = "잘못된 요청입니다.", content = @Content(schema = @Schema(implementation = ApiResponse.class)))
     })
     @Parameters({
             @Parameter(name = "cropCategory", description = "작물 카테고리 이름", example = "곡물", required = true),
@@ -208,8 +236,8 @@ public class EstimateRestController {
                     "최신순으로 정렬하여 10개씩 페이징으로 제공합니다."
     )
     @ApiResponses({
-            @io.swagger.v3.oas.annotations.responses.
-                    ApiResponse(responseCode = "COMMON200", description = "OK, 성공")
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200", description = "OK, 성공"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON400", description = "잘못된 요청입니다.", content = @Content(schema = @Schema(implementation = ApiResponse.class)))
     })
     @Parameters({
             @Parameter(name = "cropName", description = "작물 이름", example = "쌀", required = true),
@@ -238,8 +266,8 @@ public class EstimateRestController {
                     "최신순으로 9개씩 페이징"
     )
     @ApiResponses({
-            @io.swagger.v3.oas.annotations.responses.
-                    ApiResponse(responseCode = "COMMON200", description = "OK, 성공")
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200", description = "OK, 성공"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON400", description = "잘못된 요청입니다.", content = @Content(schema = @Schema(implementation = ApiResponse.class)))
     })
     @Parameters({
             @Parameter(name = "expertId", description = "전문가 ID", required = true),
@@ -268,8 +296,8 @@ public class EstimateRestController {
                     "최신순으로 9개씩 페이징"
     )
     @ApiResponses({
-            @io.swagger.v3.oas.annotations.responses.
-                    ApiResponse(responseCode = "COMMON200", description = "OK, 성공")
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200", description = "OK, 성공"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON400", description = "잘못된 요청입니다.", content = @Content(schema = @Schema(implementation = ApiResponse.class)))
     })
     @Parameters({
             @Parameter(name = "expertId", description = "전문가 ID", required = true),
@@ -298,8 +326,8 @@ public class EstimateRestController {
                     "최신순으로 30개씩 페이징"
     )
     @ApiResponses({
-            @io.swagger.v3.oas.annotations.responses.
-                    ApiResponse(responseCode = "COMMON200", description = "OK, 성공")
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200", description = "OK, 성공"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON400", description = "잘못된 요청입니다.", content = @Content(schema = @Schema(implementation = ApiResponse.class)))
     })
     @Parameters({
             @Parameter(name = "userId", description = "농업인 ID", required = true),
@@ -328,8 +356,8 @@ public class EstimateRestController {
                     "최신순으로 30개씩 페이징"
     )
     @ApiResponses({
-            @io.swagger.v3.oas.annotations.responses.
-                    ApiResponse(responseCode = "COMMON200", description = "OK, 성공")
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200", description = "OK, 성공"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON400", description = "잘못된 요청입니다.", content = @Content(schema = @Schema(implementation = ApiResponse.class)))
     })
     @Parameters({
             @Parameter(name = "userId", description = "농업인 ID", required = true),
@@ -357,8 +385,8 @@ public class EstimateRestController {
                     "최신순으로 최대 5개를 반환합니다."
     )
     @ApiResponses({
-            @io.swagger.v3.oas.annotations.responses.
-                    ApiResponse(responseCode = "COMMON200", description = "OK, 성공")
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200", description = "OK, 성공"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON400", description = "잘못된 요청입니다.", content = @Content(schema = @Schema(implementation = ApiResponse.class)))
     })
     @Parameters({
             @Parameter(name = "userId", description = "농업인 ID", required = true)
