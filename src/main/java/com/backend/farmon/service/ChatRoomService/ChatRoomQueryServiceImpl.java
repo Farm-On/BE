@@ -46,9 +46,9 @@ public class ChatRoomQueryServiceImpl implements ChatRoomQueryService {
         return PageRequest.of(pageNumber, PAGE_SIZE, Sort.by("createdAt").descending());
     }
 
-    // 채팅방 목록 조회
+    // 검색어와 일치하는 채팅방 목록 조회
     @Override
-    public ChatResponse.ChatRoomListDTO findChatRoom(Long userId, Integer read, Integer pageNumber) {
+    public ChatResponse.ChatRoomListDTO findChatRoomBySearch(Long userId, Integer read, String searchName, Integer pageNumber) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserHandler(ErrorStatus.USER_NOT_FOUND));
 
@@ -57,21 +57,25 @@ public class ChatRoomQueryServiceImpl implements ChatRoomQueryService {
 
         // 안 읽음 필터링에 따른 유저의 모든 채팅방 목록을 페이지네이션으로 조회
         Page<ChatRoom> chatRoomPage = read.equals(1)
-                ? chatRoomRepository.findUnReadChatRoomsByUserIdAndRole(userId, role, pageRequest(pageNumber))
-                : chatRoomRepository.findChatRoomsByUserIdAndRole(userId, role, pageRequest(pageNumber));
+                ? chatRoomRepository.findUnReadChatRoomsByUserIdAndRoleAndSearch(userId, role, searchName, pageRequest(pageNumber))
+                : chatRoomRepository.findChatRoomsByUserIdAndRoleAndSearch(userId, role, searchName, pageRequest(pageNumber));
 
         log.info("안 읽음 필터링에 따른 유저의 모든 채팅방 목록 페이지네이션 조회 완료 - userId: {}", userId);
 
         // 최신 메시지 타입 (썸네일에서는 텍스트만)
         List<ChatMessageType> targetTypes = List.of(ChatMessageType.TEXT);
 
+        // 안 읽은 메시지 개수 조회 타입 (텍스트, 이미지)
+        List<ChatMessageType> unReadTargetTypes = List.of(ChatMessageType.TEXT, ChatMessageType.IMAGE);
+
         // 채팅 대화방 세부 정보 목록 생성
         List<ChatResponse.ChatRoomDetailDTO> chatRoomInfoList = chatRoomPage.stream().map(chatRoom -> {
             // 전문가 여부
             boolean isExpert = chatRoom.getExpert().getId().equals(userId);
+            log.info("채팅방에서 전문가 여부: {}", isExpert);
 
             // 안 읽은 채팅 메시지 개수 조회
-            int unReadMessageCount = chatMessageRepository.findByChatRoomIdAndIsReadFalse(chatRoom.getId()).size();
+            long unReadMessageCount = chatMessageRepository.countByChatRoomIdAndIsReadFalseAndTypeIn(chatRoom.getId(), unReadTargetTypes);
             log.info("안 읽은 채팅 메시지 개수 조회 완료 - userId: {}, 안 읽은 메시지 개수: {}", userId, unReadMessageCount);
 
             // 채팅방과 일치하는 최신 메시지 조회

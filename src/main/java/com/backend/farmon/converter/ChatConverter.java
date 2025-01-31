@@ -111,23 +111,24 @@ public class ChatConverter {
     }
 
     public static ChatResponse.ChatRoomDetailDTO toChatRoomDetailDTO(
-            ChatRoom chatRoom, ChatMessage chatMessage, Area area, Boolean isExpert, Integer unReadMessageCount) {
+            ChatRoom chatRoom, ChatMessage chatMessage, Area area, Boolean isExpert, Long unReadMessageCount) {
 
+        // 내가 전문가라면 농업인을 user로 가져오기
         User user = isExpert
-                ? chatRoom.getExpert().getUser()
-                : chatRoom.getFarmer();
+                ? chatRoom.getFarmer()
+                : chatRoom.getExpert().getUser();
 
         return ChatResponse.ChatRoomDetailDTO.builder()
                 .chatRoomId(chatRoom.getId())
                 .name(user.getUserName())
-                .profileImage(isExpert && user.getExpert() != null && user.getExpert().getProfileImageUrl() != null
+                .profileImage(!isExpert && user.getExpert() != null && user.getExpert().getProfileImageUrl() != null
                         ? user.getExpert().getProfileImageUrl()
                         : null)
                 .estimateBudget(chatRoom.getEstimate().getBudget())
                 .estimateCategory(chatRoom.getEstimate().getCategory())
                 .estimateAreaName(area.getAreaName())
                 .estimateAreaDetail(area.getAreaNameDetail())
-                .unreadMessageCount(unReadMessageCount)
+                .unreadMessageCount(unReadMessageCount.intValue())
                 .lastMessageContent(chatMessage != null ? chatMessage.getContent() : null) // null-safe 처리
                 .lastMessageDate(chatMessage != null ? ConvertTime.convertToYearMonthDay(chatMessage.getCreatedAt()) : null) // null-safe 처리
                 .build();

@@ -20,10 +20,11 @@ public class ChatRoomRepositoryImpl implements ChatRoomRepositoryCustom {
     QChatRoom chatRoom = QChatRoom.chatRoom;
     QChatMessage chatMessage = QChatMessage.chatMessage;
 
-    // userId와 연관된 채팅방 페이징 조회
     @Override
-    public Page<ChatRoom> findChatRoomsByUserIdAndRole(Long userId, String role, Pageable pageable) {
+    public Page<ChatRoom> findChatRoomsByUserIdAndRoleAndSearch(Long userId, String role, String searchName, Pageable pageable) {
         BooleanBuilder builder = new BooleanBuilder();
+
+        // userId와 연관된 채팅방 조회
         builder.and(chatRoom.farmer.id.eq(userId).or(chatRoom.expert.user.id.eq(userId)));
 
         // role에 따른 조건 추가
@@ -37,6 +38,16 @@ public class ChatRoomRepositoryImpl implements ChatRoomRepositoryCustom {
 
         // 텍스트, 이미지 메시지만 조회
         builder.and(chatMessage.type.in(ChatMessageType.TEXT, ChatMessageType.IMAGE));
+
+        // 검색어 조건 (세 가지 중 하나라도 포함되면 조회)
+        if (searchName != null && !searchName.trim().isEmpty()) {
+            BooleanBuilder searchCondition = new BooleanBuilder();
+            searchCondition.or(chatRoom.farmer.userName.containsIgnoreCase(searchName)); // 농업인 사용자명 검색
+            searchCondition.or(chatRoom.expert.nickName.containsIgnoreCase(searchName)); // 전문가 닉네임 검색
+            searchCondition.or(chatRoom.expert.isNickNameOnly.eq(true).and(chatRoom.expert.user.userName.containsIgnoreCase(searchName))); // 전문가가 닉네임만 표시할 경우, 원래 사용자명도 검색
+
+            builder.and(searchCondition); // 전체 조건에 추가
+        }
 
         // 데이터 조회 쿼리
         QueryResults<ChatRoom> results = queryFactory
@@ -54,7 +65,7 @@ public class ChatRoomRepositoryImpl implements ChatRoomRepositoryCustom {
 
     // userId와 연관된 채팅방 중 안 읽음 메시지가 존재하는 채팅방만 페이징 조회
     @Override
-    public Page<ChatRoom> findUnReadChatRoomsByUserIdAndRole(Long userId, String role, Pageable pageable) {
+    public Page<ChatRoom> findUnReadChatRoomsByUserIdAndRoleAndSearch(Long userId, String role, String searchName, Pageable pageable) {
         BooleanBuilder builder = new BooleanBuilder();
 
         // role에 따른 조건 추가
@@ -69,6 +80,16 @@ public class ChatRoomRepositoryImpl implements ChatRoomRepositoryCustom {
         // 안 읽은 텍스트, 이미지 메시지만 조회
         builder.and(chatMessage.isRead.isFalse());
         builder.and(chatMessage.type.in(ChatMessageType.TEXT, ChatMessageType.IMAGE));
+
+        // 검색어 조건 (세 가지 중 하나라도 포함되면 조회)
+        if (searchName != null && !searchName.trim().isEmpty()) {
+            BooleanBuilder searchCondition = new BooleanBuilder();
+            searchCondition.or(chatRoom.farmer.userName.containsIgnoreCase(searchName)); // 농업인 사용자명 검색
+            searchCondition.or(chatRoom.expert.nickName.containsIgnoreCase(searchName)); // 전문가 닉네임 검색
+            searchCondition.or(chatRoom.expert.isNickNameOnly.eq(true).and(chatRoom.expert.user.userName.containsIgnoreCase(searchName))); // 전문가가 닉네임만 표시할 경우, 원래 사용자명도 검색
+
+            builder.and(searchCondition); // 전체 조건에 추가
+        }
 
         // 데이터 조회 쿼리
         QueryResults<ChatRoom> results = queryFactory
