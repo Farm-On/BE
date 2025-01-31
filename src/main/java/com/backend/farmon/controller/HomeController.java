@@ -98,9 +98,9 @@ public class HomeController {
             @Parameter(name = "searchName", description = "저장할 작물 이름", example = "1"),
     })
     @PostMapping("/search")
-    public ApiResponse<HomeResponse.AutoCompleteSearchDTO> postHomeAutoCompleteSearchNameList (@RequestParam(name = "userId", required = false) Long userId,
+    public ApiResponse<HomeResponse.AutoCompleteSearchPostDTO> postHomeAutoCompleteSearchNameList (@RequestParam(name = "userId", required = false) Long userId,
                                                                                                @RequestParam(name = "searchName") String searchName){
-        HomeResponse.AutoCompleteSearchDTO response = HomeResponse.AutoCompleteSearchDTO.builder().build();;
+        HomeResponse.AutoCompleteSearchPostDTO response = HomeResponse.AutoCompleteSearchPostDTO.builder().build();;
         return ApiResponse.onSuccess(response);
     }
 
