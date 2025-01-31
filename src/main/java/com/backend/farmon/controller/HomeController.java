@@ -1,9 +1,13 @@
 package com.backend.farmon.controller;
 
 import com.backend.farmon.apiPayload.ApiResponse;
+import com.backend.farmon.converter.HomeConverter;
 import com.backend.farmon.dto.home.HomeResponse;
 import com.backend.farmon.dto.post.PostType;
 import com.backend.farmon.service.PostService.PostQueryService;
+import com.backend.farmon.service.SearchService.SearchCommandService;
+import com.backend.farmon.service.SearchService.SearchQueryService;
+import com.backend.farmon.validaton.annotation.EqualsUserId;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
@@ -22,6 +26,8 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/home")
 public class HomeController {
     private final PostQueryService postQueryService;
+    private final SearchCommandService searchCommandService;
+    private final SearchQueryService searchQueryService;
 
     // 홈 화면 - 커뮤니티 게시글 조회
     @Operation(
@@ -33,7 +39,6 @@ public class HomeController {
     @ApiResponses({
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200",description = "OK, 성공"),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "POST_TYPE4001", description = "지원되지 않는 게시판 타입 입니다.", content = @Content(schema = @Schema(implementation = ApiResponse.class))),
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON400", description = "잘못된 요청입니다.", content = @Content(schema = @Schema(implementation = ApiResponse.class))),
     })
     @Parameters({
             @Parameter(name = "category", description = "커뮤니티 카테고리 이름", example = "POPULAR", required = true)
@@ -53,7 +58,6 @@ public class HomeController {
     )
     @ApiResponses({
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200",description = "OK, 성공"),
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON400", description = "잘못된 요청입니다.", content = @Content(schema = @Schema(implementation = ApiResponse.class))),
     })
     @GetMapping("/popular")
     public ApiResponse<HomeResponse.PopularPostListDTO> getHomePopularPosts (){
@@ -69,14 +73,16 @@ public class HomeController {
                     "유저 아이디와 검색어를 쿼리 스트링으로 입력해 주세요."
     )
     @ApiResponses({
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200",description = "OK, 성공")
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200",description = "OK, 성공"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "USER4001", description = "아이디와 일치하는 사용자가 없습니다.", content = @Content(schema = @Schema(implementation = ApiResponse.class))),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "AUTHORIZATION_4031", description = "인증된 사용자 정보와 요청된 리소스의 사용자 정보가 다릅니다. (userId 불일치)", content = @Content(schema = @Schema(implementation = ApiResponse.class))),
     })
     @Parameters({
             @Parameter(name = "userId", description = "로그인한 유저의 아이디(pk)", example = "1"),
             @Parameter(name = "searchName", description = "검색어", example = "1"),
     })
     @GetMapping("/search")
-    public ApiResponse<HomeResponse.AutoCompleteSearchDTO> getHomeAutoCompleteSearchNameList (@RequestParam(name = "userId", required = false) Long userId,
+    public ApiResponse<HomeResponse.AutoCompleteSearchDTO> getHomeAutoCompleteSearchNameList (@RequestParam(name = "userId") @EqualsUserId Long userId,
                                                                                               @RequestParam(name = "searchName") String searchName){
         HomeResponse.AutoCompleteSearchDTO response = HomeResponse.AutoCompleteSearchDTO.builder().build();;
         return ApiResponse.onSuccess(response);
@@ -91,17 +97,22 @@ public class HomeController {
                     "유저 아이디와 저장할 작물 이름을 쿼리 스트링으로 입력해 주세요."
     )
     @ApiResponses({
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200",description = "OK, 성공")
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200",description = "OK, 성공"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "USER4001", description = "아이디와 일치하는 사용자가 없습니다.", content = @Content(schema = @Schema(implementation = ApiResponse.class))),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "AUTHORIZATION_4031", description = "인증된 사용자 정보와 요청된 리소스의 사용자 정보가 다릅니다. (userId 불일치)", content = @Content(schema = @Schema(implementation = ApiResponse.class))),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "SEARCH_4001", description = "검색어가 비어 있습니다.", content = @Content(schema = @Schema(implementation = ApiResponse.class))),
     })
     @Parameters({
             @Parameter(name = "userId", description = "로그인한 유저의 아이디(pk)", example = "1"),
-            @Parameter(name = "searchName", description = "저장할 작물 이름", example = "1"),
+            @Parameter(name = "name", description = "저장할 작물 이름", example = "채소작물"),
     })
     @PostMapping("/search")
-    public ApiResponse<HomeResponse.AutoCompleteSearchPostDTO> postHomeAutoCompleteSearchNameList (@RequestParam(name = "userId", required = false) Long userId,
-                                                                                               @RequestParam(name = "searchName") String searchName){
-        HomeResponse.AutoCompleteSearchPostDTO response = HomeResponse.AutoCompleteSearchPostDTO.builder().build();;
-        return ApiResponse.onSuccess(response);
+    public ApiResponse<HomeResponse.AutoCompleteSearchPostDTO> postHomeAutoCompleteSearchNameList (@RequestParam(name = "userId") @EqualsUserId Long userId,
+                                                                                               @RequestParam(name = "name") String searchName){
+        searchCommandService.saveRecentSearchLog(userId, searchName);
+        log.info("자동 완성 검색어 저장 - userId: {}, 검색어: {}", userId, searchName);
+
+        return ApiResponse.onSuccess(HomeConverter.toAutoCompleteSearchPostDTO());
     }
 
 
@@ -113,16 +124,17 @@ public class HomeController {
     @ApiResponses({
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200",description = "OK, 성공"),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "USER4001", description = "아이디와 일치하는 사용자가 없습니다.", content = @Content(schema = @Schema(implementation = ApiResponse.class))),
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON400", description = "잘못된 요청입니다.", content = @Content(schema = @Schema(implementation = ApiResponse.class))),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "AUTHORIZATION_4031", description = "인증된 사용자 정보와 요청된 리소스의 사용자 정보가 다릅니다. (userId 불일치)", content = @Content(schema = @Schema(implementation = ApiResponse.class))),
     })
     @Parameters({
             @Parameter(name = "userId", description = "로그인한 유저의 아이디(pk)", example = "1")
     })
     @GetMapping("/search/recent")
-    public ApiResponse<HomeResponse.RecentSearchListDTO> getRecentSearches (@RequestParam(name = "userId") Long userId){
-        HomeResponse.RecentSearchListDTO response = HomeResponse.RecentSearchListDTO.builder().build();;
+    public ApiResponse<HomeResponse.RecentSearchListDTO> getRecentSearches (@RequestParam(name = "userId") @EqualsUserId Long userId){
+        HomeResponse.RecentSearchListDTO response = searchQueryService.findRecentSearchLogs(userId);
         return ApiResponse.onSuccess(response);
     }
+
 
     // 특정 검색어 삭제 API
     @Operation(
@@ -132,17 +144,19 @@ public class HomeController {
     @ApiResponses({
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200",description = "OK, 성공"),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "USER4001", description = "아이디와 일치하는 사용자가 없습니다.", content = @Content(schema = @Schema(implementation = ApiResponse.class))),
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON400", description = "잘못된 요청입니다.", content = @Content(schema = @Schema(implementation = ApiResponse.class))),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "AUTHORIZATION_4031", description = "인증된 사용자 정보와 요청된 리소스의 사용자 정보가 다릅니다. (userId 불일치)", content = @Content(schema = @Schema(implementation = ApiResponse.class))),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "SEARCH_4001", description = "검색어가 비어 있습니다.", content = @Content(schema = @Schema(implementation = ApiResponse.class))),
     })
     @Parameters({
             @Parameter(name = "userId", description = "로그인한 유저의 아이디(pk)", example = "1"),
-            @Parameter(name = "name", description = "삭제 할 검색어 이름", example = "병충해 관리")
+            @Parameter(name = "name", description = "삭제 할 검색어 이름", example = "채소작물")
     })
     @DeleteMapping("/search/recent")
-    public ApiResponse<HomeResponse.SearchDeleteDTO> deleteSearchName(@RequestParam(name = "userId") Long userId,
+    public ApiResponse<HomeResponse.SearchDeleteDTO> deleteSearchName(@RequestParam(name = "userId") @EqualsUserId Long userId,
                                                                       @RequestParam(name = "name") String searchName){
-        HomeResponse.SearchDeleteDTO response = HomeResponse.SearchDeleteDTO.builder().build();
-        return ApiResponse.onSuccess(response);
+        searchCommandService.deleteRecentSearchLog(userId, searchName);
+
+        return ApiResponse.onSuccess(HomeConverter.toSearchDeleteDTO());
     }
 
 
@@ -154,15 +168,16 @@ public class HomeController {
     @ApiResponses({
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200",description = "OK, 성공"),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "USER4001", description = "아이디와 일치하는 사용자가 없습니다.", content = @Content(schema = @Schema(implementation = ApiResponse.class))),
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON400", description = "잘못된 요청입니다.", content = @Content(schema = @Schema(implementation = ApiResponse.class))),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "AUTHORIZATION_4031", description = "인증된 사용자 정보와 요청된 리소스의 사용자 정보가 다릅니다. (userId 불일치)", content = @Content(schema = @Schema(implementation = ApiResponse.class))),
     })
     @Parameters({
-            @Parameter(name = "userId", description = "로그인한 유저의 아이디(pk), 로그인 하지 않은 사용자 일 경우 입력하지 않아도 됩니다.", example = "1")
+            @Parameter(name = "userId", description = "로그인한 유저의 아이디(pk)", example = "1")
     })
     @DeleteMapping("/search/recent/all")
-    public ApiResponse<HomeResponse.SearchDeleteDTO> deleteAllSearchName(@RequestParam(name = "userId") Long userId) {
-        HomeResponse.SearchDeleteDTO response = HomeResponse.SearchDeleteDTO.builder().build();;
-        return ApiResponse.onSuccess(response);
+    public ApiResponse<HomeResponse.SearchDeleteDTO> deleteAllSearchName(@RequestParam(name = "userId") @EqualsUserId Long userId) {
+        searchCommandService.deleteAllRecentSearchLog(userId);
+
+        return ApiResponse.onSuccess(HomeConverter.toSearchDeleteDTO());
     }
 
     // 추천 검색어 조회
@@ -173,16 +188,15 @@ public class HomeController {
     @ApiResponses({
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200",description = "OK, 성공"),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "USER4001", description = "아이디와 일치하는 사용자가 없습니다.", content = @Content(schema = @Schema(implementation = ApiResponse.class))),
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON400", description = "잘못된 요청입니다.", content = @Content(schema = @Schema(implementation = ApiResponse.class))),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "AUTHORIZATION_4031", description = "인증된 사용자 정보와 요청된 리소스의 사용자 정보가 다릅니다. (userId 불일치)", content = @Content(schema = @Schema(implementation = ApiResponse.class))),
     })
     @Parameters({
             @Parameter(name = "userId", description = "로그인한 유저의 아이디(pk)", example = "1")
     })
     @GetMapping("/search/recommend")
-    public ApiResponse<HomeResponse.RecommendSearchListDTO> getRecommendSearches (@RequestParam(name = "userId") Long userId){
+    public ApiResponse<HomeResponse.RecommendSearchListDTO> getRecommendSearches (@RequestParam(name = "userId") @EqualsUserId Long userId){
         HomeResponse.RecommendSearchListDTO response = HomeResponse.RecommendSearchListDTO.builder().build();;
         return ApiResponse.onSuccess(response);
     }
-
 
 }

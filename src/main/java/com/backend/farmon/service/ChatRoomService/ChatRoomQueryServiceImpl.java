@@ -36,8 +36,6 @@ public class ChatRoomQueryServiceImpl implements ChatRoomQueryService {
     private final UserRepository userRepository;
     private final EstimateRepository estimateRepository;
     private final UserAuthorizationUtil userAuthorizationUtil;
-    private final ChatRoomCommandService chatRoomCommandService;
-    private final WebSocketSessionManager webSocketSessionManager;
 
     private static final Integer PAGE_SIZE=10;
 
