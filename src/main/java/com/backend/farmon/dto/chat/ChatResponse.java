@@ -45,6 +45,15 @@ public class ChatResponse {
         @Schema(description = "채팅 중인 상대방 이름", example = "김팜온")
         String name;
 
+        @Schema(description = "채팅 중인 상대방 닉네임 (채팅 상대가 전문가일 경우에만 해당) / 채팅 상대가 농업인이면 null", example = "병해충전문가")
+        String nickName;
+
+        @Schema(description = "채팅 중인 상대가 전문가일 경우, 닉네임만 보이게 활성화 여부 / 채팅 상대가 농업인이면 null", example = "true")
+        Boolean isExpertNickNameOnly;
+
+        @Schema(description = "채팅 상대 역할, 농업인 또는 전문가", example = "농업인")
+        String type;
+
         @Schema(description = "채팅 중인 상대방 프로필 이미지")
         String profileImage;
 
@@ -140,6 +149,12 @@ public class ChatResponse {
 
         @Schema(description = "채팅 중인 상대방 이름", example = "김팜온")
         String name;
+
+        @Schema(description = "채팅 중인 상대방 닉네임 (채팅 상대가 전문가일 경우에만 해당)", example = "병해충전문가")
+        String nickName;
+
+        @Schema(description = "채팅 중인 상대가 전문가일 경우, 닉네임만 보이게 활성화 여부", example = "true")
+        Boolean isExpertNickNameOnly;
 
         @Schema(description = "채팅 중인 상대방 프로필 이미지")
         String profileImage;

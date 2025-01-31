@@ -16,8 +16,11 @@ public interface ChatMessageRepository extends JpaRepository<ChatMessage, Long>,
     @Query("SELECT cm FROM ChatMessage cm WHERE cm.chatRoom.id = :chatRoomId AND cm.type IN :types ORDER BY cm.createdAt DESC")
     Optional<ChatMessage> findLatestMessageByTypes(@Param("chatRoomId") Long chatRoomId, @Param("types") List<ChatMessageType> types);
 
-    // 채팅방 아이디와 일치하면서 isRead가 false인 메시지 리스트 조회
-    List<ChatMessage> findByChatRoomIdAndIsReadFalse(Long chatRoomId);
+    // 채팅방 아이디와 일치하면서 isRead가 false인 메시지 개수 조회
+    long countByChatRoomIdAndIsReadFalseAndTypeIn(Long chatRoomId, List<ChatMessageType> types);
+
+//    @Query("SELECT COUNT(cm) FROM ChatMessage cm WHERE cm.chatRoom.id = :chatRoomId AND cm.isRead = false AND cm.type IN :types")
+//    long countUnreadMessagesByChatRoomIdAndTypes(@Param("chatRoomId") Long chatRoomId, @Param("types") List<ChatMessageType> types);
 
     // 채팅방 아이디와 일치하는 채팅 메시지들 삭제
     @Modifying

@@ -10,12 +10,14 @@ import com.backend.farmon.domain.Expert;
 import com.backend.farmon.domain.ExpertCareer;
 import com.backend.farmon.domain.ExpertDatail;
 import com.backend.farmon.domain.User;
+import com.backend.farmon.dto.estimate.EstimateResponseDTO;
 import com.backend.farmon.dto.expert.*;
 import com.backend.farmon.repository.ExpertCareerRepository.ExpertCareerRepository;
 import com.backend.farmon.repository.ExpertDetailRepository.ExpertDetailRepository;
 import com.backend.farmon.repository.ExpertReposiotry.ExpertRepository;
 import com.backend.farmon.service.AWS.S3Service;
 import com.backend.farmon.service.ExpertService.ExpertCommandService;
+import com.backend.farmon.service.ExpertService.ExpertQueryService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
@@ -38,7 +40,9 @@ public class ExpertController {
 
     private final ExpertCommandService expertCommandService;
     private final ExpertCareerRepository expertCareerRepository;
+    private final ExpertConverter expertConverter;
     private final ExpertRepository expertRepository;
+    private final ExpertQueryService expertQueryService;
     private final ExpertDetailRepository expertDetailRepository;
     private final S3Service s3Service;
 
@@ -49,9 +53,12 @@ public class ExpertController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200", description = "OK, 성공"),
     })
     public ApiResponse<ExpertProfileResponse.ExpertProfileDTO> getExpertProfilePage(
-            @Parameter(name = "expert-id", description = "전문가 아이디")
             @PathVariable(name = "expert-id") Long expertId) {
-        return null;
+
+        Expert expert = expertRepository.findById(expertId)
+                .orElseThrow(() -> new ExpertHandler(ErrorStatus.EXPERT_NOT_FOUND));
+
+        return ApiResponse.onSuccess(expertConverter.getProfilePage(expert));
     }
 
     // 전문가 경력 등록
@@ -262,7 +269,7 @@ public class ExpertController {
 
 
     // 전문가 프로필 목록 조회
-    @GetMapping("/api/expert")
+    @GetMapping("/api/expert/list")
     @Operation(
             summary = "전문가 프로필 목록 조회 API",
             description = "전문가 프로필 목록을 조회하는 API이며, 페이징을 포함합니다. " +
@@ -272,14 +279,16 @@ public class ExpertController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200",description = "OK, 성공")
     })
     @Parameters({
-            @Parameter(name = "service", description = "전문가 서비스 필터링"),
-            @Parameter(name = "area", description = "전문가 지역 필터링"),
+            @Parameter(name = "crop", description = "전문가 분야 필터링", required = false),
+            @Parameter(name = "area", description = "전문가 지역 필터링", required = false),
             @Parameter(name = "page", description = "페이지 번호, 1부터 시작입니다.", example = "1", required = true)
     })
-    public ApiResponse<ExpertListResponse.ExpertProfileListDTO> getExpertList (@RequestParam(name = "service") Long service,
-                                                                               @RequestParam(name = "area") String area,
-                                                                               @RequestParam(name = "page")  Integer page){
-        return null;
+    public ApiResponse<ExpertListResponse.ExpertProfileListDTO> getExpertList (@RequestParam(name = "crop", required = false) String crop,
+                                                                               @RequestParam(name = "area", required = false) String area,
+                                                                               @RequestParam(name = "page") Integer page){
+        ExpertListResponse.ExpertProfileListDTO response = expertQueryService.getExpertList(crop, area, page-1);
+
+        return ApiResponse.onSuccess(response);
     }
 
 }

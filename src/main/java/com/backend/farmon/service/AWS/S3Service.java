@@ -160,8 +160,8 @@ public class S3Service {
 
         // S3에 파일 업로드
         amazonS3.putObject(bucket, storedFileName, multipartFile.getInputStream(), metadata);
-        expert.setProfileImageUrl(storedFileName);
 
+        expert.setProfileImageUrl(getFullPath(storedFileName));
         return getFullPath(storedFileName);
     }
 //

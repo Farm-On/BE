@@ -62,6 +62,10 @@ public class ChatConverter {
 
         return ChatResponse.ChatRoomDataDTO.builder()
                 .name(chatRoom.getExpert().getUser().getUserName())
+                .nickName(chatRoom.getExpert().getNickName() != null
+                        ? chatRoom.getExpert().getNickName()
+                        : null)
+                .isExpertNickNameOnly(chatRoom.getExpert().getIsNickNameOnly())
                 .profileImage(chatRoom.getExpert().getProfileImageUrl() != null
                         ? chatRoom.getExpert().getProfileImageUrl()
                         : null)
@@ -111,23 +115,27 @@ public class ChatConverter {
     }
 
     public static ChatResponse.ChatRoomDetailDTO toChatRoomDetailDTO(
-            ChatRoom chatRoom, ChatMessage chatMessage, Area area, Boolean isExpert, Integer unReadMessageCount) {
+            ChatRoom chatRoom, ChatMessage chatMessage, Area area, Boolean isExpert, Long unReadMessageCount) {
 
+        // 내가 전문가라면 농업인을 user로 가져오기
         User user = isExpert
-                ? chatRoom.getExpert().getUser()
-                : chatRoom.getFarmer();
+                ? chatRoom.getFarmer()
+                : chatRoom.getExpert().getUser();
 
         return ChatResponse.ChatRoomDetailDTO.builder()
                 .chatRoomId(chatRoom.getId())
                 .name(user.getUserName())
-                .profileImage(isExpert && user.getExpert() != null && user.getExpert().getProfileImageUrl() != null
+                .nickName(!isExpert ? user.getExpert().getNickName() : null) // 내가 전문가가 아니면(내가 농업인) 상대는 전문가
+                .isExpertNickNameOnly(!isExpert ? user.getExpert().getIsNickNameOnly() : null)
+                .type(isExpert ? "농업인" : "전문가") // 내가 전문가이면 상대 타입은 농업인
+                .profileImage(!isExpert && user.getExpert() != null && user.getExpert().getProfileImageUrl() != null
                         ? user.getExpert().getProfileImageUrl()
                         : null)
                 .estimateBudget(chatRoom.getEstimate().getBudget())
                 .estimateCategory(chatRoom.getEstimate().getCategory())
                 .estimateAreaName(area.getAreaName())
                 .estimateAreaDetail(area.getAreaNameDetail())
-                .unreadMessageCount(unReadMessageCount)
+                .unreadMessageCount(unReadMessageCount.intValue())
                 .lastMessageContent(chatMessage != null ? chatMessage.getContent() : null) // null-safe 처리
                 .lastMessageDate(chatMessage != null ? ConvertTime.convertToYearMonthDay(chatMessage.getCreatedAt()) : null) // null-safe 처리
                 .build();
