@@ -39,12 +39,15 @@ public class ChatRoomRepositoryImpl implements ChatRoomRepositoryCustom {
         // 텍스트, 이미지 메시지만 조회
         builder.and(chatMessage.type.in(ChatMessageType.TEXT, ChatMessageType.IMAGE));
 
-        // 검색어 조건 (세 가지 중 하나라도 포함되면 조회)
+        // 검색어 조건 (여섯 가지 중 하나라도 포함되면 조회)
         if (searchName != null && !searchName.trim().isEmpty()) {
             BooleanBuilder searchCondition = new BooleanBuilder();
             searchCondition.or(chatRoom.farmer.userName.containsIgnoreCase(searchName)); // 농업인 사용자명 검색
             searchCondition.or(chatRoom.expert.nickName.containsIgnoreCase(searchName)); // 전문가 닉네임 검색
-            searchCondition.or(chatRoom.expert.isNickNameOnly.eq(true).and(chatRoom.expert.user.userName.containsIgnoreCase(searchName))); // 전문가가 닉네임만 표시할 경우, 원래 사용자명도 검색
+            searchCondition.or(chatRoom.expert.isNickNameOnly.eq(false).and(chatRoom.expert.user.userName.containsIgnoreCase(searchName))); // 전문가가 닉네임만 표시하지 않을 경우, 원래 사용자명도 검색
+            searchCondition.or(chatRoom.estimate.crop.category.containsIgnoreCase(searchName)); // 작물 카테고리로 검색
+            searchCondition.or(chatRoom.estimate.crop.name.containsIgnoreCase(searchName)); // 작물 디테일 이름으로 검색
+            searchCondition.or(chatRoom.estimate.category.containsIgnoreCase(searchName)); // 견적 분야로 검색
 
             builder.and(searchCondition); // 전체 조건에 추가
         }
@@ -81,12 +84,15 @@ public class ChatRoomRepositoryImpl implements ChatRoomRepositoryCustom {
         builder.and(chatMessage.isRead.isFalse());
         builder.and(chatMessage.type.in(ChatMessageType.TEXT, ChatMessageType.IMAGE));
 
-        // 검색어 조건 (세 가지 중 하나라도 포함되면 조회)
+        // 검색어 조건 (여섯 가지 중 하나라도 포함되면 조회)
         if (searchName != null && !searchName.trim().isEmpty()) {
             BooleanBuilder searchCondition = new BooleanBuilder();
             searchCondition.or(chatRoom.farmer.userName.containsIgnoreCase(searchName)); // 농업인 사용자명 검색
             searchCondition.or(chatRoom.expert.nickName.containsIgnoreCase(searchName)); // 전문가 닉네임 검색
-            searchCondition.or(chatRoom.expert.isNickNameOnly.eq(true).and(chatRoom.expert.user.userName.containsIgnoreCase(searchName))); // 전문가가 닉네임만 표시할 경우, 원래 사용자명도 검색
+            searchCondition.or(chatRoom.expert.isNickNameOnly.eq(false).and(chatRoom.expert.user.userName.containsIgnoreCase(searchName))); // 전문가가 닉네임만 표시하지 않을 경우, 원래 사용자명도 검색
+            searchCondition.or(chatRoom.estimate.crop.category.containsIgnoreCase(searchName)); // 작물 카테고리로 검색
+            searchCondition.or(chatRoom.estimate.crop.name.containsIgnoreCase(searchName)); // 작물 디테일 이름으로 검색
+            searchCondition.or(chatRoom.estimate.category.containsIgnoreCase(searchName)); // 견적 분야로 검색
 
             builder.and(searchCondition); // 전체 조건에 추가
         }

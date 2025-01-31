@@ -118,4 +118,29 @@ public class HomeResponse {
         @Schema(description = "검색어 삭제 성공 여부", example = "true")
         Boolean isSearchDelete;
     }
+
+    @ToString
+    @Getter
+    @Setter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Builder
+    @Schema(description = "홈 페이지 자동 완성 검색어 정보")
+    public static class AutoCompleteSearchDTO  {
+
+        @Schema(description = "추천 검색어 리스트")
+        List <String> searchList;
+    }
+
+    @Getter
+    @Setter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Builder
+    @Schema(description = "홈 페이지 자동 완성 검색어 저장 반환 정보")
+    public static class AutoCompleteSearchPostDTO {
+
+        @Schema(description = "검색어 저장 여부", example = "true")
+        Boolean isSearchSave;
+    }
 }

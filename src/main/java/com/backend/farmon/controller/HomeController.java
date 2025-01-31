@@ -27,7 +27,8 @@ public class HomeController {
     @Operation(
             summary = "홈 화면 커뮤니티 게시글 조회 API",
             description = "홈 화면에서 커뮤니티 카테고리에 따른 게시글을 조회합니다. " +
-                    "필터링 할 커뮤니티 카테고리 이름을 쿼리 스트링으로 입력해 주세요. "
+                    "필터링 할 커뮤니티 카테고리 이름을 쿼리 스트링으로 입력해 주세요. " +
+                    "로그인한 사용자의 경우 발급받은 토큰을 헤더에 입려해주세요. 로그인하지 않은 사용자의 경우에는 토큰을 입력하지 않아도 됩니다."
     )
     @ApiResponses({
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200",description = "OK, 성공"),
@@ -47,7 +48,8 @@ public class HomeController {
     // 홈 화면 - 인기 칼럼 조회
     @Operation(
             summary = "홈 화면 인기 칼럼 조회 API",
-            description = "홈 화면에서 인기 칼럼 게시글 목록을 6개 조회합니다."
+            description = "홈 화면에서 인기 칼럼 게시글 목록을 6개 조회합니다." +
+            "로그인한 사용자의 경우 발급받은 토큰을 헤더에 입려해주세요. 로그인하지 않은 사용자의 경우에는 토큰을 입력하지 않아도 됩니다."
     )
     @ApiResponses({
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200",description = "OK, 성공"),
@@ -60,10 +62,53 @@ public class HomeController {
     }
 
 
+    // 홈 화면 검색 - 자동 완성
+    @Operation(
+            summary = "홈 화면 검색어 목록 조회 API",
+            description = "홈 화면 검색어 입력 시 사용자가 입력한 검색어와 관련된 작물 이름들을 반환합니다. " +
+                    "유저 아이디와 검색어를 쿼리 스트링으로 입력해 주세요."
+    )
+    @ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200",description = "OK, 성공")
+    })
+    @Parameters({
+            @Parameter(name = "userId", description = "로그인한 유저의 아이디(pk)", example = "1"),
+            @Parameter(name = "searchName", description = "검색어", example = "1"),
+    })
+    @GetMapping("/search")
+    public ApiResponse<HomeResponse.AutoCompleteSearchDTO> getHomeAutoCompleteSearchNameList (@RequestParam(name = "userId", required = false) Long userId,
+                                                                                              @RequestParam(name = "searchName") String searchName){
+        HomeResponse.AutoCompleteSearchDTO response = HomeResponse.AutoCompleteSearchDTO.builder().build();;
+        return ApiResponse.onSuccess(response);
+    }
+
+
+    // 홈 화면 검색 - 자동 완성 저장
+    @Operation(
+            summary = "홈 화면 검색어 저장 API",
+            description = "홈 화면 검색어 입력 시 사용자가 입력한 검색어와 관련된 작물 이름들이 반환되었을 때 " +
+                    "반환된 작물 이름들 중 사용자가 원하는 작물을 클릭하면 해당 작물 이름을 저장합니다. " +
+                    "유저 아이디와 저장할 작물 이름을 쿼리 스트링으로 입력해 주세요."
+    )
+    @ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200",description = "OK, 성공")
+    })
+    @Parameters({
+            @Parameter(name = "userId", description = "로그인한 유저의 아이디(pk)", example = "1"),
+            @Parameter(name = "searchName", description = "저장할 작물 이름", example = "1"),
+    })
+    @PostMapping("/search")
+    public ApiResponse<HomeResponse.AutoCompleteSearchDTO> postHomeAutoCompleteSearchNameList (@RequestParam(name = "userId", required = false) Long userId,
+                                                                                               @RequestParam(name = "searchName") String searchName){
+        HomeResponse.AutoCompleteSearchDTO response = HomeResponse.AutoCompleteSearchDTO.builder().build();;
+        return ApiResponse.onSuccess(response);
+    }
+
+
     // 최근 검색어 조회
     @Operation(
             summary = "홈 화면 최근 검색어 조회 API",
-            description = "홈 화면 검색 창에서 사용자의 최근 검색어들을 조회합니다. 로그인 한 사용자의 경우에는 유저 아이디를 쿼리 스트링으로 입력해 주세요."
+            description = "홈 화면 검색 창에서 사용자의 최근 검색어들을 조회합니다. 유저 아이디를 쿼리 스트링으로 입력해 주세요."
     )
     @ApiResponses({
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200",description = "OK, 성공"),
@@ -71,39 +116,18 @@ public class HomeController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON400", description = "잘못된 요청입니다.", content = @Content(schema = @Schema(implementation = ApiResponse.class))),
     })
     @Parameters({
-            @Parameter(name = "userId", description = "로그인한 유저의 아이디(pk), 로그인 하지 않은 사용자 일 경우 입력하지 않아도 됩니다.", example = "1")
+            @Parameter(name = "userId", description = "로그인한 유저의 아이디(pk)", example = "1")
     })
     @GetMapping("/search/recent")
-    public ApiResponse<HomeResponse.RecentSearchListDTO> getRecentSearches (@RequestParam(name = "userId", required = false) Long userId){
+    public ApiResponse<HomeResponse.RecentSearchListDTO> getRecentSearches (@RequestParam(name = "userId") Long userId){
         HomeResponse.RecentSearchListDTO response = HomeResponse.RecentSearchListDTO.builder().build();;
         return ApiResponse.onSuccess(response);
     }
 
-
-    // 추천 검색어 조회
-    @Operation(
-            summary = "홈 화면 추천 검색어 조회 API",
-            description = "홈 화면 검색 창에서 추천 검색어들을 조회합니다.  로그인 한 사용자의 경우에는 유저 아이디를 쿼리 스트링으로 입력해 주세요."
-    )
-    @ApiResponses({
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200",description = "OK, 성공"),
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "USER4001", description = "아이디와 일치하는 사용자가 없습니다.", content = @Content(schema = @Schema(implementation = ApiResponse.class))),
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON400", description = "잘못된 요청입니다.", content = @Content(schema = @Schema(implementation = ApiResponse.class))),
-    })
-    @Parameters({
-            @Parameter(name = "userId", description = "로그인한 유저의 아이디(pk), 로그인 하지 않은 사용자 일 경우 입력하지 않아도 됩니다.", example = "1")
-    })
-    @GetMapping("/search/recommend")
-    public ApiResponse<HomeResponse.RecommendSearchListDTO> getRecommendSearches (@RequestParam(name = "userId", required = false) Long userId){
-        HomeResponse.RecommendSearchListDTO response = HomeResponse.RecommendSearchListDTO.builder().build();;
-        return ApiResponse.onSuccess(response);
-    }
-
-
     // 특정 검색어 삭제 API
     @Operation(
-            summary = "홈 화면에서 특정 검색어 삭제 API",
-            description = "홈 화면에서 특정 검색어를 삭제하는 API 입니다. 유저 아이디와 삭제할 검색어 이름을 쿼리 스트링으로 입력해 주세요."
+            summary = "홈 화면에서 최근 검색어에서 특정 검색어 삭제 API",
+            description = "홈 화면에서 최근 검색어 목록에서 특정 검색어를 삭제하는 API 입니다. 유저 아이디와 삭제할 검색어 이름을 쿼리 스트링으로 입력해 주세요."
     )
     @ApiResponses({
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200",description = "OK, 성공"),
@@ -114,10 +138,10 @@ public class HomeController {
             @Parameter(name = "userId", description = "로그인한 유저의 아이디(pk)", example = "1"),
             @Parameter(name = "name", description = "삭제 할 검색어 이름", example = "병충해 관리")
     })
-    @DeleteMapping("/search")
+    @DeleteMapping("/search/recent")
     public ApiResponse<HomeResponse.SearchDeleteDTO> deleteSearchName(@RequestParam(name = "userId") Long userId,
-                                                                  @RequestParam(name = "name") String searchName){
-        HomeResponse.SearchDeleteDTO response = HomeResponse.SearchDeleteDTO.builder().build();;
+                                                                      @RequestParam(name = "name") String searchName){
+        HomeResponse.SearchDeleteDTO response = HomeResponse.SearchDeleteDTO.builder().build();
         return ApiResponse.onSuccess(response);
     }
 
@@ -135,27 +159,30 @@ public class HomeController {
     @Parameters({
             @Parameter(name = "userId", description = "로그인한 유저의 아이디(pk), 로그인 하지 않은 사용자 일 경우 입력하지 않아도 됩니다.", example = "1")
     })
-    @DeleteMapping("/search/all")
+    @DeleteMapping("/search/recent/all")
     public ApiResponse<HomeResponse.SearchDeleteDTO> deleteAllSearchName(@RequestParam(name = "userId") Long userId) {
         HomeResponse.SearchDeleteDTO response = HomeResponse.SearchDeleteDTO.builder().build();;
         return ApiResponse.onSuccess(response);
     }
 
-    // 홈 화면 검색 - 자동 완성
-//    @Operation(
-//            summary = "홈 화면 조회 API",
-//            description = "홈 화면 로딩에 필요한 정보를 조회합니다. 로그인 한 사용자의 경우에는 유저 아이디를 쿼리 스트링으로 입력해 주세요."
-//    )
-//    @ApiResponses({
-//            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200",description = "OK, 성공")
-//    })
-//    @Parameters({
-//            @Parameter(name = "userId", description = "로그인한 유저의 아이디(pk), 로그인 하지 않은 사용자 일 경우 입력하지 않아도 됩니다.", example = "1"),
-//    })
-//    @GetMapping("/search")
-//    public ApiResponse<HomeResponse.HomePageDTO> getChatRoomPage (@RequestParam(name = "userId", required = false) Long userId,
-//                                                                  @RequestParam(name = "category") String category){
-//        HomeResponse.HomePageDTO response = HomeResponse.HomePageDTO.builder().build();;
-//        return ApiResponse.onSuccess(response);
-//    }
+    // 추천 검색어 조회
+    @Operation(
+            summary = "홈 화면 추천 검색어 조회 API",
+            description = "홈 화면 검색 창에서 추천 검색어들을 조회합니다. 유저 아이디를 쿼리 스트링으로 입력해 주세요."
+    )
+    @ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200",description = "OK, 성공"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "USER4001", description = "아이디와 일치하는 사용자가 없습니다.", content = @Content(schema = @Schema(implementation = ApiResponse.class))),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON400", description = "잘못된 요청입니다.", content = @Content(schema = @Schema(implementation = ApiResponse.class))),
+    })
+    @Parameters({
+            @Parameter(name = "userId", description = "로그인한 유저의 아이디(pk)", example = "1")
+    })
+    @GetMapping("/search/recommend")
+    public ApiResponse<HomeResponse.RecommendSearchListDTO> getRecommendSearches (@RequestParam(name = "userId") Long userId){
+        HomeResponse.RecommendSearchListDTO response = HomeResponse.RecommendSearchListDTO.builder().build();;
+        return ApiResponse.onSuccess(response);
+    }
+
+
 }
