@@ -204,4 +204,27 @@ public class EstimateQueryServiceImpl implements EstimateQueryService {
 
     }
 
+    @Override
+    public EstimateResponseDTO.FilteredListDTO searchEstimateListByFilter2(Long expertId, String cropCategory, String cropName, EstimateRequestDTO.FilterDTO requestDTO, int page) {
+        if(requestDTO == null) {
+            return EstimateResponseDTO.FilteredListDTO.builder().build();
+        };
+
+        // Repository를 호출하여 조건에 맞는 견적서를 조회
+        // 1) 레포지토리에서 데이터 조회
+        Page<Estimate> estimatePage = estimateRepository.findFilteredEstimates2(
+                expertId,
+                cropCategory,
+                cropName,
+                requestDTO.getEstimateCategory(),
+                requestDTO.getBudget(),
+                requestDTO.getAreaName(),
+                requestDTO.getAreaNameDetail(),
+                PageRequest.of(page -1, 10, Sort.by(Sort.Direction.DESC, "createdAt"))
+        );
+
+        return estimateConverter.toFilteredListDTO(estimatePage, requestDTO.getEstimateCategory(), requestDTO.getBudget(), requestDTO.getAreaName(), requestDTO.getAreaNameDetail());
+
+    }
+
 }
