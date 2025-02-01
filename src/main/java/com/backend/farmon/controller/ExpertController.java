@@ -132,7 +132,7 @@ public class ExpertController {
 
     // 전문가 추가정보 편집
     @PatchMapping("/api/expert/{expert-id}/detail")
-    @Operation(summary = "전문가 추가정보 편집 API")
+    @Operation(summary = "전문가 추가정보 편집 API", description = "100자 이내의 내용을 적어주세요.")
     @ApiResponses({
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200", description = "OK, 성공"),
     })
@@ -140,7 +140,7 @@ public class ExpertController {
             @Parameter(name = "expert-id", description = "추가정보를 편집하려는 전문가의 id", required = true),
     })
     public ApiResponse<String> updateExpertDetail(
-            @RequestBody ExpertDetailRequest.ExpertDetailPostDTO expertDetailPostDTO,
+            @Valid @RequestBody ExpertDetailRequest.ExpertDetailPostDTO expertDetailPostDTO,
             @PathVariable(name = "expert-id") Long expertId) {
         Expert expert = expertRepository.findById(expertId)
                 .orElseThrow(() -> new ExpertHandler(ErrorStatus.EXPERT_NOT_FOUND));
