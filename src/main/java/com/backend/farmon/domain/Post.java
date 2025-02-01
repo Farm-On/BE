@@ -1,12 +1,7 @@
 package com.backend.farmon.domain;
 
-import com.backend.farmon.domain.Board;
-import com.backend.farmon.domain.Comment;
-import com.backend.farmon.domain.LikeCount;
-import com.backend.farmon.domain.User;
 import com.backend.farmon.domain.commons.BaseEntity;
 import com.backend.farmon.dto.Filter.FieldCategory;
-import com.backend.farmon.dto.post.PostType;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
@@ -46,7 +41,8 @@ public class Post extends BaseEntity {
     @JsonBackReference
     private User user;
 
-    private int poslikes;
+    @Column(columnDefinition = "INTEGER DEFAULT 0", nullable = false)
+    private int postLikes;
 
     @Enumerated(EnumType.STRING)
     private FieldCategory fieldCategory;
@@ -72,11 +68,11 @@ public class Post extends BaseEntity {
     }
 
     public void increaseLikes() {
-        this.poslikes++;
+        this.postLikes++;
     }
 
     public void decreaseLikes() {
-        this.poslikes--;
+        this.postLikes--;
     }
 
     public int getLikeCount() {
