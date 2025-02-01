@@ -3,7 +3,6 @@ package com.backend.farmon.service.AWS;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.backend.farmon.apiPayload.code.status.ErrorStatus;
-import com.backend.farmon.apiPayload.exception.handler.ExpertDetailHandler;
 import com.backend.farmon.apiPayload.exception.handler.ExpertHandler;
 import com.backend.farmon.domain.*;
 import com.backend.farmon.repository.ExpertReposiotry.ExpertRepository;

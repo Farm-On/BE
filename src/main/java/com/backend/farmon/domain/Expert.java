@@ -33,6 +33,8 @@ public class Expert extends BaseEntity {
 
     private String expertDescription; // 전문가 한줄소개
 
+    private String additionalInformation; // 전문가 추가정보
+
     private Float rating;
     private Integer careerYears;
 
@@ -70,9 +72,6 @@ public class Expert extends BaseEntity {
 
     @OneToMany(mappedBy = "expert", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Portfolio> portfolioList = new ArrayList<>();
-
-    @OneToMany(mappedBy = "expert", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<ExpertDatail> expertDatailList = new ArrayList<>();
 
     @OneToMany(mappedBy = "expert", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ExpertCareer> expertCareerList = new ArrayList<>();

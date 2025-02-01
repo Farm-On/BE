@@ -37,8 +37,8 @@ public class ExpertProfileResponse {
         @Schema(description = "전문가 경력 목록 리스트")
         List<ExpertCareerDTO> careers;
 
-        @Schema(description = "전문가 추가정보 목록 리스트")
-        List<ExpertDetailDTO> details;
+        @Schema(description = "전문가 추가정보")
+        String additionalInformation;
 
         @Schema(description = "전문가 전문 분야 카테고리")
         String expertCropCategory;

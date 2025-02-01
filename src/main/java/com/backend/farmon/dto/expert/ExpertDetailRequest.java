@@ -12,7 +12,7 @@ public class ExpertDetailRequest {
     @Getter
     @NoArgsConstructor
     @AllArgsConstructor
-    @Schema(description = "전문가 추가정보 등록 요청 DTO")
+    @Schema(description = "전문가 추가정보 편집 요청 DTO")
     public static class ExpertDetailPostDTO {
         @Schema(description = "추가정보 내용", example = "농업기술센터 병해충 방제 특강 강사 활동")
         @NotBlank

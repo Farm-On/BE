@@ -3,17 +3,14 @@ package com.backend.farmon.controller;
 import com.backend.farmon.apiPayload.ApiResponse;
 import com.backend.farmon.apiPayload.code.status.ErrorStatus;
 import com.backend.farmon.apiPayload.exception.handler.ExpertCareerHandler;
-import com.backend.farmon.apiPayload.exception.handler.ExpertDetailHandler;
 import com.backend.farmon.apiPayload.exception.handler.ExpertHandler;
 import com.backend.farmon.converter.ExpertConverter;
 import com.backend.farmon.domain.Expert;
 import com.backend.farmon.domain.ExpertCareer;
-import com.backend.farmon.domain.ExpertDatail;
 import com.backend.farmon.domain.User;
 import com.backend.farmon.dto.estimate.EstimateResponseDTO;
 import com.backend.farmon.dto.expert.*;
 import com.backend.farmon.repository.ExpertCareerRepository.ExpertCareerRepository;
-import com.backend.farmon.repository.ExpertDetailRepository.ExpertDetailRepository;
 import com.backend.farmon.repository.ExpertReposiotry.ExpertRepository;
 import com.backend.farmon.service.AWS.S3Service;
 import com.backend.farmon.service.ExpertService.ExpertCommandService;
@@ -43,7 +40,6 @@ public class ExpertController {
     private final ExpertConverter expertConverter;
     private final ExpertRepository expertRepository;
     private final ExpertQueryService expertQueryService;
-    private final ExpertDetailRepository expertDetailRepository;
     private final S3Service s3Service;
 
     // 전문가 내 프로필 페이지 조회
@@ -134,77 +130,24 @@ public class ExpertController {
         }
     }
 
-    // 전문가 추가정보 등록
-    @PostMapping("/api/expert/{expert-id}/detail")
-    @Operation(summary = "전문가 추가정보 등록 API")
+    // 전문가 추가정보 편집
+    @PatchMapping("/api/expert/{expert-id}/detail")
+    @Operation(summary = "전문가 추가정보 편집 API")
     @ApiResponses({
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200", description = "OK, 성공"),
     })
     @Parameters({
-            @Parameter(name = "expert-id", description = "추가정보를 등록하려는 전문가의 id", required = true),
+            @Parameter(name = "expert-id", description = "추가정보를 편집하려는 전문가의 id", required = true),
     })
-    public ApiResponse<ExpertDetailResponse.PostExpertDetailResultDTO> postExpertDetail(
-            @RequestBody @Valid ExpertDetailRequest.ExpertDetailPostDTO expertDetailPostDTO,
-            @PathVariable(name = "expert-id") Long expertId) {
-        ExpertDatail newExpertDetail = expertCommandService.postExpertDetail(expertId, expertDetailPostDTO);
-        return ApiResponse.onSuccess(ExpertConverter.toExpertDetailPostResultDTO(newExpertDetail));
-    }
-
-    // 전문가 특정 추가정보 조회
-    @GetMapping("/api/expert/detail/{detail-id}")
-    @Operation(summary = "전문가 특정 추가정보 조회 API")
-    @ApiResponses({
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200", description = "OK, 성공"),
-    })
-    @Parameters({
-            @Parameter(name = "detail-id", description = "조회하려는 추가정보의 id", required = true)
-    })
-    public ApiResponse<ExpertDetailResponse.GetExpertDetailResultDTO> getExpertDetail(
-            @PathVariable(name = "detail-id") Long detailId) {
-        ExpertDatail expertDetail = expertDetailRepository.findById(detailId)
-                .orElseThrow(() -> new ExpertDetailHandler(ErrorStatus.EXPERT_DETAIL_NOT_FOUND));
-
-        return ApiResponse.onSuccess(ExpertConverter.toExpertDetailGetResultDTO(expertDetail));
-    }
-
-    // 전문가 특정 추가정보 편집
-    @PatchMapping("/api/expert/detail/{detail-id}")
-    @Operation(summary = "전문가 특정 추가정보 편집 API")
-    @ApiResponses({
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200", description = "OK, 성공"),
-    })
-    @Parameters({
-            @Parameter(name = "detail-id", description = "편집하려는 추가정보의 id", required = true)
-    })
-    public ApiResponse<ExpertDetailResponse.GetExpertDetailResultDTO> updateExpertDetail(
+    public ApiResponse<String> updateExpertDetail(
             @RequestBody ExpertDetailRequest.ExpertDetailPostDTO expertDetailPostDTO,
-            @PathVariable(name = "detail-id") Long detailId) {
-        ExpertDatail expertDetail = expertDetailRepository.findById(detailId)
-                .orElseThrow(() -> new ExpertDetailHandler(ErrorStatus.EXPERT_DETAIL_NOT_FOUND));
+            @PathVariable(name = "expert-id") Long expertId) {
+        Expert expert = expertRepository.findById(expertId)
+                .orElseThrow(() -> new ExpertHandler(ErrorStatus.EXPERT_NOT_FOUND));
 
-        ExpertDatail updatedExpertDetail = ExpertConverter.updateExpertDetail(expertDetail, expertDetailPostDTO);
-        expertDetailRepository.save(updatedExpertDetail);
-        return ApiResponse.onSuccess(ExpertConverter.toExpertDetailGetResultDTO(updatedExpertDetail));
-    }
-
-    // 전문가 특정 추가정보 삭제
-    @DeleteMapping("/api/expert/detail/{detail-id}")
-    @Operation(summary = "전문가 특정 추가정보 삭제 API")
-    @ApiResponses({
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200", description = "OK, 성공"),
-    })
-    @Parameters({
-            @Parameter(name = "detail-id", description = "삭제하려는 추가정보의 id", required = true)
-    })
-    public ApiResponse<String> deleteExpertDetail(@PathVariable(name = "detail-id") Long detailId) {
-        ExpertDatail expertDetail = expertDetailRepository.findById(detailId)
-                .orElseThrow(() -> new ExpertDetailHandler(ErrorStatus.EXPERT_DETAIL_NOT_FOUND));
-        try {
-            expertDetailRepository.delete(expertDetail);
-            return ApiResponse.onSuccess("전문가 추가정보가 성공적으로 삭제되었습니다.");
-        } catch (Exception e) {
-            return ApiResponse.onFailure("ERROR_DELETE_EXPERT_DETAIL","전문가 추가정보 삭제에 실패했습니다.",null);
-        }
+        expert.setAdditionalInformation(expertDetailPostDTO.getContent());
+        expertRepository.save(expert);
+        return ApiResponse.onSuccess("전문가 추가정보가 업데이트 되었습니다.");
     }
 
     // 전문가 프로필 이미지 설정 API

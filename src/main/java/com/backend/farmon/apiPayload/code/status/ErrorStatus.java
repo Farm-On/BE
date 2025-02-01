@@ -20,6 +20,7 @@ public enum ErrorStatus implements BaseErrorCode {
     USER_NOT_FOUND(HttpStatus.BAD_REQUEST, "USER4001", "아이디와 일치하는 사용자가 없습니다."),
     NICKNAME_NOT_EXIST(HttpStatus.BAD_REQUEST, "USER4002", "닉네임은 필수 입니다."),
     EXCHANGE_ROLE_SAME(HttpStatus.BAD_REQUEST, "USER4003", "전환하려는 역할과 현재 로그인한 역할이 일치합니다."),
+    WITHDRAW_USER_LOGIN(HttpStatus.BAD_REQUEST, "USER4004", "회원탈퇴한 유저입니다."),
 
     // 전문가 관련 에러
     EXPERT_NOT_FOUND(HttpStatus.BAD_REQUEST, "EXPERT4001", "아이디와 일치하는 전문가가 없습니다."),
@@ -62,9 +63,6 @@ public enum ErrorStatus implements BaseErrorCode {
 
     // 전문가 경력 관련 에러
     EXPERT_CAREER_NOT_FOUND(HttpStatus.BAD_REQUEST, "EXPERT_CAREER4001", "해당 경력 아이디와 일치하는 경력이 존재하지 않습니다."),
-
-    // 전문가 추가정보 관련 에러
-    EXPERT_DETAIL_NOT_FOUND(HttpStatus.BAD_REQUEST, "EXPERT_DETAIL4001", "해당 추가정보 아이디와 일치하는 추가정보가 존재하지 않습니다."),
 
     // 채팅 메시지 타입
     MESSAGE_TYPE_NOT_FOUND(HttpStatus.BAD_REQUEST, "MESSAGE_TYPE4001", "지원되지 않는 채팅 메시지 타입입니다."),
