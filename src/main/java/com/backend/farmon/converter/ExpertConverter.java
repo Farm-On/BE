@@ -105,38 +105,6 @@ public class ExpertConverter {
         return expertCareer;
     }
 
-    // 전문가 추가정보 엔티티 생성
-    public static ExpertDatail toExpertDetail(ExpertDetailRequest.ExpertDetailPostDTO request) {
-        return ExpertDatail.builder()
-                .detailContent(request.getContent())
-                .build();
-    }
-
-    // 전문가 추가정보 POST 응답 DTO 생성
-    public static ExpertDetailResponse.PostExpertDetailResultDTO toExpertDetailPostResultDTO(ExpertDatail request) {
-        return ExpertDetailResponse.PostExpertDetailResultDTO.builder()
-                .expertDetailId(request.getId())
-                .createdAt(LocalDateTime.now())
-                .build();
-    }
-
-    // 전문가 추가정보 GET 응답 DTO 생성
-    public static ExpertDetailResponse.GetExpertDetailResultDTO toExpertDetailGetResultDTO(ExpertDatail request) {
-        return ExpertDetailResponse.GetExpertDetailResultDTO.builder()
-                .expertId(request.getExpert().getId())
-                .content(request.getDetailContent())
-                .build();
-    }
-
-    // 전문가 추가정보 엔티티 업데이트
-    public static ExpertDatail updateExpertDetail(ExpertDatail expertDetail, ExpertDetailRequest.ExpertDetailPostDTO expertDetailPostDTO) {
-        if (expertDetailPostDTO.getContent() != null) {
-            expertDetail.setDetailContent(expertDetailPostDTO.getContent());
-        }
-
-        return expertDetail;
-    }
-
     // 전문가 대표서비스 수정 응답 DTO 생성
     public static ExpertProfileResponse.ResultUpdateSpecialtyDTO updateSpecialtyDTO(Expert request) {
         return ExpertProfileResponse.ResultUpdateSpecialtyDTO.builder()
@@ -202,9 +170,6 @@ public class ExpertConverter {
         List<ExpertProfileResponse.ExpertCareerDTO> expertCareerDTOList = expert.getExpertCareerList().stream()
                 .map(ExpertConverter::expertCareerViewDTO).collect(Collectors.toList());
 
-        List<ExpertProfileResponse.ExpertDetailDTO> expertDetailDTOList = expert.getExpertDatailList().stream()
-                .map(ExpertConverter::expertDetailViewDTO).collect(Collectors.toList());
-
         // Estimate 수를 카운트
         long consultingCount = estimateRepository.countByExpert(expert);
 
@@ -217,7 +182,7 @@ public class ExpertConverter {
                 // .reviewCount() 리뷰 추가시 수정
                 .consultingCount(consultingCount)
                 .careers(expertCareerDTOList)
-                .details(expertDetailDTOList)
+                .additionalInformation(expert.getAdditionalInformation())
                 .expertCropCategory(expert.getCrop().getCategory())
                 .expertCropDetail(expert.getCrop().getName())
                 .serviceDetail1(expert.getServiceDetail1())
@@ -256,12 +221,4 @@ public class ExpertConverter {
                 .detailContent4(expertCareer.getDetailContent4())
                 .build();
     }
-
-
-    public static ExpertProfileResponse.ExpertDetailDTO expertDetailViewDTO(ExpertDatail expertDatail) {
-        return ExpertProfileResponse.ExpertDetailDTO.builder()
-                .content(expertDatail.getDetailContent())
-                .build();
-    }
-
 }
