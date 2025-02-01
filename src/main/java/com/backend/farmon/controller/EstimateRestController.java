@@ -446,7 +446,55 @@ public class EstimateRestController {
 
     }
 
+    /**
+     * (9) 필터링(검색/조건) 예시
+     *  - 예: 지역, 예산 범위, 견적 카테고리 를 query param으로 받아서 검색
+     *  - 지역만 데이터를 담고 있을 수도 있고, 범위, 견적 카테고리만 데이터를 담고 있을 수도 있고
+     *  - 지역, 예싼 범위, 견적 카테고리 모두 데이터를 가지고 있을 수도있다.
+     *  - 실제 구현에서는 여러 파라미터들을 받아서 동적 쿼리를 구성해야 함.
+     *  - 검색결과는 10개씩, 최신순, 페이징 처리
+     */
+    @Operation(
+            summary = "견적서 필터링 검색",
+            description = "지역 ID, 예산 범위, 견적 카테고리 세 조건으로 견적서를 검색합니다."
+    )
+    @ApiResponses(
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200", description = "OK, 성공")
+    )
+    @Parameters({
+            @Parameter(name = "expertId", description = "추천탭에서 필터링시 전문가 ID 필요", required = false),
+            @Parameter(name = "cropCategory", description = "작물카테고리 탭에서 필터링시 작물카테고리 필요 ", required = false),
+            @Parameter(name = "cropName", description = "세부작물 탭에서 필터링시 세부 작물 이름 필요"),
+            @Parameter(name = "estimateCategory", description = "견적 카테고리", required = false),
+            @Parameter(name = "budget", description = "예산 범위(예:50만원 ~ 100만원)", required = false),
+            @Parameter(name = "areaName", description = "지역 이름(예: 서울)", required = false),
+            @Parameter(name = "areaNameDetail", description = "지역 세부 이름(예: 강남구)", required = false),
+            @Parameter(name = "page", description = "페이지 번호", required = true)
+    })
+    @GetMapping("/expert/filter2")
+    public ApiResponse<EstimateResponseDTO.FilteredListDTO> filterEstimates2(
+            @RequestParam(name = "expertId", required = false) Long expertId,
+            @RequestParam(name = "cropCategory", required = false) String cropCategory,
+            @RequestParam(name = "cropName", required = false) String cropName,
+            @RequestParam(name = "estimateCategory", required = false) String estimateCategory,
+            @RequestParam(name = "budget", required = false) String budget,
+            @RequestParam(name = "areaName", required = false) String areaName,
+            @RequestParam(name = "areaNameDetail", required = false) String areaNameDetail,
+            @RequestParam(name = "page", defaultValue = "1") Integer page
+    ) {
+        //필터 DTO 생성
+        EstimateRequestDTO.FilterDTO request = EstimateRequestDTO.FilterDTO.builder()
+                .estimateCategory(estimateCategory)
+                .budget(budget)
+                .areaName(areaName)
+                .areaNameDetail(areaNameDetail)
+                .build();
 
+        EstimateResponseDTO.FilteredListDTO response = estimateQueryService.searchEstimateListByFilter2(expertId, cropCategory, cropName, request, page);
+
+        return ApiResponse.onSuccess(response);
+
+    }
 
 
 }
