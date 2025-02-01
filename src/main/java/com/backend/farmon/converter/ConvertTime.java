@@ -68,7 +68,7 @@ public class ConvertTime {
         if (dateTime == null) {
             return null;
         }
-        return dateTime.format(DateTimeFormatter.ofPattern("a h:mm", Locale.KOREAN));
+        return dateTime.format(DateTimeFormatter.ofPattern("a hh:mm", Locale.KOREAN));
     }
 
     // LocalDateTime을 "2025.01.10" 형식의 문자열로 변환
