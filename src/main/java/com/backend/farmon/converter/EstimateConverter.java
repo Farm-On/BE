@@ -9,6 +9,7 @@ import com.backend.farmon.dto.estimate.EstimateResponseDTO;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Component;
 
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -55,6 +56,9 @@ public class EstimateConverter {
 
     // Estimate -> DetialResponseDTO
     public EstimateResponseDTO.DetailDTO toDetailDTO(Estimate estimate) {
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy.MM.dd");
+
         return EstimateResponseDTO.DetailDTO.builder()
                 .estimateId(estimate.getId())
                 .userId(estimate.getUser().getId())
@@ -67,7 +71,7 @@ public class EstimateConverter {
                 .budget(estimate.getBudget())
                 .title(estimate.getTitle())
                 .body(estimate.getBody())
-                .createdDate(estimate.getCreatedAt().toLocalDate())
+                .createdDate(estimate.getCreatedAt().toLocalDate().format(formatter))
                 .build();
     }
 
@@ -128,6 +132,9 @@ public class EstimateConverter {
 
     //Estimate 엔티티 -> PreviewDTO
     private EstimateResponseDTO.PreviewDTO toPreviewDTO(Estimate estimate) {
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy.MM.dd");
+
         return EstimateResponseDTO.PreviewDTO.builder()
                 .estimateId(estimate.getId())
                 .title(estimate.getTitle())
@@ -138,7 +145,7 @@ public class EstimateConverter {
                 .areaNameDetail(estimate.getArea().getAreaNameDetail())
                 .budget(estimate.getBudget())
                 .status(estimate.getStatus())
-                .createdAt(estimate.getCreatedAt().toLocalDate())
+                .createdAt(estimate.getCreatedAt().toLocalDate().format(formatter))
                 .build();
     }
 

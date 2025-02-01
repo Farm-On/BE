@@ -40,7 +40,7 @@ public class EstimateResponseDTO {
         String budget;
         String title;
         String body;
-        LocalDate createdDate;
+        String createdDate;
 
         // 이미지 URL 목록 추가
         List<String> imageUrls;
@@ -126,7 +126,7 @@ public class EstimateResponseDTO {
         String areaNameDetail;
         String budget;
         Integer status;
-        LocalDate createdAt;
+        String createdAt;
     }
 
 
