@@ -61,7 +61,7 @@ public class ChatRoomQueryServiceImpl implements ChatRoomQueryService {
         log.info("안 읽음 필터링에 따른 유저의 모든 채팅방 목록 페이지네이션 조회 완료 - userId: {}", userId);
 
         // 최신 메시지 타입 (썸네일에서는 텍스트만)
-        List<ChatMessageType> targetTypes = List.of(ChatMessageType.TEXT);
+        List<String> targetTypes = List.of(ChatMessageType.TEXT.toString());
 
         // 안 읽은 메시지 개수 조회 타입 (텍스트, 이미지)
         List<ChatMessageType> unReadTargetTypes = List.of(ChatMessageType.TEXT, ChatMessageType.IMAGE);
