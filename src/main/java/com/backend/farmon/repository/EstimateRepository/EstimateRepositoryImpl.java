@@ -34,6 +34,8 @@ public class EstimateRepositoryImpl implements EstimateRepositoryCustom {
         //BooleanBuilder 동적 필터링 조건 추가
         BooleanBuilder booleanBuilder = new BooleanBuilder();
 
+        booleanBuilder.and(estimate.status.eq(0));
+
         if(estimateCategory != null && !estimateCategory.isEmpty()) {
             booleanBuilder.and(estimate.category.eq(estimateCategory));
         }
@@ -140,6 +142,8 @@ public class EstimateRepositoryImpl implements EstimateRepositoryCustom {
         else if(cropName != null && !cropName.isEmpty()) {
             booleanBuilder.and(estimate.crop.name.eq(cropName));
         };
+
+        booleanBuilder.and(estimate.status.eq(0));
 
         if(estimateCategory != null && !estimateCategory.isEmpty()) {
             booleanBuilder.and(estimate.category.eq(estimateCategory));
