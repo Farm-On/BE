@@ -57,6 +57,10 @@ public class EstimateCommandServiceImpl implements EstimateCommandService {
 
         // 2) 여러 이미지 추가(추후에 작성)
         if(imageFiles != null && !imageFiles.isEmpty()) {
+            //imageFile 이 5개 초과면 오류발생
+            if (imageFiles.size() > 5) {
+                throw new IllegalArgumentException("사진은 최대 5개 까지만 업로드할 수 있습니다.");
+            }
             for(MultipartFile imageFile : imageFiles) {
                 if (imageFile != null && !imageFile.isEmpty()) {
                     String imageKey = "estimate/" + UUID.randomUUID() + "_" + imageFile.getOriginalFilename();
