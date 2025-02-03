@@ -52,7 +52,7 @@ public class ExceptionAdvice extends ResponseEntityExceptionHandler {
         return handleExceptionInternalArgs(e,HttpHeaders.EMPTY,ErrorStatus.valueOf("_BAD_REQUEST"),request,errors);
     }
 
-    // ✅ 401 UNAUTHORIZED - 인증 오류 추가
+    // 401 UNAUTHORIZED - 인증 오류 추가
     @ExceptionHandler(AuthenticationException.class)
     public ResponseEntity<Object> handleAuthenticationException(AuthenticationException e, WebRequest request) {
         log.warn("401 Unauthorized Error: {}", e.getMessage());
