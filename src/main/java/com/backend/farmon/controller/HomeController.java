@@ -199,7 +199,7 @@ public class HomeController {
     })
     @GetMapping("/search/recommend")
     public ApiResponse<HomeResponse.RecommendSearchListDTO> getRecommendSearchNameList (@RequestParam(name = "userId") @EqualsUserId Long userId){
-        HomeResponse.RecommendSearchListDTO response = HomeResponse.RecommendSearchListDTO.builder().build();;
+        HomeResponse.RecommendSearchListDTO response = HomeResponse.RecommendSearchListDTO.builder().build();
         return ApiResponse.onSuccess(response);
     }
 
