@@ -201,14 +201,16 @@ public class ExpertConverter {
 
     public static ExpertProfileResponse.PortfolioDetailDTO portfolioViewDTO(Portfolio portfolio) {
         return ExpertProfileResponse.PortfolioDetailDTO.builder()
+                .portfolioId(portfolio.getId())
                 .thumbnailImg(portfolio.getThumbnailImg())
-                .name(portfolio.getTitle())
+                .title(portfolio.getTitle())
                 .build();
     }
 
 
     public static ExpertProfileResponse.ExpertCareerDTO expertCareerViewDTO(ExpertCareer expertCareer) {
         return ExpertProfileResponse.ExpertCareerDTO.builder()
+                .careerId(expertCareer.getId())
                 .title(expertCareer.getTitle())
                 .startYear(expertCareer.getStartYear())
                 .startMonth(expertCareer.getStartMonth())

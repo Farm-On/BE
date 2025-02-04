@@ -1,11 +1,21 @@
 package com.backend.farmon.controller;
 
 import com.backend.farmon.apiPayload.ApiResponse;
+import com.backend.farmon.apiPayload.code.status.ErrorStatus;
+import com.backend.farmon.apiPayload.exception.handler.ExpertHandler;
+import com.backend.farmon.apiPayload.exception.handler.UserHandler;
 import com.backend.farmon.config.security.JWTUtil;
+import com.backend.farmon.config.security.UserAuthorizationUtil;
+import com.backend.farmon.converter.ExpertConverter;
+import com.backend.farmon.converter.SignupConverter;
+import com.backend.farmon.converter.UserConverter;
+import com.backend.farmon.domain.User;
 import com.backend.farmon.domain.enums.Role;
 import com.backend.farmon.dto.user.ExchangeResponse;
 import com.backend.farmon.dto.user.MypageRequest;
 import com.backend.farmon.dto.user.MypageResponse;
+import com.backend.farmon.dto.user.SignupRequest;
+import com.backend.farmon.repository.UserRepository.UserRepository;
 import com.backend.farmon.service.UserService.UserQueryService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -17,6 +27,8 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 @Slf4j
@@ -27,29 +39,52 @@ public class UserController {
 
     private final UserQueryService userQueryService;
     private final JWTUtil jwtUtil;
+    private final UserAuthorizationUtil userAuthorizationUtil;
+    private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
-    @GetMapping("/api/user/{id}")
+    @GetMapping("/api/user/{user-id}/mypage")
     @Operation(summary = "마이페이지 조회 API")
     @ApiResponses({
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200",description = "OK, 성공")
     })
-    public ApiResponse<MypageResponse.UserInfoDTO> getUserInfo(@PathVariable Long id){
-
-        return null;
+    @Parameters({
+            @Parameter(name = "user-id", description = "회원정보를 조회 하려는 유저의 id", required = true),
+    })
+    public ApiResponse<MypageResponse.UserInfoDTO> getUserInfo(@PathVariable(name="user-id") Long userId){
+        if(!userAuthorizationUtil.isCurrentUserIdMatching(userId))
+            throw new UserHandler(ErrorStatus.AUTHORIZATION_NOT_EQUALS);
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserHandler(ErrorStatus.USER_NOT_FOUND));
+        return ApiResponse.onSuccess(UserConverter.toUserInfoGetResultDTO(user));
     }
 
-    @PatchMapping("/api/user/{id}")
+    @PatchMapping("/api/user/{user-id}/mypage")
     @Operation(summary = "마이페이지 수정 API")
     @ApiResponses({
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200", description = "OK, 성공"),
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON400", description = "BAD REQUEST, 잘못된 요청"),
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON404", description = "NOT FOUND, 리소스를 찾을 수 없음")
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200", description = "OK, 성공")
     })
-    public ApiResponse<MypageResponse> updateUserInfo(
-            @PathVariable Long id,
+    @Parameters({
+            @Parameter(name = "user-id", description = "회원정보를 변경 하려는 유저의 id", required = true),
+    })
+    public ApiResponse<MypageResponse.UserInfoDTO> updateUserInfo(
+            @PathVariable(name="user-id") Long userId,
             @RequestBody MypageRequest.UpdateUserInfoDTO updateUserInfoDTO
     ) {
-        return null;
+        if(!userAuthorizationUtil.isCurrentUserIdMatching(userId))
+            throw new UserHandler(ErrorStatus.AUTHORIZATION_NOT_EQUALS);
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserHandler(ErrorStatus.USER_NOT_FOUND));
+
+        // null이 아닌 값만 업데이트
+        if (updateUserInfoDTO.getName() != null) user.setUserName(updateUserInfoDTO.getName());
+        if (updateUserInfoDTO.getBirth() != null) user.setBirthDate(updateUserInfoDTO.getBirth());
+        if (updateUserInfoDTO.getEmail() != null) user.setEmail(updateUserInfoDTO.getEmail());
+        if (updateUserInfoDTO.getPassword() != null)
+            user.encodePassword(passwordEncoder.encode(updateUserInfoDTO.getPassword()));
+
+        userRepository.save(user);
+        return ApiResponse.onSuccess(UserConverter.toUserInfoGetResultDTO(user));
     }
 
     @GetMapping("/api/user/exchange")

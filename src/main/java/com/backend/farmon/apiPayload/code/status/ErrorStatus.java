@@ -40,6 +40,11 @@ public enum ErrorStatus implements BaseErrorCode {
     // 회원가입 에러
     EMAIL_ALREADY_EXIST(HttpStatus.BAD_REQUEST, "PAGE4001", "이미 가입된 이메일주소입니다."),
 
+    // 문자인증 관련 에러
+    PHONENUM_ALREADY_EXIST(HttpStatus.BAD_REQUEST, "SMS4001", "해당 전화번호로 가입한 계정이 이미 존재합니다."),
+    PHONENUM_NOT_EXIST(HttpStatus.BAD_REQUEST, "SMS4002", "해당 전화번호로 발급된 인증번호가 존재하지 않습니다."),
+    AUTHCODE_INVALID(HttpStatus.BAD_REQUEST, "SMS4003", "인증문자가 만료되었습니다."),
+
     // 커뮤니티 게시판   
     POST_TYPE_NOT_FOUND(HttpStatus.BAD_REQUEST, "POST_TYPE4001", "지원되지 않는 게시판 타입 입니다."),
     POST_NOT_SAVED(HttpStatus.BAD_REQUEST, "POST_TYPE4002", "게시글이 저장되지 않았습니다."),
