@@ -536,7 +536,7 @@ public class EstimateRestController {
     @Parameters({
             @Parameter(name = "page", description = "페이지 번호", required = true)
     })
-    @GetMapping("/expertCards")
+    @GetMapping("/expert-cards")
     public ApiResponse<EstimateResponseDTO.ExpertCardListDTO> getExpertProfileCards(
             @RequestParam(name = "page", defaultValue = "1") Integer page
     ){
