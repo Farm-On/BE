@@ -129,8 +129,73 @@ public class EstimateResponseDTO {
         String createdAt;
     }
 
+    // 7) 견적서에 매핑된 채팅과 전문가 정보 dto
+    @Schema(description = "견적서 상세 보기 밑 제안받은 견적용 DTO")
+    @Getter
+    @Setter
+    @AllArgsConstructor
+    @NoArgsConstructor
+    @Builder
+    public static class OfferDTO {
+        Long estimateId;
+        Long chatRoomId;
+        Long expertId;
+        String name;
+        String nickname;
+        Boolean isNicknameOnly;
+        Float rating;
+        String profileImageUrl;
+        String description;
+        Long consultingCount;
+    }
 
+    // 8) 견적서에 매핑된 채팅과 전문가 정보 dto
+    @Schema(description = "제안받은 견젹 리스트 DTO")
+    @Getter
+    @Setter
+    @AllArgsConstructor
+    @NoArgsConstructor
+    @Builder
+    public static class OfferListDTO {
+        Integer listSize;
 
+        List<OfferDTO> offerList;
+    }
 
+    // 9) 전문가 직접찾기용 전문가 카드 리스트 dto
+    @Schema(description = "전문가 직접찾기용 전문가 카드 리스트 DTO")
+    @Getter
+    @Setter
+    @AllArgsConstructor
+    @NoArgsConstructor
+    @Builder
+    public static class ExpertCardListDTO {
+        Integer listSize;
+        Integer totalPage;
+        Long totalElements;
+        Integer currentPage;
+        Boolean isFirst;
+        Boolean isLast;
+        List<ExpertCardDTO> expertCardDTOList;
+    }
+
+    // 10) 전문가 직접찾기용 전문가 카드 데이터 dto
+    @Schema(description = "전문가 직접찾기용 전문가 카드 DTO")
+    @Getter
+    @Setter
+    @AllArgsConstructor
+    @NoArgsConstructor
+    @Builder
+    public static class ExpertCardDTO {
+        Long expertId;
+        String name;
+        String nickname;
+        Boolean isNicknameOnly;
+        String cropCategory;
+        String cropName;
+        Float rating;
+        Integer careerYears;
+        String profileImageUrl;
+    }
 
 }
