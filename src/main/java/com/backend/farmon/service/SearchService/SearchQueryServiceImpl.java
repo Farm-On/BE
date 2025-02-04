@@ -18,7 +18,6 @@ import java.util.stream.Collectors;
 
 @Slf4j
 @RequiredArgsConstructor
-@Transactional(readOnly = true)
 @Service
 public class SearchQueryServiceImpl implements SearchQueryService{
     private final CropRepository cropRepository;
@@ -64,27 +63,6 @@ public class SearchQueryServiceImpl implements SearchQueryService{
 
         return Collections.emptyList();
     }
-
-    // 자동 완성 검색어 조회
-    // 검색어 자동 완성 기능 관련 로직
-//    public List<String> autoSearchNameList(String keyword) {
-//        Long index = findFromSortedSet(keyword);  // 사용자가 입력한 검색어를 바탕으로 Redis에서 조회한 결과 매칭되는 index
-//
-//        if (index == null) {
-//            // 만약 사용자 검색어 바탕으로 자동 완성 검색어를 만들 수 없으면 추천 검색어 리스트 반환
-//            return recommendSearchNameRankList();
-//        }
-//
-//        Set<String> allValuesAfterIndexFromSortedSet = findAllValuesAfterIndexFromSortedSet(index);   //사용자 검색어 이후로 정렬된 Redis 데이터들 가져오기
-//
-//        List<String> autoCorrectKeywordList = allValuesAfterIndexFromSortedSet.stream()
-//                .filter(value -> value.endsWith(suffix) && value.startsWith(keyword))
-//                .map(value -> StringUtils.removeEnd(value, suffix))
-//                .limit(maxSize)
-//                .toList();  //자동 완성을 통해 만들어진 최대 maxSize개의 키워드들
-//
-//        return autoCorrectKeywordList;
-//    }
 
     public List<String> autoSearchNameList(String keyword) {
         Long index = findFromSortedSet(keyword);  // 사용자가 입력한 검색어를 바탕으로 Redis에서 조회한 결과 매칭되는 index

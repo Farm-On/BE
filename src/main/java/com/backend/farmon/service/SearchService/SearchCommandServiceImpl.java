@@ -20,7 +20,6 @@ import java.util.concurrent.Executors;
 
 @Slf4j
 @RequiredArgsConstructor
-@Transactional(readOnly = true)
 @Service
 public class SearchCommandServiceImpl implements SearchCommandService {
 
@@ -48,7 +47,6 @@ public class SearchCommandServiceImpl implements SearchCommandService {
 
 
     // 사용자 최근 검색어 저장
-    @Transactional
     @Override
     public void saveRecentSearchLog(Long userId, String searchName) {
         User user = userRepository.findById(userId)
@@ -87,7 +85,7 @@ public class SearchCommandServiceImpl implements SearchCommandService {
     }
 
     // 검색어와 일치하는 사용자의 최근 검색어 삭제
-    @Transactional
+
     @Override
     public void deleteRecentSearchLog(Long userId, String searchName) {
         User user = userRepository.findById(userId)
@@ -100,7 +98,6 @@ public class SearchCommandServiceImpl implements SearchCommandService {
     }
 
     // 사용자 최근 검색어 전체 삭제
-    @Transactional
     @Override
     public void deleteAllRecentSearchLog(Long userId) {
         User user = userRepository.findById(userId)
@@ -116,7 +113,6 @@ public class SearchCommandServiceImpl implements SearchCommandService {
     }
 
     // 추천 검색어 저장
-    @Transactional
     @Override
     public void saveRecommendSearchLog(Long userId, String cropName) {
         User user = userRepository.findById(userId)
@@ -135,7 +131,6 @@ public class SearchCommandServiceImpl implements SearchCommandService {
     }
 
     // 특정 추천 검색어 삭제
-    @Transactional
     @Override
     public void deleteRecommendSearchLog(Long userId, String cropName) {
         User user = userRepository.findById(userId)

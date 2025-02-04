@@ -1,5 +1,9 @@
 package com.backend.farmon.controller;
 
+import com.backend.farmon.dto.home.HomeResponse;
+import com.backend.farmon.service.SearchService.SearchCommandService;
+import com.backend.farmon.service.SearchService.SearchQueryService;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -8,11 +12,13 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @Slf4j
+@RequiredArgsConstructor
 @RestController
 public class TestController {
 
-    @Autowired
-    private RedisTemplate<String, String> stringRedisTemplate;
+    private final RedisTemplate<String, String> stringRedisTemplate;
+    private final SearchCommandService searchCommandService;
+    private final SearchQueryService searchQueryService;
 
     @GetMapping("/test")
     public String test(){
@@ -53,4 +59,11 @@ public class TestController {
         }
     }
 
+    @GetMapping("/test-redis/set/recommend")
+    public  HomeResponse.RecommendSearchListDTO testRecommendRedis(@RequestParam Long userId, @RequestParam String value) {
+        // Redis에 데이터 저장
+        searchCommandService.saveRecommendSearchLog(userId, value);
+
+        return searchQueryService.getRecommendSearchNameRank();
+    }
 }
