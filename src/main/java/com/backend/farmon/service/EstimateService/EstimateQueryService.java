@@ -2,6 +2,7 @@ package com.backend.farmon.service.EstimateService;
 
 import com.backend.farmon.dto.estimate.EstimateRequestDTO;
 import com.backend.farmon.dto.estimate.EstimateResponseDTO;
+import org.springframework.data.domain.Pageable;
 
 public interface EstimateQueryService {
     //1) 견적서 상세정보
@@ -36,4 +37,8 @@ public interface EstimateQueryService {
 
     // 10) 전문가-견적찾기-필터링 견적서카테고리, 예산범위, 지역 으로 필터링2
     EstimateResponseDTO.FilteredListDTO searchEstimateListByFilter2(Long expertId, String cropCategory, String cropName, EstimateRequestDTO.FilterDTO requestDTO, int page);
+
+    EstimateResponseDTO.OfferListDTO getEstimateOffers(Long estimateId);
+
+    EstimateResponseDTO.ExpertCardListDTO getExpertProfileCards(int page);
 }
