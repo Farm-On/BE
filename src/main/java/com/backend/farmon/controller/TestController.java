@@ -20,16 +20,15 @@ public class TestController {
     }
 
     @GetMapping("/test-redis/set")
-    public String testRedis(@RequestParam String key) {
+    public String testRedis(@RequestParam String key, @RequestParam String value) {
         try {
             // Redis에 데이터 저장
-            stringRedisTemplate.opsForValue().set(key, "Hello, Redis!");
+            stringRedisTemplate.opsForValue().set(key, value);
 
             // Redis에서 데이터 가져오기
-            String value = stringRedisTemplate.opsForValue().get(key);
+            String redisValue = stringRedisTemplate.opsForValue().get(key);
 
-            // 결과 반환
-            return value != null ? "Redis 연결 성공! Value: " + value : "Redis 연결 실패!";
+            return redisValue != null ? "Redis 연결 성공! Value: " + redisValue : "Redis 연결 실패!";
         } catch (Exception e) {
             log.error(e.getMessage());
             return "Redis 오류: " + e.getMessage();
