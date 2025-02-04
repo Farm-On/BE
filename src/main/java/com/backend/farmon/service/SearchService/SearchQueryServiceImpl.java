@@ -48,7 +48,9 @@ public class SearchQueryServiceImpl implements SearchQueryService{
     }
 
     // 추천 검색어 리스트 조회
-     List<String> recommendSearchNameRankList(){
+     private List<String> recommendSearchNameRankList(){
+        log.info("추천 검색어 리스트 조회");
+
         ZSetOperations<String, String> zSetOperations = recommendSearchLogRedisTemplate.opsForZSet();
 
         // score 순으로 10개 보여줌 (value, score) 형태
@@ -68,8 +70,9 @@ public class SearchQueryServiceImpl implements SearchQueryService{
     @Override
     public List<String> autoSearchNameList(String keyword) {
         Long index = findFromSortedSet(keyword);  // 사용자가 입력한 검색어를 바탕으로 Redis에서 조회한 결과 매칭되는 index
+        log.info("index: {}", index);
 
-        if (index == null) {
+        if (index == null || index == 0) {
             // 만약 사용자 검색어 바탕으로 자동 완성 검색어를 만들 수 없으면 추천 검색어 리스트 반환
             return recommendSearchNameRankList();
         }
