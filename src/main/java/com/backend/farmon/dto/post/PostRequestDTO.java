@@ -33,8 +33,7 @@ public class PostRequestDTO {
         @Schema(description = "해시태그")
         private String hashTag;
 
-//        @Schema(description = "조회수", defaultValue = "0")
-//        private int views=0;
+
 
         @Schema(description = "좋아요수" ,defaultValue = "1")
         private int liked=0;
@@ -48,8 +47,7 @@ public class PostRequestDTO {
         @Schema(description = "작성 시간", example = "2025-01-01T12:00:00")
         private String createdAt;
 
-        @Schema(description = "수정 시간", example = "2025-01-01T12:30:00")
-        private String updatedAt;
+
 
     }
     @Getter

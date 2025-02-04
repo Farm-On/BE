@@ -69,7 +69,7 @@ public class ChatRoomQueryServiceImpl implements ChatRoomQueryService {
         // 채팅 대화방 세부 정보 목록 생성
         List<ChatResponse.ChatRoomDetailDTO> chatRoomInfoList = chatRoomPage.stream().map(chatRoom -> {
             // 전문가 여부
-            boolean isExpert = chatRoom.getExpert().getId().equals(userId);
+            boolean isExpert = chatRoom.getExpert().getUser().getId().equals(userId);
             log.info("채팅방에서 전문가 여부: {}", isExpert);
 
             // 안 읽은 채팅 메시지 개수 조회
@@ -105,7 +105,7 @@ public class ChatRoomQueryServiceImpl implements ChatRoomQueryService {
                 .orElseThrow(() -> new ChatRoomHandler(ErrorStatus.CHATROOM_NOT_FOUND));
 
         // 채팅방 입장 시 접속 시간 수정
-        boolean isExpert = chatRoom.getExpert().getId().equals(userId);
+        boolean isExpert = chatRoom.getExpert().getUser().getId().equals(userId);
 //        chatRoomCommandService.changeChatRoomEnterTime(userId, chatRoomId, isExpert);
 //        log.info("채팅방 입장 접속 시간 변경 - userId: {}, chatRoomId: {}, 전문가 여부: {}", userId, chatRoomId, isExpert);
 
