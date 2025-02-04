@@ -200,9 +200,10 @@ public class HomeController {
         try {
             log.info("추천 검색어 스케줄링 실행");
             HomeResponse.RecommendSearchListDTO response = searchQueryService.getRecommendSearchNameRank();
+
             recommendSearchListFuture = CompletableFuture.completedFuture(ResponseEntity.ok().body(response));
         } catch (Exception e) {
-            System.err.println("Error during scheduled task: " + e.getMessage());
+            log.warn("추천 검색어 스케줄링 실패: " + e.getMessage());
             recommendSearchListFuture = null;
         }
     }
