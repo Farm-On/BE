@@ -17,8 +17,15 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 
 @Tag(name = "홈 화면", description = "홈 화면에 관한 API")
 @Slf4j
@@ -30,6 +37,7 @@ public class HomeController {
     private final PostQueryService postQueryService;
     private final SearchCommandService searchCommandService;
     private final SearchQueryService searchQueryService;
+    private CompletableFuture< ResponseEntity<HomeResponse.RecommendSearchListDTO> > recommendSearchListFuture;
 
     // 홈 화면 - 커뮤니티 게시글 조회
     @Operation(
@@ -184,6 +192,22 @@ public class HomeController {
         return ApiResponse.onSuccess(HomeConverter.toSearchDeleteDTO());
     }
 
+    // 추천 검색어 스케줄링
+    // 매일 1일 오전 1시에 스케줄링된 작업, 추천 검색어 리스트 불러오기 실행
+    @Scheduled(cron = "0 0 1 1 * *", zone = "Asia/Seoul")
+    @Async("customAsyncExecutor")
+    public void recommendSearchListSchedule() {
+        try {
+            log.info("추천 검색어 스케줄링 실행");
+            HomeResponse.RecommendSearchListDTO response = searchQueryService.getRecommendSearchNameRank();
+
+            recommendSearchListFuture = CompletableFuture.completedFuture(ResponseEntity.ok().body(response));
+        } catch (Exception e) {
+            log.warn("추천 검색어 스케줄링 실패: " + e.getMessage());
+            recommendSearchListFuture = null;
+        }
+    }
+
     // 추천 검색어 조회
     @Operation(
             summary = "홈 화면 추천 검색어 조회 API",
@@ -198,8 +222,24 @@ public class HomeController {
             @Parameter(name = "userId", description = "로그인한 유저의 아이디(pk)", example = "1")
     })
     @GetMapping("/search/recommend")
-    public ApiResponse<HomeResponse.RecommendSearchListDTO> getRecommendSearchNameList (@RequestParam(name = "userId") @EqualsUserId Long userId){
-        HomeResponse.RecommendSearchListDTO response = HomeResponse.RecommendSearchListDTO.builder().build();;
+    public ApiResponse<HomeResponse.RecommendSearchListDTO> getRecommendSearchNameList(@RequestParam(name = "userId") @EqualsUserId Long userId) {
+        try {
+            // 완료된 스케줄링된 작업이 있는 경우
+            if (recommendSearchListFuture != null && recommendSearchListFuture.isDone()) {
+                HomeResponse.RecommendSearchListDTO response = recommendSearchListFuture.get().getBody();
+                log.info("스케줄링된 추천 검색어 리스트 반환");
+
+                return ApiResponse.onSuccess(response);
+            }
+        } catch (InterruptedException | ExecutionException e) {
+            // 예외 발생 시 에러 응답 반환
+            return ApiResponse.onFailure("INTERNAL_SERVER_ERROR", e.getMessage(), null);
+        }
+
+        // 스케줄링된 작업이 없거나 실패했을 경우 새로운 추천 검색어 조회 실행
+        HomeResponse.RecommendSearchListDTO response = searchQueryService.getRecommendSearchNameRank();
+        log.info("스케줄링된 작업이 없어 추천 검색어 리스트 조회 후 반환");
+
         return ApiResponse.onSuccess(response);
     }
 

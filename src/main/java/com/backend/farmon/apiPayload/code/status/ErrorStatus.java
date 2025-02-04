@@ -14,7 +14,7 @@ public enum ErrorStatus implements BaseErrorCode {
     _INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "COMMON500", "서버 에러, 관리자에게 문의 바랍니다."),
     _BAD_REQUEST(HttpStatus.BAD_REQUEST,"COMMON400","잘못된 요청입니다."),
     _UNAUTHORIZED(HttpStatus.UNAUTHORIZED,"COMMON401","해당 경로는 인증이 필요합니다."),
-    _FORBIDDEN(HttpStatus.FORBIDDEN, "COMMON403", "금지된 요청입니다."),
+    _FORBIDDEN(HttpStatus.FORBIDDEN, "COMMON403", "금지된 요청입니다. (현재 사용자의 역할로는 해당 경로는 접근이 불가합니다.)"),
 
     // 유저 관려 에러
     USER_NOT_FOUND(HttpStatus.BAD_REQUEST, "USER4001", "아이디와 일치하는 사용자가 없습니다."),
@@ -32,12 +32,18 @@ public enum ErrorStatus implements BaseErrorCode {
 
     // 채팅방 관련 에러
     CHATROOM_NOT_FOUND(HttpStatus.BAD_REQUEST, "CHATROOM4001", "채팅방 아이디와 일치하는 채팅방이 없습니다."),
+    CHATROOM_CREATE_ONLY_EXPERT(HttpStatus.FORBIDDEN, "CHATROOM4031", "채팅방 생성은 전문가만 가능합니다."),
 
     // 페이지 번호
     PAGE_NOT_FOUND(HttpStatus.BAD_REQUEST, "PAGE4001", "페이지 번호는 1 이상이어야 합니다."),
 
     // 회원가입 에러
     EMAIL_ALREADY_EXIST(HttpStatus.BAD_REQUEST, "PAGE4001", "이미 가입된 이메일주소입니다."),
+
+    // 문자인증 관련 에러
+    PHONENUM_ALREADY_EXIST(HttpStatus.BAD_REQUEST, "SMS4001", "해당 전화번호로 가입한 계정이 이미 존재합니다."),
+    PHONENUM_NOT_EXIST(HttpStatus.BAD_REQUEST, "SMS4002", "해당 전화번호로 발급된 인증번호가 존재하지 않습니다."),
+    AUTHCODE_INVALID(HttpStatus.BAD_REQUEST, "SMS4003", "인증문자가 만료되었습니다."),
 
     // 커뮤니티 게시판   
     POST_TYPE_NOT_FOUND(HttpStatus.BAD_REQUEST, "POST_TYPE4001", "지원되지 않는 게시판 타입 입니다."),

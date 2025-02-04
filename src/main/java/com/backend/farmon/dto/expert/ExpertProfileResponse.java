@@ -75,11 +75,14 @@ public class ExpertProfileResponse {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class PortfolioDetailDTO {
+        @Schema(description = "포트폴리오 ID")
+        Long portfolioId;
+
         @Schema(description = "포트폴리오 썸네일 이미지")
         String thumbnailImg;
 
         @Schema(description = "포트폴리오 제목")
-        String name;
+        String title;
     }
 
     @Builder
@@ -87,6 +90,9 @@ public class ExpertProfileResponse {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class ExpertCareerDTO {
+        @Schema(description = "경력 ID")
+        Long careerId;
+
         @Schema(description = "전문가 경력 제목")
         String title;
 

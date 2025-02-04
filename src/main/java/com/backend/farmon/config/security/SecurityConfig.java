@@ -18,6 +18,8 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @Configuration
 public class SecurityConfig { // 애플리케이션의 보안 정책을 정의
     private CustomUserDetailsService userDetailsService;
+    private final CustomAuthenticationEntryPoint authenticationEntryPoint; // Unauthorized 핸들러
+    private final CustomAccessDeniedHandler customAccessDeniedHandler; // Forbidden 핸들러
 
     // SecurityFilterChain 정의
     // 추후에 농업인 관련 페이지는 농업인만, 전문가 관련 페이지는 전문가만 가입할 수 있도록 수정 필요
@@ -39,10 +41,18 @@ public class SecurityConfig { // 애플리케이션의 보안 정책을 정의
 //                        .requestMatchers("/").authenticated()
 
                         // 공용 접근 허용 (누구나 접근 가능)
-                        .requestMatchers("/**","/api/login","/api/user/join","/api/expert/join", "/api/home/community", "/api/home/popular").permitAll()
+                        .requestMatchers("/api/login","/api/generate","/api/verify","/api/user/join", "/api/home/community", "/api/home/popular",
+                                "/api/expert/list", "/api/expert/{expert-id}",
+                                "/api/posts/popular/list/**", "/api/posts/all/list/**", "/api/posts/free/list/**","/api/posts/qna/list/**",
+                                "/api/posts/expertCol/list/**", "/api/posts/{postId}/comments",
+                                "/ws-stomp/**", "test/**").permitAll()
                         .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/swagger-ui.html").permitAll() // Swagger 경로 허용
                         .anyRequest().authenticated()
                 )
+
+                // Unauthorized, Forbidden 에러 핸들러 추가
+                .exceptionHandling(exception -> exception.authenticationEntryPoint(authenticationEntryPoint))
+                .exceptionHandling(exception -> exception.accessDeniedHandler(customAccessDeniedHandler))
 
                 .addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);  // JWT 필터 추가
 
