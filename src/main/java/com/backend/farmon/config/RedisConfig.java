@@ -27,7 +27,7 @@ public class RedisConfig {
         return new LettuceConnectionFactory(redisStandaloneConfiguration);
     }
 
-    // 사용자 최근 검색어 저장 (RecentSearch+userId, 검색어)
+    // 사용자 최근 검색어 저장 (RecentSearchLog, 검색어)
     @Bean(name = "recentSearchLogRedisTemplate")
     public RedisTemplate<String, String> recentSearchLogRedisTemplate() {
         RedisTemplate<String, String> redisTemplate = new RedisTemplate<>();
@@ -42,9 +42,26 @@ public class RedisConfig {
         return redisTemplate;
     }
 
-    // 추천 검색어 저장 (RecommendSearch+userId, 작물 이름)
+    // 추천 검색어 저장 (RecommendSearchLog, 작물 이름)
     @Bean(name = "recommendSearchLogRedisTemplate")
     public RedisTemplate<String, String> recommendSearchLogRedisTemplate() {
+        RedisTemplate<String, String> redisTemplate = new RedisTemplate<>();
+        redisTemplate.setConnectionFactory(redisConnectionFactory());
+
+        // Key 직렬화 (String)
+        redisTemplate.setKeySerializer(new StringRedisSerializer());
+        redisTemplate.setHashKeySerializer(new StringRedisSerializer());
+
+        // Value 직렬화
+        redisTemplate.setHashValueSerializer(new Jackson2JsonRedisSerializer<>(String.class));
+        redisTemplate.setValueSerializer(new Jackson2JsonRedisSerializer<>(String.class));
+
+        return redisTemplate;
+    }
+
+    // 자동 완성 검색어 저장 (AutoSearchLog, 작물 이름)
+    @Bean(name = "autoSearchLogRedisTemplate")
+    public RedisTemplate<String, String> autoSearchLogRedisTemplate() {
         RedisTemplate<String, String> redisTemplate = new RedisTemplate<>();
         redisTemplate.setConnectionFactory(redisConnectionFactory());
 
