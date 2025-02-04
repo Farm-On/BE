@@ -136,7 +136,7 @@ public class SearchCommandServiceImpl implements SearchCommandService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserHandler(ErrorStatus.USER_NOT_FOUND));
 
-        Long count = recommendSearchLogRedisTemplate.opsForList().remove(RECOMMEND_SEARCH_KEY, 1, cropName);
+        Long count = recommendSearchLogRedisTemplate.opsForZSet().remove(RECOMMEND_SEARCH_KEY, 1, cropName);
         log.info("삭제된 추천 검색어: {}, 검색 횟수: {}", cropName, count);
     }
 
