@@ -193,7 +193,7 @@ public class HomeController {
     }
 
     // 추천 검색어 스케줄링
-    // 매일 1일 오전 1시에 스케줄링된 작업, 추천 검색어 리스트 불러오기 실행
+    // 매월 1일 오전 1시에 스케줄링된 작업, 추천 검색어 리스트 불러오기 실행
     @Scheduled(cron = "0 0 1 1 * *", zone = "Asia/Seoul")
     @Async("customAsyncExecutor")
     public void recommendSearchListSchedule() {

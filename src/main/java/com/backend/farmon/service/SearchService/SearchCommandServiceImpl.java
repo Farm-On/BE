@@ -25,6 +25,7 @@ public class SearchCommandServiceImpl implements SearchCommandService {
     private final RedisTemplate<String, String> recommendSearchLogRedisTemplate;
 
     private static final int SEARCH_SIZE=10;
+    private static final String RECOMMEND_SEARCH_KEY="RecommendSearchLog"; // 추천 검색어 key
 
 
     // 사용자 최근 검색어 저장
@@ -105,12 +106,11 @@ public class SearchCommandServiceImpl implements SearchCommandService {
         if(cropName == null || cropName.isEmpty())
             throw new SearchHandler(ErrorStatus.SEARCH_NOT_EMPTY);
 
-        String key = "RecommendSearchLog";
-        log.info("입력한 검색어 key, value: " + key + ", " + cropName);
+        log.info("입력한 검색어 key, value: " + RECOMMEND_SEARCH_KEY + ", " + cropName);
 
         // 전체 사용자 대상 검색어 추가
-        Double score = recommendSearchLogRedisTemplate.opsForZSet().score(key, cropName);
-        recommendSearchLogRedisTemplate.opsForZSet().add(key, cropName, (score != null) ? score + 1 : 1);
+        Double score = recommendSearchLogRedisTemplate.opsForZSet().score(RECOMMEND_SEARCH_KEY, cropName);
+        recommendSearchLogRedisTemplate.opsForZSet().add(RECOMMEND_SEARCH_KEY, cropName, (score != null) ? score + 1 : 1);
 
         log.info("추천 검색어 저장 완료 - userId: {}, 검색어: {}", userId, cropName);
     }
@@ -122,9 +122,7 @@ public class SearchCommandServiceImpl implements SearchCommandService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserHandler(ErrorStatus.USER_NOT_FOUND));
 
-        String key = "RecommendSearchLog";
-
-        Long count = recommendSearchLogRedisTemplate.opsForList().remove(key, 1, cropName);
+        Long count = recommendSearchLogRedisTemplate.opsForList().remove(RECOMMEND_SEARCH_KEY, 1, cropName);
         log.info("삭제된 추천 검색어: {}, 검색 횟수: {}", cropName, count);
     }
 }

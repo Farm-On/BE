@@ -23,6 +23,8 @@ public class SearchQueryServiceImpl implements SearchQueryService{
     private final RedisTemplate<String, String> recentSearchLogRedisTemplate;
     private final RedisTemplate<String, String> recommendSearchLogRedisTemplate;
 
+    private static final String RECOMMEND_SEARCH_KEY="RecommendSearchLog"; // 추천 검색어 key
+
     // 사용자 최근 검색어 리스트 조회
     @Override
     public HomeResponse.RecentSearchListDTO findRecentSearchLogs(Long userId) {
@@ -41,11 +43,10 @@ public class SearchQueryServiceImpl implements SearchQueryService{
 
     // 추천 검색어 리스트 조회
      List<String> recommendSearchNameRankList(){
-        String key= "RecommendSearchLog";
         ZSetOperations<String, String> zSetOperations = recommendSearchLogRedisTemplate.opsForZSet();
 
         // score 순으로 10개 보여줌 (value, score) 형태
-        Set<ZSetOperations.TypedTuple<String>> typedTuples = zSetOperations.reverseRangeWithScores(key, 0, 9);
+        Set<ZSetOperations.TypedTuple<String>> typedTuples = zSetOperations.reverseRangeWithScores(RECOMMEND_SEARCH_KEY, 0, 9);
 
         // 검색어만 추출하여 리스트로 변환
         if (typedTuples != null) {
