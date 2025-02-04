@@ -16,6 +16,10 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springdoc.core.converters.models.PageableAsQueryParam;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
@@ -61,8 +65,7 @@ public class EstimateRestController {
             @Parameter(description = "업로드할 이미지 파일들", content = @Content(mediaType = MediaType.MULTIPART_FORM_DATA_VALUE,
                     array = @ArraySchema(schema = @Schema(type = "string", format = "binary")))) List<MultipartFile> imageFiles
     ) {
-        // 예시로 작성된 Dto 를 그대로 반환
-        // 여기서 response 에는 DB 저장 후 생성된 estimateId 등을 담았다고 가정
+        // 여기서 response 에는 DB 저장 후 생성된 estimateId 등을 담았다
 
         EstimateResponseDTO.CreateDTO response = estimateCommandService.createEstimate(request, imageFiles);
 
@@ -79,7 +82,8 @@ public class EstimateRestController {
     )
     @ApiResponses({
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200", description = "OK, 성공"),
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON400", description = "잘못된 요청입니다.", content = @Content(schema = @Schema(implementation = ApiResponse.class)))
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON400", description = "잘못된 요청입니다.", content = @Content(schema = @Schema(implementation = ApiResponse.class))),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON401", description = "사용자 토큰이 잘못되었습니다.", content = @Content(schema = @Schema(implementation = ApiResponse.class)))
     })
     @Parameters({
             @Parameter(name = "estimateId", description = "조회하려는 견적서의 id(pk)", example = "100", required = true)
@@ -460,6 +464,7 @@ public class EstimateRestController {
     )
     @ApiResponses(
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200", description = "OK, 성공")
+
     )
     @Parameters({
             @Parameter(name = "expertId", description = "추천탭에서 필터링시 전문가 ID 필요", required = false),
@@ -496,5 +501,47 @@ public class EstimateRestController {
 
     }
 
+    /**
+     * (10) 견적서 id로 견적서로 온 견적 채팅과 채팅 보낸 전문가 정보 불러오기
+     * 반환할 response 값, estimateId, chatRoomId, expertId, name, nickname, rating,  isNicknameOnly, profileImageUrl, description, consultingCount(estimate 테이블에서 expertId가 해당 expertId인 데이터 개수)
+     */
+    @Operation(
+            summary = "견적 요청서로 온 제안받은 견적 불러오기",
+            description = "pathVariable 로 받은 견적서 ID에 매핑된 채팅룸 ID와 채팅을 보낸 전문가 ID 와 정보를 모두(프론트 무한스크롤) 가져온다"
+    )
+    @ApiResponses(
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200", description = "OK, 성공")
+    )
+    @Parameters({
+            @Parameter(name = "estimateId", description = "견적서 ID", required = true)
+    })
+    @GetMapping("/{estimateId}/offers")
+    public ApiResponse<EstimateResponseDTO.OfferListDTO> getEstimateOffers(
+            @PathVariable Long estimateId
+    ){
+        EstimateResponseDTO.OfferListDTO response = estimateQueryService.getEstimateOffers(estimateId);
 
+        return ApiResponse.onSuccess(response);
+    }
+    /**
+     * (11) 전문가 직접찾기 용 전문가 정보 카드 데이터 불러오기
+     */
+    @Operation(
+            summary = "전문가 직접 찾기용 전문가 프로필카드 불러오기 (3개씩 페이징)",
+            description = "농업인->내견적화면 전문가 직접 찾기용 API로 파라미터는 따로 필요없습니다."
+    )
+    @ApiResponses(
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200", description = "OK, 성공")
+    )
+    @Parameters({
+            @Parameter(name = "page", description = "페이지 번호", required = true)
+    })
+    @GetMapping("/experts")
+    public ApiResponse<EstimateResponseDTO.ExpertCardListDTO> getExpertProfileCards(
+            @RequestParam(name = "page", defaultValue = "1") Integer page
+    ){
+        EstimateResponseDTO.ExpertCardListDTO response = estimateQueryService.getExpertProfileCards(page);
+
+        return ApiResponse.onSuccess(response);
+    }
 }
