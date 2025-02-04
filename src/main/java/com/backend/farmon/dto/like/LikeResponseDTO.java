@@ -14,10 +14,10 @@ import lombok.NoArgsConstructor;
 public class LikeResponseDTO {
 
     @Schema(description = "좋아요 유저의 ID", example = "1")
-    private String userId;
+    private Long userId;
 
     @Schema(description = "좋아요 대상 ID", example = "xxx")
-    private String postId;
+    private Long postId;
 
     @Schema(description = "좋아요 개수", example = "1")
     private int likeCount;

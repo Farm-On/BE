@@ -18,10 +18,10 @@ public class CommentRequestDTO {
         private String commentContent;
 
         @Schema(description = "작성자 유저 아이디", example = "samsunggood", required = true)
-        private String userId;
+        private Long userId;
 
         @Schema(description = "게시글 아이디", example = "hjunew", required = true)
-        private String postId;
+        private Long postId;
 
 
     }
