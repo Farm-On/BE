@@ -26,7 +26,7 @@ public class SearchCommandServiceImpl implements SearchCommandService {
 
     private static final int SEARCH_SIZE=10;
     private static final String RECOMMEND_SEARCH_KEY="RecommendSearchLog"; // 추천 검색어 key
-
+    private final String recentSearchKey ="RecentSearchLog"; // 최근 검색어 key
 
     // 사용자 최근 검색어 저장
     @Transactional
@@ -38,7 +38,7 @@ public class SearchCommandServiceImpl implements SearchCommandService {
         if(searchName == null || searchName.isEmpty())
             throw new SearchHandler(ErrorStatus.SEARCH_NOT_EMPTY);
 
-        String key = "RecentSearchLog" + userId;
+        String key = recentSearchKey + userId;
         log.info("입력한 검색어 key, value: " + key + ", " + searchName);
 
         // key가 이미 존재하는지 확인
@@ -74,7 +74,7 @@ public class SearchCommandServiceImpl implements SearchCommandService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserHandler(ErrorStatus.USER_NOT_FOUND));
 
-        String key = "RecentSearchLog" + userId;
+        String key = recentSearchKey + userId;
 
         Long count = recentSearchLogRedisTemplate.opsForList().remove(key, 1, searchName);
         log.info("삭제된 최근 검색어: {}, 검색 횟수: {}", searchName, count);
@@ -87,7 +87,7 @@ public class SearchCommandServiceImpl implements SearchCommandService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserHandler(ErrorStatus.USER_NOT_FOUND));
 
-        Set<String> keys = recentSearchLogRedisTemplate.keys("RecentSearchLog" + userId);
+        Set<String> keys = recentSearchLogRedisTemplate.keys(recentSearchKey + userId);
 
         if (keys != null && !keys.isEmpty()) {
             recentSearchLogRedisTemplate.delete(keys);

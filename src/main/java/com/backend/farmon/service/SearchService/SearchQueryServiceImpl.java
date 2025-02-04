@@ -24,12 +24,13 @@ public class SearchQueryServiceImpl implements SearchQueryService{
     private final RedisTemplate<String, String> recommendSearchLogRedisTemplate;
 
     private static final String RECOMMEND_SEARCH_KEY="RecommendSearchLog"; // 추천 검색어 key
+    private final String recentSearchKey="RecentSearchLog"; // 최근 검색어 key
 
     // 사용자 최근 검색어 리스트 조회
     @Override
     public HomeResponse.RecentSearchListDTO findRecentSearchLogs(Long userId) {
         return HomeResponse.RecentSearchListDTO.builder()
-                .recentSearchList( recentSearchLogRedisTemplate.opsForList().range("RecentSearchLog"+userId, 0, 9))
+                .recentSearchList( recentSearchLogRedisTemplate.opsForList().range(recentSearchKey+userId, 0, 9))
                 .build();
     }
 
