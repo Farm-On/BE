@@ -507,7 +507,7 @@ public class EstimateRestController {
      */
     @Operation(
             summary = "견적 요청서로 온 제안받은 견적 불러오기",
-            description = "pathVariable 로 받은 견적서 ID에 매핑된 채팅룸 ID와 채팅을 보낸 전문가 ID 와 정보를 모두(프론트 무한스크롤) 가져온다"
+            description = "pathVariable 로 받은 견적서 ID에 매핑된 채팅룸 ID와 채팅을 보낸 전문가 ID 와 정보를 모두(프론트 무한스크롤) 가져옵니다."
     )
     @ApiResponses(
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200", description = "OK, 성공")
@@ -528,7 +528,7 @@ public class EstimateRestController {
      */
     @Operation(
             summary = "전문가 직접 찾기용 전문가 프로필카드 불러오기 (3개씩 페이징)",
-            description = "농업인->내견적화면 전문가 직접 찾기용 API로 파라미터는 따로 필요없습니다."
+            description = "농업인->내견적화면 전문가 직접 찾기용 API 로 페이지번호를 쿼리스트링으로 보내주세요."
     )
     @ApiResponses(
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200", description = "OK, 성공")
@@ -536,7 +536,7 @@ public class EstimateRestController {
     @Parameters({
             @Parameter(name = "page", description = "페이지 번호", required = true)
     })
-    @GetMapping("/experts")
+    @GetMapping("/expertCards")
     public ApiResponse<EstimateResponseDTO.ExpertCardListDTO> getExpertProfileCards(
             @RequestParam(name = "page", defaultValue = "1") Integer page
     ){
