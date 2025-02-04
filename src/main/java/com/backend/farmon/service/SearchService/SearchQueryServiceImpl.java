@@ -76,9 +76,9 @@ public class SearchQueryServiceImpl implements SearchQueryService{
 
         Set<String> allValuesAfterIndexFromSortedSet = findAllValuesAfterIndexFromSortedSet(index);   // 사용자 검색어 이후로 정렬된 Redis 데이터들 가져오기
 
-        // 자동 완성 검색어 리스트 생성
+        // 자동 완성 검색어 리스트 생성 (키워드가 단어 어디에 있든 포함되도록 수정)
         List<String> autoCorrectKeywordList = allValuesAfterIndexFromSortedSet.stream()
-                .filter(value -> value.endsWith(suffix) && value.startsWith(keyword))
+                .filter(value -> value.contains(keyword) && value.endsWith(suffix)) // startsWith -> contains 변경
                 .map(value -> StringUtils.removeEnd(value, suffix))
                 .limit(maxSize)
                 .collect(Collectors.toList());
