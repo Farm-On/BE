@@ -1,5 +1,6 @@
 package com.backend.farmon.controller;
 
+import com.backend.farmon.config.security.JWTUtil;
 import com.backend.farmon.dto.estimate.EstimateRequestDTO;
 import com.backend.farmon.dto.estimate.EstimateResponseDTO;
 import com.backend.farmon.service.EstimateService.EstimateCommandService;
@@ -12,14 +13,24 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springdoc.core.converters.models.PageableAsQueryParam;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import com.backend.farmon.apiPayload.ApiResponse;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.awt.*;
+import java.nio.file.attribute.UserPrincipal;
 import java.util.List;
 
 @Tag(name = "농사 견적서", description = "농사 견적서 관련 API")
@@ -31,6 +42,7 @@ public class EstimateRestController {
 
     private final EstimateCommandService estimateCommandService;
     private final EstimateQueryService estimateQueryService;
+    private final JWTUtil jwtUtil;
     /**
      * (1) 견적서 생성 (농업인 전용)
      */
@@ -40,8 +52,8 @@ public class EstimateRestController {
                     "작성자 ID와 견적서 내용(카테고리, 견적, 상세 내용, 예산(예: '500만원 ~ 1,000만원') 등)을 Request 에 담아 보내주세요."
     )
     @ApiResponses({
-            @io.swagger.v3.oas.annotations.responses.
-                    ApiResponse(responseCode = "COMMON200", description = "OK, 성공")
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200", description = "OK, 성공"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON400", description = "잘못된 요청입니다.", content = @Content(schema = @Schema(implementation = ApiResponse.class)))
     })
     @PostMapping(consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
     public ApiResponse<EstimateResponseDTO.CreateDTO> createEstimate(
@@ -53,9 +65,7 @@ public class EstimateRestController {
             @Parameter(description = "업로드할 이미지 파일들", content = @Content(mediaType = MediaType.MULTIPART_FORM_DATA_VALUE,
                     array = @ArraySchema(schema = @Schema(type = "string", format = "binary")))) List<MultipartFile> imageFiles
     ) {
-        // 실제 로직(저장)은 생략
-        // 예시로 작성된 Dto 를 그대로 반환
-        // 여기서 response 에는 DB 저장 후 생성된 estimateId 등을 담았다고 가정
+        // 여기서 response 에는 DB 저장 후 생성된 estimateId 등을 담았다
 
         EstimateResponseDTO.CreateDTO response = estimateCommandService.createEstimate(request, imageFiles);
 
@@ -71,8 +81,9 @@ public class EstimateRestController {
             description = "견적서 id와 일치하는 견적서를 상세조회합니다."
     )
     @ApiResponses({
-            @io.swagger.v3.oas.annotations.responses.
-                    ApiResponse(responseCode = "COMMON200", description = "OK, 성공")
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200", description = "OK, 성공"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON400", description = "잘못된 요청입니다.", content = @Content(schema = @Schema(implementation = ApiResponse.class))),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON401", description = "사용자 토큰이 잘못되었습니다.", content = @Content(schema = @Schema(implementation = ApiResponse.class)))
     })
     @Parameters({
             @Parameter(name = "estimateId", description = "조회하려는 견적서의 id(pk)", example = "100", required = true)
@@ -80,11 +91,29 @@ public class EstimateRestController {
     @GetMapping("/{estimateId}")
     public ApiResponse<EstimateResponseDTO.DetailDTO> getEstimateDetail(
             @PathVariable Long estimateId
+            //HttpServletRequest request
     ) {
-        // 실제 조회 로직 대신 예시
+//        // 요청에서 JWT 토큰 추출
+//        String token =jwtUtil.extractTokenFromRequest(request);
+//
+//
+//        // 토큰이 없거나 유효하지 않다면 401 응답 반환
+//        if (token == null || !jwtUtil.validateToken(token)) {
+//            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid or missing JWT token");
+//        }
+//
+//        // 토큰에서 사용자 정보 추출
+//        Long userId = jwtUtil.extractUserId(token);
+//        String role = jwtUtil.extractRole(token);
+//
+//        // 로그 출력
+//        log.info("Authenticated User ID: {}, Role: {}", userId, role);
+
+        // 견적서 상세 조회
         EstimateResponseDTO.DetailDTO response = estimateQueryService.getEstimateDetail(estimateId);
 
         return ApiResponse.onSuccess(response);
+
     }
 
 
@@ -97,7 +126,9 @@ public class EstimateRestController {
                     "수정할 내용(카테고리, 내용, 주소 등)을 RequestBody 로 보내주세요."
     )
     @ApiResponses({
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200", description = "OK, 성공")
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200", description = "OK, 성공"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON400", description = "잘못된 요청입니다.", content = @Content(schema = @Schema(implementation = ApiResponse.class)))
+
     })
     @Parameters({
             @Parameter(name = "estimatedId", description = "수정할 견적서의 ID(pk)", example = "100", required = true)
@@ -120,7 +151,8 @@ public class EstimateRestController {
             description = "견적서 ID와 일치하는 견적서를 삭제합니다."
     )
     @ApiResponses({
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200", description = "OK, 성공")
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200", description = "OK, 성공"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON400", description = "잘못된 요청입니다.", content = @Content(schema = @Schema(implementation = ApiResponse.class)))
     })
     @Parameters({
             @Parameter(name = "estimateId", description = "삭제할 견적서의 ID(pk)", example = "100", required = true)
@@ -148,8 +180,8 @@ public class EstimateRestController {
             "견적서를 최신순으로 10개 페이징하여 조회합니다."
     )
     @ApiResponses({
-            @io.swagger.v3.oas.annotations.responses.
-                    ApiResponse(responseCode = "COMMON200", description = "OK, 성공")
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200", description = "OK, 성공"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON400", description = "잘못된 요청입니다.", content = @Content(schema = @Schema(implementation = ApiResponse.class)))
     })
     @Parameters({
             @Parameter(name = "expertId", description = "전문가 ID", example = "10", required = true),
@@ -178,8 +210,8 @@ public class EstimateRestController {
                     "최신순으로 정렬하여 10개씩 페이징으로 제공합니다."
     )
     @ApiResponses({
-            @io.swagger.v3.oas.annotations.responses.
-                    ApiResponse(responseCode = "COMMON200", description = "OK, 성공")
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200", description = "OK, 성공"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON400", description = "잘못된 요청입니다.", content = @Content(schema = @Schema(implementation = ApiResponse.class)))
     })
     @Parameters({
             @Parameter(name = "cropCategory", description = "작물 카테고리 이름", example = "곡물", required = true),
@@ -208,8 +240,8 @@ public class EstimateRestController {
                     "최신순으로 정렬하여 10개씩 페이징으로 제공합니다."
     )
     @ApiResponses({
-            @io.swagger.v3.oas.annotations.responses.
-                    ApiResponse(responseCode = "COMMON200", description = "OK, 성공")
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200", description = "OK, 성공"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON400", description = "잘못된 요청입니다.", content = @Content(schema = @Schema(implementation = ApiResponse.class)))
     })
     @Parameters({
             @Parameter(name = "cropName", description = "작물 이름", example = "쌀", required = true),
@@ -238,8 +270,8 @@ public class EstimateRestController {
                     "최신순으로 9개씩 페이징"
     )
     @ApiResponses({
-            @io.swagger.v3.oas.annotations.responses.
-                    ApiResponse(responseCode = "COMMON200", description = "OK, 성공")
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200", description = "OK, 성공"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON400", description = "잘못된 요청입니다.", content = @Content(schema = @Schema(implementation = ApiResponse.class)))
     })
     @Parameters({
             @Parameter(name = "expertId", description = "전문가 ID", required = true),
@@ -268,8 +300,8 @@ public class EstimateRestController {
                     "최신순으로 9개씩 페이징"
     )
     @ApiResponses({
-            @io.swagger.v3.oas.annotations.responses.
-                    ApiResponse(responseCode = "COMMON200", description = "OK, 성공")
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200", description = "OK, 성공"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON400", description = "잘못된 요청입니다.", content = @Content(schema = @Schema(implementation = ApiResponse.class)))
     })
     @Parameters({
             @Parameter(name = "expertId", description = "전문가 ID", required = true),
@@ -298,8 +330,8 @@ public class EstimateRestController {
                     "최신순으로 30개씩 페이징"
     )
     @ApiResponses({
-            @io.swagger.v3.oas.annotations.responses.
-                    ApiResponse(responseCode = "COMMON200", description = "OK, 성공")
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200", description = "OK, 성공"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON400", description = "잘못된 요청입니다.", content = @Content(schema = @Schema(implementation = ApiResponse.class)))
     })
     @Parameters({
             @Parameter(name = "userId", description = "농업인 ID", required = true),
@@ -328,8 +360,8 @@ public class EstimateRestController {
                     "최신순으로 30개씩 페이징"
     )
     @ApiResponses({
-            @io.swagger.v3.oas.annotations.responses.
-                    ApiResponse(responseCode = "COMMON200", description = "OK, 성공")
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200", description = "OK, 성공"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON400", description = "잘못된 요청입니다.", content = @Content(schema = @Schema(implementation = ApiResponse.class)))
     })
     @Parameters({
             @Parameter(name = "userId", description = "농업인 ID", required = true),
@@ -357,8 +389,8 @@ public class EstimateRestController {
                     "최신순으로 최대 5개를 반환합니다."
     )
     @ApiResponses({
-            @io.swagger.v3.oas.annotations.responses.
-                    ApiResponse(responseCode = "COMMON200", description = "OK, 성공")
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200", description = "OK, 성공"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON400", description = "잘못된 요청입니다.", content = @Content(schema = @Schema(implementation = ApiResponse.class)))
     })
     @Parameters({
             @Parameter(name = "userId", description = "농업인 ID", required = true)
@@ -418,7 +450,98 @@ public class EstimateRestController {
 
     }
 
+    /**
+     * (9) 필터링(검색/조건) 예시
+     *  - 예: 지역, 예산 범위, 견적 카테고리 를 query param으로 받아서 검색
+     *  - 지역만 데이터를 담고 있을 수도 있고, 범위, 견적 카테고리만 데이터를 담고 있을 수도 있고
+     *  - 지역, 예싼 범위, 견적 카테고리 모두 데이터를 가지고 있을 수도있다.
+     *  - 실제 구현에서는 여러 파라미터들을 받아서 동적 쿼리를 구성해야 함.
+     *  - 검색결과는 10개씩, 최신순, 페이징 처리
+     */
+    @Operation(
+            summary = "견적서 필터링 검색",
+            description = "지역 ID, 예산 범위, 견적 카테고리 세 조건으로 견적서를 검색합니다."
+    )
+    @ApiResponses(
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200", description = "OK, 성공")
 
+    )
+    @Parameters({
+            @Parameter(name = "expertId", description = "추천탭에서 필터링시 전문가 ID 필요", required = false),
+            @Parameter(name = "cropCategory", description = "작물카테고리 탭에서 필터링시 작물카테고리 필요 ", required = false),
+            @Parameter(name = "cropName", description = "세부작물 탭에서 필터링시 세부 작물 이름 필요"),
+            @Parameter(name = "estimateCategory", description = "견적 카테고리", required = false),
+            @Parameter(name = "budget", description = "예산 범위(예:50만원 ~ 100만원)", required = false),
+            @Parameter(name = "areaName", description = "지역 이름(예: 서울)", required = false),
+            @Parameter(name = "areaNameDetail", description = "지역 세부 이름(예: 강남구)", required = false),
+            @Parameter(name = "page", description = "페이지 번호", required = true)
+    })
+    @GetMapping("/expert/filter2")
+    public ApiResponse<EstimateResponseDTO.FilteredListDTO> filterEstimates2(
+            @RequestParam(name = "expertId", required = false) Long expertId,
+            @RequestParam(name = "cropCategory", required = false) String cropCategory,
+            @RequestParam(name = "cropName", required = false) String cropName,
+            @RequestParam(name = "estimateCategory", required = false) String estimateCategory,
+            @RequestParam(name = "budget", required = false) String budget,
+            @RequestParam(name = "areaName", required = false) String areaName,
+            @RequestParam(name = "areaNameDetail", required = false) String areaNameDetail,
+            @RequestParam(name = "page", defaultValue = "1") Integer page
+    ) {
+        //필터 DTO 생성
+        EstimateRequestDTO.FilterDTO request = EstimateRequestDTO.FilterDTO.builder()
+                .estimateCategory(estimateCategory)
+                .budget(budget)
+                .areaName(areaName)
+                .areaNameDetail(areaNameDetail)
+                .build();
 
+        EstimateResponseDTO.FilteredListDTO response = estimateQueryService.searchEstimateListByFilter2(expertId, cropCategory, cropName, request, page);
 
+        return ApiResponse.onSuccess(response);
+
+    }
+
+    /**
+     * (10) 견적서 id로 견적서로 온 견적 채팅과 채팅 보낸 전문가 정보 불러오기
+     * 반환할 response 값, estimateId, chatRoomId, expertId, name, nickname, rating,  isNicknameOnly, profileImageUrl, description, consultingCount(estimate 테이블에서 expertId가 해당 expertId인 데이터 개수)
+     */
+    @Operation(
+            summary = "견적 요청서로 온 제안받은 견적 불러오기",
+            description = "pathVariable 로 받은 견적서 ID에 매핑된 채팅룸 ID와 채팅을 보낸 전문가 ID 와 정보를 모두(프론트 무한스크롤) 가져옵니다."
+    )
+    @ApiResponses(
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200", description = "OK, 성공")
+    )
+    @Parameters({
+            @Parameter(name = "estimateId", description = "견적서 ID", required = true)
+    })
+    @GetMapping("/{estimateId}/offers")
+    public ApiResponse<EstimateResponseDTO.OfferListDTO> getEstimateOffers(
+            @PathVariable Long estimateId
+    ){
+        EstimateResponseDTO.OfferListDTO response = estimateQueryService.getEstimateOffers(estimateId);
+
+        return ApiResponse.onSuccess(response);
+    }
+    /**
+     * (11) 전문가 직접찾기 용 전문가 정보 카드 데이터 불러오기
+     */
+    @Operation(
+            summary = "전문가 직접 찾기용 전문가 프로필카드 불러오기 (3개씩 페이징)",
+            description = "농업인->내견적화면 전문가 직접 찾기용 API 로 페이지번호를 쿼리스트링으로 보내주세요."
+    )
+    @ApiResponses(
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200", description = "OK, 성공")
+    )
+    @Parameters({
+            @Parameter(name = "page", description = "페이지 번호", required = true)
+    })
+    @GetMapping("/expert-cards")
+    public ApiResponse<EstimateResponseDTO.ExpertCardListDTO> getExpertProfileCards(
+            @RequestParam(name = "page", defaultValue = "1") Integer page
+    ){
+        EstimateResponseDTO.ExpertCardListDTO response = estimateQueryService.getExpertProfileCards(page);
+
+        return ApiResponse.onSuccess(response);
+    }
 }

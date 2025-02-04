@@ -11,13 +11,16 @@ import com.backend.farmon.repository.CropRepository.CropRepository;
 import com.backend.farmon.repository.EstimateImageRepository.EstimateImageRepository;
 import com.backend.farmon.repository.EstimateRepository.EstimateRepository;
 import com.backend.farmon.repository.UserRepository.UserRepository;
+import com.backend.farmon.service.SearchService.SearchCommandService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -31,6 +34,14 @@ public class EstimateCommandServiceImpl implements EstimateCommandService {
     private final UuidRepository uuidRepository;
     private final AmazonS3Manager amazonS3Manager;
     private final EstimateConverter estimateConverter;
+    private final SearchCommandService searchCommandService;
+
+    private String extractS3KeyFromUrl(String imageUrl) {
+        return imageUrl.substring(imageUrl.indexOf("estimate/"));
+        // 예: https://s3.amazonaws.com/bucket-name/estimate/UUID_filename.jpg
+        // -> estimate/UUID_filename.jpg (S3에서 삭제할 key)
+    }
+
     /**
      * Create(견적서 작성)
      */
@@ -49,6 +60,10 @@ public class EstimateCommandServiceImpl implements EstimateCommandService {
 
         // 2) 여러 이미지 추가(추후에 작성)
         if(imageFiles != null && !imageFiles.isEmpty()) {
+            //imageFile 이 5개 초과면 오류발생
+            if (imageFiles.size() > 5) {
+                throw new IllegalArgumentException("사진은 최대 5개 까지만 업로드할 수 있습니다.");
+            }
             for(MultipartFile imageFile : imageFiles) {
                 if (imageFile != null && !imageFile.isEmpty()) {
                     String imageKey = "estimate/" + UUID.randomUUID() + "_" + imageFile.getOriginalFilename();
@@ -65,6 +80,9 @@ public class EstimateCommandServiceImpl implements EstimateCommandService {
         // 3) 견적서 저장
         Estimate savedEstimate = estimateRepository.save(estimate);
 
+        // 추천 검색어 저장(작물)
+        searchCommandService.saveRecommendSearchLog(requestDTO.getUserId(), requestDTO.getCropName());
+
         // 4) Response 생성
         return estimateConverter.toCreateResponseDTO(savedEstimate);
     }
@@ -78,6 +96,8 @@ public class EstimateCommandServiceImpl implements EstimateCommandService {
         // 1) 견적서 조회
         Estimate estimate = estimateRepository.findById(estimateId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 estimate id와 일치하는 견적서가 존재하지 않습니다."));
+        // 이전 견적 작물 이름
+        String lastCropName = estimate.getCrop().getName();
 
         // 2) 변경 (실제 수정 필드만 변경)
         if (requestDTO.getCategory() != null) estimate.setCategory(requestDTO.getCategory());
@@ -93,6 +113,10 @@ public class EstimateCommandServiceImpl implements EstimateCommandService {
         // 3) 수정사항 저장
         estimateRepository.save(estimate);
 
+        // 추천 검색어 삭제 및 저장
+        searchCommandService.deleteRecommendSearchLog(requestDTO.getUserId(), lastCropName);
+        searchCommandService.saveRecentSearchLog(requestDTO.getUserId(), requestDTO.getCropName());
+
         return estimateConverter.toUpdateResponseDTO(estimateId, estimate);
     }
     /**
@@ -105,6 +129,16 @@ public class EstimateCommandServiceImpl implements EstimateCommandService {
         Estimate estimate = estimateRepository.findById(estimateId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 estimate id와 일치하는 견적서가 존재하지 않습니다."));
 
+        // S3에서 이미지 삭제
+        List<String> imageUrls = estimate.getEstimateImageList().stream()
+                .map(EstimateImage::getImageUrl)
+                        .collect(Collectors.toList());
+
+        for (String imageUrl : imageUrls) {
+            //S3에서 이미지 삭제(imageUrl 에서 S3 key 추출)
+            String s3key = extractS3KeyFromUrl(imageUrl);
+            amazonS3Manager.deleteFile(s3key);
+        }
         // 2) 견적서 삭제
         estimateRepository.delete(estimate);
 

@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
+import java.util.Locale;
 
 // CreatedAt 포맷 클래스
 public class ConvertTime {
@@ -64,7 +65,10 @@ public class ConvertTime {
 
     // 24시간 형식을 오전/오후 형식으로 변환
     public static String convertToAmPmFormat(LocalDateTime dateTime) {
-        return dateTime.format(DateTimeFormatter.ofPattern("a h:mm"));
+        if (dateTime == null) {
+            return null;
+        }
+        return dateTime.format(DateTimeFormatter.ofPattern("a hh:mm", Locale.KOREAN));
     }
 
     // LocalDateTime을 "2025.01.10" 형식의 문자열로 변환

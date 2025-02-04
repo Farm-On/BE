@@ -35,56 +35,29 @@ public class ChatRoomController {
     @Operation(
             summary = "사용자의 전체 채팅 목록 조회 API",
             description = "사용자의 전체 채팅 목록을 조회하는 API이며, 페이징을 포함합니다. " +
-                    "유저 아이디, 읽음 여부 필터, 페이지 번호를 쿼리 스트링으로 입력해주세요."
+                    "채팅 상대 이름 혹은 작물 이름으로 검색하는 경우에는 검색어를 쿼리 스트링에 입력해 주세요. " +
+                    "검색어를 입력하지 않은 경우에는 전체 채팅 목록을 조회합니다. " +
+                    "유저 아이디, 읽음 여부 필터, 검색어, 페이지 번호를 쿼리 스트링으로 입력해주세요."
     )
     @ApiResponses({
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200",description = "OK, 성공"),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "USER4001", description = "아이디와 일치하는 사용자가 없습니다.", content = @Content(schema = @Schema(implementation = ApiResponse.class))),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "AUTHORIZATION_4031", description = "인증된 사용자 정보와 요청된 리소스의 사용자 정보가 다릅니다. (userId 불일치)", content = @Content(schema = @Schema(implementation = ApiResponse.class))),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "PAGE4001", description = "페이지 번호는 1 이상이어야 합니다.", content = @Content(schema = @Schema(implementation = ApiResponse.class))),
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON400", description = "잘못된 요청입니다.", content = @Content(schema = @Schema(implementation = ApiResponse.class))),
     })
     @Parameters({
             @Parameter(name = "userId", description = "로그인한 유저의 아이디(pk)", example = "1", required = true),
             @Parameter(name = "read", description = "읽음 여부 필터링. 안 읽은 채팅방만 필터링 시에는 1, 이외에는 0 입니다.", example = "0", required = true),
-            @Parameter(name = "page", description = "페이지 번호, 1부터 시작입니다.", example = "1", required = true)
+            @Parameter(name = "page", description = "페이지 번호, 1부터 시작입니다.", example = "1", required = true),
+            @Parameter(name = "searchName", description = "검색어", example = "병해중전문가"),
     })
     @GetMapping("/rooms/all")
     public ApiResponse<ChatResponse.ChatRoomListDTO> getChatRoomPage (@RequestParam(name = "userId") @EqualsUserId Long userId,
                                                                       @RequestParam(name = "read") Integer read,
-                                                                      @CheckPage Integer page){
+                                                                      @CheckPage Integer page,
+                                                                      @RequestParam(name = "searchName", required = false) String searchName){
 
-        ChatResponse.ChatRoomListDTO response = chatRoomQueryService.findChatRoom(userId, read, page);
-
-        return ApiResponse.onSuccess(response);
-    }
-
-
-    // 이름, 작물 이름과 일치하는 채팅 목록 조회
-    @Operation(
-            summary = "채팅 상대 이름 혹은 작물 이름으로 검색하여 일치하는 채팅 목록 조회 API",
-            description = "채팅 상대 이름 혹은 작물 이름으로 검색하여 일치하는 채팅 목록 조회하는 API이며, 페이징을 포함합니다. " +
-                    "유저 아이디, 읽음 여부 필터, 검색할 채팅 상대 이름, 페이지 번호를 쿼리 스트링으로 입력해주세요."
-    )
-    @ApiResponses({
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200", description = "OK, 성공"),
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "USER4001", description = "아이디와 일치하는 사용자가 없습니다.", content = @Content(schema = @Schema(implementation = ApiResponse.class))),
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "AUTHORIZATION_4031", description = "인증된 사용자 정보와 요청된 리소스의 사용자 정보가 다릅니다. (userId 불일치)", content = @Content(schema = @Schema(implementation = ApiResponse.class))),
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "PAGE4001", description = "페이지 번호는 1 이상이어야 합니다.", content = @Content(schema = @Schema(implementation = ApiResponse.class))),
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON400", description = "잘못된 요청입니다.", content = @Content(schema = @Schema(implementation = ApiResponse.class))),
-    })
-    @Parameters({
-            @Parameter(name = "userId", description = "로그인한 유저의 아이디(pk)", example = "1", required = true),
-            @Parameter(name = "read", description = "읽음 여부 필터링. 안 읽은 채팅방만 필터링 시에는 false, 이외에는 true 입니다.", example = "false", required = true),
-            @Parameter(name = "searchName", description = "검색어", example = "김팜온", required = true),
-            @Parameter(name = "page", description = "페이지 번호, 1부터 시작입니다.", example = "1", required = true)
-    })
-    @GetMapping("/rooms/all/search")
-    public ApiResponse<ChatResponse.ChatRoomListDTO> getChatRoomPageBySearch(@RequestParam(name = "userId") @EqualsUserId Long userId,
-                                                                             @RequestParam(name = "read") String read,
-                                                                             @RequestParam(name = "searchName") String searchName,
-                                                                             @CheckPage Integer page) {
-        ChatResponse.ChatRoomListDTO response = ChatResponse.ChatRoomListDTO.builder().build();
+        ChatResponse.ChatRoomListDTO response = chatRoomQueryService.findChatRoomBySearch(userId, read, searchName, page);
 
         return ApiResponse.onSuccess(response);
     }
@@ -100,11 +73,11 @@ public class ChatRoomController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200",description = "OK, 성공"),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "EXPERT4001", description = "아이디와 일치하는 전문가가 없습니다.", content = @Content(schema = @Schema(implementation = ApiResponse.class))),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "AUTHORIZATION_4031", description = "인증된 사용자 정보와 요청된 리소스의 사용자 정보가 다릅니다. (userId 불일치)", content = @Content(schema = @Schema(implementation = ApiResponse.class))),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "CHATROOM_4031", description = "채팅방 생성은 전문가만 가능합니다", content = @Content(schema = @Schema(implementation = ApiResponse.class))),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "ESTIMATE4001", description = "견적 아이디와 일치하는 견적이 없습니다.", content = @Content(schema = @Schema(implementation = ApiResponse.class))),
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON400", description = "잘못된 요청입니다.", content = @Content(schema = @Schema(implementation = ApiResponse.class))),
     })
     @Parameters({
-            @Parameter(name = "userId", description = "로그인한 유저(전문가)의 아이디(pk)", example = "1", required = true),
+            @Parameter(name = "expertId", description = "로그인한 유저의 아이디(pk)", example = "1", required = true),
             @Parameter(name = "estimateId", description = "채팅하려는 견적의 아이디", example = "1", required = true),
     })
     @PostMapping("/room")
@@ -128,7 +101,6 @@ public class ChatRoomController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "USER4001", description = "아이디와 일치하는 사용자가 없습니다.", content = @Content(schema = @Schema(implementation = ApiResponse.class))),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "AUTHORIZATION_4031", description = "인증된 사용자 정보와 요청된 리소스의 사용자 정보가 다릅니다. (userId 불일치)", content = @Content(schema = @Schema(implementation = ApiResponse.class))),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "CHATROOM4001", description = "채팅방 아이디와 일치하는 채팅방이 없습니다.", content = @Content(schema = @Schema(implementation = ApiResponse.class))),
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON400", description = "잘못된 요청입니다.", content = @Content(schema = @Schema(implementation = ApiResponse.class))),
     })
     @Parameters({
             @Parameter(name = "userId", description = "로그인한 유저의 아이디(pk)", example = "1", required = true),
@@ -154,7 +126,6 @@ public class ChatRoomController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "CHATROOM4001", description = "채팅방 아이디와 일치하는 채팅방이 없습니다.", content = @Content(schema = @Schema(implementation = ApiResponse.class))),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "AUTHORIZATION_4031", description = "인증된 사용자 정보와 요청된 리소스의 사용자 정보가 다릅니다. (userId 불일치)", content = @Content(schema = @Schema(implementation = ApiResponse.class))),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "PAGE4001", description = "페이지 번호는 1 이상이어야 합니다.", content = @Content(schema = @Schema(implementation = ApiResponse.class))),
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON400", description = "잘못된 요청입니다.", content = @Content(schema = @Schema(implementation = ApiResponse.class))),
     })
     @Parameters({
             @Parameter(name = "userId", description = "로그인한 유저의 아이디(pk)", example = "1", required = true),
@@ -182,7 +153,6 @@ public class ChatRoomController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "USER4001", description = "아이디와 일치하는 사용자가 없습니다.", content = @Content(schema = @Schema(implementation = ApiResponse.class))),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "AUTHORIZATION_4031", description = "인증된 사용자 정보와 요청된 리소스의 사용자 정보가 다릅니다. (userId 불일치)", content = @Content(schema = @Schema(implementation = ApiResponse.class))),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "CHATROOM4001", description = "채팅방 아이디와 일치하는 채팅방이 없습니다.", content = @Content(schema = @Schema(implementation = ApiResponse.class))),
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON400", description = "잘못된 요청입니다.", content = @Content(schema = @Schema(implementation = ApiResponse.class))),
     })
     @Parameters({
             @Parameter(name = "userId", description = "로그인한 유저의 아이디(pk)", example = "1", required = true),
@@ -208,7 +178,6 @@ public class ChatRoomController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "USER4001", description = "아이디와 일치하는 사용자가 없습니다.", content = @Content(schema = @Schema(implementation = ApiResponse.class))),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "AUTHORIZATION_4031", description = "인증된 사용자 정보와 요청된 리소스의 사용자 정보가 다릅니다. (userId 불일치)", content = @Content(schema = @Schema(implementation = ApiResponse.class))),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "CHATROOM4001", description = "채팅방 아이디와 일치하는 채팅방이 없습니다.", content = @Content(schema = @Schema(implementation = ApiResponse.class))),
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON400", description = "잘못된 요청입니다.", content = @Content(schema = @Schema(implementation = ApiResponse.class))),
     })
     @Parameters({
             @Parameter(name = "userId", description = "로그인한 유저의 아이디(pk)", example = "1", required = true),

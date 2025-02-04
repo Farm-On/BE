@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class TestController {
 
     @Autowired
-    private RedisTemplate<String, String> redisTemplate;
+    private RedisTemplate<String, String> stringRedisTemplate;
 
     @GetMapping("/test")
     public String test(){
@@ -20,16 +20,15 @@ public class TestController {
     }
 
     @GetMapping("/test-redis/set")
-    public String testRedis(@RequestParam String key) {
+    public String testRedis(@RequestParam String key, @RequestParam String value) {
         try {
             // Redis에 데이터 저장
-            redisTemplate.opsForValue().set(key, "Hello, Redis!");
+            stringRedisTemplate.opsForValue().set(key, value);
 
             // Redis에서 데이터 가져오기
-            String value = redisTemplate.opsForValue().get("testKey");
+            String redisValue = stringRedisTemplate.opsForValue().get(key);
 
-            // 결과 반환
-            return value != null ? "Redis 연결 성공! Value: " + value : "Redis 연결 실패!";
+            return redisValue != null ? "Redis 연결 성공! Value: " + redisValue : "Redis 연결 실패!";
         } catch (Exception e) {
             log.error(e.getMessage());
             return "Redis 오류: " + e.getMessage();
@@ -40,7 +39,7 @@ public class TestController {
     public String checkKey(@RequestParam String key) {
         try {
             // Redis에 해당 키가 존재하는지 확인
-            Boolean exists = redisTemplate.hasKey(key);
+            Boolean exists = stringRedisTemplate.hasKey(key);
 
             // 결과 반환
             if (exists != null && exists) {

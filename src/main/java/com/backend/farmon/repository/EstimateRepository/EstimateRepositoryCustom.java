@@ -6,5 +6,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 public interface EstimateRepositoryCustom {
-    Page<Estimate> findFilteredEstimates(String estimateName,String budget, String areaName, String areaNameDetail, Pageable pageable);
+    Page<Estimate> findFilteredEstimates(String estimateCategory,String budget, String areaName, String areaNameDetail, Pageable pageable);
+
+    Page<Estimate> findFilteredEstimates2(Long expertId, String cropCategory, String cropName, String estimateName,String budget, String areaName, String areaNameDetail, Pageable pageable);
+
 }

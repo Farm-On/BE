@@ -1,10 +1,13 @@
 package com.backend.farmon.service.EstimateService;
 
 import com.backend.farmon.converter.EstimateConverter;
+import com.backend.farmon.domain.ChatRoom;
 import com.backend.farmon.domain.Estimate;
 import com.backend.farmon.domain.EstimateImage;
+import com.backend.farmon.domain.Expert;
 import com.backend.farmon.dto.estimate.EstimateRequestDTO;
 import com.backend.farmon.dto.estimate.EstimateResponseDTO;
+import com.backend.farmon.repository.ChatRoomReposiotry.ChatRoomRepository;
 import com.backend.farmon.repository.EstimateRepository.EstimateRepository;
 import com.backend.farmon.repository.ExpertReposiotry.ExpertRepository;
 import jakarta.transaction.Transactional;
@@ -15,6 +18,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -26,6 +30,7 @@ public class EstimateQueryServiceImpl implements EstimateQueryService {
     private final EstimateRepository estimateRepository;
     private final EstimateConverter estimateConverter;
     private final ExpertRepository expertRepository;
+    private final ChatRoomRepository chatRoomRepository;
     /**
      * Read(상세 조회) - 단건
      */
@@ -202,6 +207,57 @@ public class EstimateQueryServiceImpl implements EstimateQueryService {
 
         return estimateConverter.toFilteredListDTO(estimatePage, requestDTO.getEstimateCategory(), requestDTO.getBudget(), requestDTO.getAreaName(), requestDTO.getAreaNameDetail());
 
+    }
+
+    @Override
+    public EstimateResponseDTO.FilteredListDTO searchEstimateListByFilter2(Long expertId, String cropCategory, String cropName, EstimateRequestDTO.FilterDTO requestDTO, int page) {
+        if(requestDTO == null) {
+            return EstimateResponseDTO.FilteredListDTO.builder().build();
+        };
+
+        // Repository를 호출하여 조건에 맞는 견적서를 조회
+        // 1) 레포지토리에서 데이터 조회
+        Page<Estimate> estimatePage = estimateRepository.findFilteredEstimates2(
+                expertId,
+                cropCategory,
+                cropName,
+                requestDTO.getEstimateCategory(),
+                requestDTO.getBudget(),
+                requestDTO.getAreaName(),
+                requestDTO.getAreaNameDetail(),
+                PageRequest.of(page -1, 10, Sort.by(Sort.Direction.DESC, "createdAt"))
+        );
+
+        return estimateConverter.toFilteredListDTO(estimatePage, requestDTO.getEstimateCategory(), requestDTO.getBudget(), requestDTO.getAreaName(), requestDTO.getAreaNameDetail());
+
+    }
+
+    @Override
+    public EstimateResponseDTO.OfferListDTO getEstimateOffers(Long estimateId) {
+        //견적서 존재 여부 확인
+        Estimate estimate = estimateRepository.findById(estimateId)
+                .orElseThrow(() -> new IllegalArgumentException("유효하지 않은 견적서 ID 입니다."));
+
+        //해당 견적서와 매핑된 채팅방 목록 조회
+        List<ChatRoom> chatRoomList = chatRoomRepository.findChatRoomByEstimateId(estimateId);
+
+        if(chatRoomList == null || chatRoomList.isEmpty()) {
+            return EstimateResponseDTO.OfferListDTO.builder().build();
+        }
+
+        //OfferListDTO 반환
+        return estimateConverter.toOfferListDTO(estimateId, chatRoomList, estimateRepository);
+    }
+
+    @Override
+    public EstimateResponseDTO.ExpertCardListDTO getExpertProfileCards(int page) {
+
+        // 1) 전문가를 3개씩 페이징하여 조회
+        Pageable pageable = PageRequest.of(page -1, 3, Sort.by(Sort.Direction.ASC, "createdAt"));
+        Page<Expert> expertPage = expertRepository.findExpertsWithPaging(pageable);
+
+        // expertCardListDTO 반환
+        return estimateConverter.toExpertCardListDTO(expertPage);
     }
 
 }

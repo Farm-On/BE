@@ -59,12 +59,16 @@ public class ExpertListResponse {
         @Schema(description = "전문가 한 줄 소개")
         String expertDescription;
 
-        @Schema(description = "전문가 전문 분야 카테고리 리스트")
-        List<Long> expertCrops;
+        @Schema(description = "전문가 전문 분야 카테고리")
+        String expertCropCategory;
 
-        @Schema(description = "전문가 활동 위치 카테고리 리스트")
-        List<Long> expertLocations;
+        @Schema(description = "전문가 전문 분야 세부")
+        String expertCropDetail;
 
-        LocalDate createdAt; // 기본 정렬 전문가 가입날짜순
+        @Schema(description = "전문가 활동 위치 카테고리")
+        String expertLocationCategory;
+
+        @Schema(description = "전문가 활동 위치 세부")
+        String expertLocationDetail;
     }
 }
