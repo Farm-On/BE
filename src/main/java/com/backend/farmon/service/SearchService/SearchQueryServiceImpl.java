@@ -64,6 +64,8 @@ public class SearchQueryServiceImpl implements SearchQueryService{
         return Collections.emptyList();
     }
 
+    // 자동 완성 검색어 조회
+    @Override
     public List<String> autoSearchNameList(String keyword) {
         Long index = findFromSortedSet(keyword);  // 사용자가 입력한 검색어를 바탕으로 Redis에서 조회한 결과 매칭되는 index
 
