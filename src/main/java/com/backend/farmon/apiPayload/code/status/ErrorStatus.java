@@ -32,6 +32,7 @@ public enum ErrorStatus implements BaseErrorCode {
 
     // 채팅방 관련 에러
     CHATROOM_NOT_FOUND(HttpStatus.BAD_REQUEST, "CHATROOM4001", "채팅방 아이디와 일치하는 채팅방이 없습니다."),
+    CHATROOM_CREATE_ONLY_EXPERT(HttpStatus.FORBIDDEN, "CHATROOM4031", "채팅방 생성은 전문가만 가능합니다."),
 
     // 페이지 번호
     PAGE_NOT_FOUND(HttpStatus.BAD_REQUEST, "PAGE4001", "페이지 번호는 1 이상이어야 합니다."),

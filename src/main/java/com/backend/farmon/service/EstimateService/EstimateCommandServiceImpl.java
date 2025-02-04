@@ -11,8 +11,10 @@ import com.backend.farmon.repository.CropRepository.CropRepository;
 import com.backend.farmon.repository.EstimateImageRepository.EstimateImageRepository;
 import com.backend.farmon.repository.EstimateRepository.EstimateRepository;
 import com.backend.farmon.repository.UserRepository.UserRepository;
+import com.backend.farmon.service.SearchService.SearchCommandService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -32,6 +34,7 @@ public class EstimateCommandServiceImpl implements EstimateCommandService {
     private final UuidRepository uuidRepository;
     private final AmazonS3Manager amazonS3Manager;
     private final EstimateConverter estimateConverter;
+    private final SearchCommandService searchCommandService;
 
     private String extractS3KeyFromUrl(String imageUrl) {
         return imageUrl.substring(imageUrl.indexOf("estimate/"));
@@ -77,6 +80,9 @@ public class EstimateCommandServiceImpl implements EstimateCommandService {
         // 3) 견적서 저장
         Estimate savedEstimate = estimateRepository.save(estimate);
 
+        // 추천 검색어 저장(작물)
+        searchCommandService.saveRecommendSearchLog(requestDTO.getUserId(), requestDTO.getCropName());
+
         // 4) Response 생성
         return estimateConverter.toCreateResponseDTO(savedEstimate);
     }
@@ -90,6 +96,8 @@ public class EstimateCommandServiceImpl implements EstimateCommandService {
         // 1) 견적서 조회
         Estimate estimate = estimateRepository.findById(estimateId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 estimate id와 일치하는 견적서가 존재하지 않습니다."));
+        // 이전 견적 작물 이름
+        String lastCropName = estimate.getCrop().getName();
 
         // 2) 변경 (실제 수정 필드만 변경)
         if (requestDTO.getCategory() != null) estimate.setCategory(requestDTO.getCategory());
@@ -104,6 +112,10 @@ public class EstimateCommandServiceImpl implements EstimateCommandService {
 
         // 3) 수정사항 저장
         estimateRepository.save(estimate);
+
+        // 추천 검색어 삭제 및 저장
+        searchCommandService.deleteRecommendSearchLog(requestDTO.getUserId(), lastCropName);
+        searchCommandService.saveRecentSearchLog(requestDTO.getUserId(), requestDTO.getCropName());
 
         return estimateConverter.toUpdateResponseDTO(estimateId, estimate);
     }
