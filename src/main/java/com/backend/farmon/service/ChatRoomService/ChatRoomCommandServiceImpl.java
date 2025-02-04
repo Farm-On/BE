@@ -5,6 +5,7 @@ import com.backend.farmon.apiPayload.exception.handler.ChatRoomHandler;
 import com.backend.farmon.apiPayload.exception.handler.EstimateHandler;
 import com.backend.farmon.apiPayload.exception.handler.ExpertHandler;
 import com.backend.farmon.apiPayload.exception.handler.UserHandler;
+import com.backend.farmon.config.security.UserAuthorizationUtil;
 import com.backend.farmon.converter.ChatConverter;
 import com.backend.farmon.converter.ConvertTime;
 import com.backend.farmon.domain.*;
@@ -32,13 +33,18 @@ public class ChatRoomCommandServiceImpl implements ChatRoomCommandService{
     private final ExpertRepository expertRepository;
     private final UserRepository userRepository;
     private final EstimateRepository estimateRepository;
+    private final UserAuthorizationUtil userAuthorizationUtil;
 
     // 채팅방 생성
     @Transactional
     @Override
     public ChatResponse.ChatRoomCreateDTO addChatRoom(Long userId, Long estimateId) {
+        // 채팅방 생성은 전문가만 가능
+        if(!userAuthorizationUtil.isCurrentUserRoleMatching("EXPERT"))
+            throw new ChatRoomHandler(ErrorStatus.CHATROOM_CREATE_ONLY_EXPERT);
+
         // 채팅 신청한 전문가
-        Expert expert = expertRepository.findById(userId)
+        Expert expert = expertRepository.findExpertByUserId(userId)
                 .orElseThrow(()-> new ExpertHandler(ErrorStatus.EXPERT_NOT_FOUND));
 
         // 채팅 신청한 견적
@@ -119,9 +125,13 @@ public class ChatRoomCommandServiceImpl implements ChatRoomCommandService{
     @Override
     public void changeChatRoomEnterTime(Long userId, ChatRoom chatRoom) {
         // 전문가라면 전문가 접속 시간 뱐걍
-        if(chatRoom.getExpert().getUser().getId().equals(userId))
+        if(chatRoom.getExpert().getUser().getId().equals(userId)){
             chatRoom.setExpertLastEnter(LocalDateTime.now());
-        else
+            log.info("전문가 접속 시간 변경 - 채팅방 아이디: {}", chatRoom.getId());
+        }
+        else{
             chatRoom.setFarmerLastEnter(LocalDateTime.now());
+            log.info("농업인 접속 시간 변경 - 채팅방 아이디: {}", chatRoom.getId());
+        }
     }
 }

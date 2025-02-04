@@ -4,7 +4,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 
 @Schema(name = "게시판 타입")
 public enum PostType {
-    ALL, POPULAR, QNA, EXPERT_LOUNGE, EXPERT_COLUMN;
+    ALL, POPULAR, QNA, EXPERT_LOUNGE, EXPERT_COLUMN, FREE;
 
 
 }
