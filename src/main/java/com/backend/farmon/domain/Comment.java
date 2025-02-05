@@ -9,6 +9,8 @@ import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.ColumnDefault;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,9 +20,8 @@ import java.util.List;
 @Getter
 @Builder
 @AllArgsConstructor
-public class Comment extends BaseEntity {
+public class Comment extends  BaseEntity {
     // 수정까지 가능
-
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -67,6 +68,15 @@ public class Comment extends BaseEntity {
     @Column(nullable = false)
     private Boolean isDeleted;
 
+
+    @Column(name = "time")
+    private String time; //댓글 작성 시간
+
+
+    @PrePersist
+    protected void Createtime() {
+        time = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy.MM.dd HH:mm:ss"));
+    }
 
     public Comment() {
 

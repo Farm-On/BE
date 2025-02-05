@@ -1,22 +1,25 @@
 package com.backend.farmon.service.PostService;
 
+import com.backend.farmon.apiPayload.code.status.ErrorStatus;
+import com.backend.farmon.apiPayload.exception.GeneralException;
 import com.backend.farmon.converter.HomeConverter;
+import com.backend.farmon.converter.PostConverter;
 import com.backend.farmon.domain.Board;
-import com.backend.farmon.domain.FieldCategoryEntity;
+import com.backend.farmon.domain.Crop;
 import com.backend.farmon.domain.Post;
-import com.backend.farmon.dto.Filter.FieldCategory;
+import com.backend.farmon.domain.PostImg;
+import com.backend.farmon.domain.commons.TimeDifferenceUtil;
 import com.backend.farmon.dto.home.HomeResponse;
 import com.backend.farmon.dto.post.PostPagingResponseDTO;
+import com.backend.farmon.dto.post.PostResponseDTO;
 import com.backend.farmon.dto.post.PostType;
 import com.backend.farmon.repository.BoardRepository.BoardRepository;
 import com.backend.farmon.repository.CommentRepository.CommentRepository;
-import com.backend.farmon.repository.FilterRepository.FieldCategoryRepository;
 import com.backend.farmon.repository.LikeCountRepository.LikeCountRepository;
 import com.backend.farmon.repository.PostRepository.PostRepository;
 import com.backend.farmon.service.AWS.S3Service;
 import com.backend.farmon.strategy.postType.PostFetchStrategy;
 import com.backend.farmon.strategy.postType.PostFetchStrategyFactory;
-import com.backend.farmon.domain.SubCategory;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -44,7 +47,6 @@ public class PostQueryServiceImpl implements PostQueryService {
     private final LikeCountRepository likeCountRepository;
     private final PostRepository postRepository;
     private final BoardRepository boardRepository;
-    private final FieldCategoryRepository fieldCatrogryRepository;
     private final S3Service s3Service;
 
     // 홈 화면 카테고리에 따른 커뮤니티 게시글 3개씩 조회
@@ -86,142 +88,83 @@ public class PostQueryServiceImpl implements PostQueryService {
         return HomeConverter.toPopularPostListDTO(expertColumnPostList);
     }
 
-
-
-    //전체 게시판 (인기 게시판 말고 전부로) 에서 필터링 분야 적용된 걸로 해서 정렬
+    //전체 게시판 좋아요 순
     @Transactional(readOnly = true)
-    public Page<PostPagingResponseDTO> findAllPostsByBoardPK(Long boardId, int page, int size, String sortStr) {
+    public Page<PostPagingResponseDTO> findAllPostsByBoardPK(Long boardId, int page, int size, String sortStr, List<Crop> crops) {
         Sort sort = Sort.by(Sort.Direction.fromString(sortStr), "createdAt");
         Pageable pageable = PageRequest.of(page - 1, size, sort);
 
-        List<FieldCategoryEntity> selectedFieldCategories = getSelectedFieldCategories(); // FieldCategory Enum 리스트로 변경
+        Page<Post> postPages = (crops == null || crops.isEmpty())
+                ? postRepository.findAllByBoardId(boardId, pageable)
+                : postRepository.findPostsByBoardIdAndCrops(boardId, crops.stream().map(Crop::getName).collect(Collectors.toList()), pageable);
 
-        Page<Post> postPages;
-        if (!selectedFieldCategories.isEmpty()) {
-            postPages = postRepository.findAllByBoardIdAndFieldCategoryEntities(boardId, selectedFieldCategories, pageable);
-        } else {
-            postPages = postRepository.findAllByBoardId(boardId, pageable);
-        }
-
-        return postPages.map(postPage -> new PostPagingResponseDTO(postPage, s3Service.getFullPath(postPage.getPostImgs())));
+        // Post 객체를 PostPagingResponseDTO로 변환하고 S3 URL을 포함하여 반환
+        return postPages.map(post -> new PostPagingResponseDTO(post, s3Service.getFullPath(post.getPostImgs())));
     }
 
-
-    // 필터링된 FieldCategory에서 선택된 하위 카테고리들의 FieldCategory를 가져오는 메서드 (수정됨)
-    @Transactional
-    public List<FieldCategoryEntity> getSelectedFieldCategories() {
-        return fieldCatrogryRepository.findAll().stream()
-                .flatMap(fieldCategoryEntity -> fieldCategoryEntity.getSubCategories().stream())
-                .filter(SubCategory::isSelected)
-                .map(SubCategory::getFieldCategory)
-                .distinct()
-                .collect(Collectors.toList());
-
-    }
-
-
-    //인기 게시판 좋아요 순
+    // 인기 게시판 좋아요 순
     @Transactional(readOnly = true)
-    public Page<PostPagingResponseDTO> findPopularPosts(Long boardId, int pageNum, int size, String sort) {
+    public Page<PostPagingResponseDTO> findPopularPosts(Long boardId, int pageNum, int size, String sort, List<Crop> crops) {
         Sort.Direction direction = Sort.Direction.fromString(sort);
         Pageable pageable = PageRequest.of(pageNum - 1, size, Sort.by(direction, "postLikes"));
 
-        List<FieldCategoryEntity> selectedFieldCategories = getSelectedFieldCategories(); // FieldCategory Enum 리스트로 변경
+        Page<Post> posts = (crops == null || crops.isEmpty())
+                ? postRepository.findPopularPosts(boardId, pageable)
+                : postRepository.findPostsByBoardIdAndCrops(boardId, crops.stream().map(Crop::getName).collect(Collectors.toList()), pageable);
 
-        Page<Post> posts;
-        if (!selectedFieldCategories.isEmpty()) {
-            posts = postRepository.findAllByBoardIdAndFieldCategoryEntities(boardId, selectedFieldCategories, pageable);
-        } else {
-            posts = postRepository.findPopularPosts(boardId, pageable);
-        }
+        return posts.map(post -> new PostPagingResponseDTO(post, s3Service.getFullPath(post.getPostImgs())));
+    }
+
+    // Qna 글 조회
+    @Transactional(readOnly = true)
+    public Page<PostPagingResponseDTO> findQnaPostsByBoardPK(Long boardId, int page, int size, String sortStr, List<String> crops) {
+        // 정렬 방향 설정: 'ASC' 또는 'DESC' 기준으로 생성일(createdAt)로 정렬 기본이 DESC
+        Sort sort = Sort.by(Sort.Direction.fromString(sortStr), "createdAt");
+        Pageable pageable = PageRequest.of(page - 1, size, sort);
+
+        Page<Post> posts = (crops == null || crops.isEmpty())
+                ? postRepository.findPopularPosts(boardId, pageable)
+                : postRepository.findPostsByBoardIdAndCrops(boardId, crops, pageable);
 
         return posts.map(post -> new PostPagingResponseDTO(post, s3Service.getFullPath(post.getPostImgs())));
     }
 
 
 
+    // 전문가 글 조회
     @Transactional(readOnly = true)
-    public Page<PostPagingResponseDTO> findQnaPostsByBoardPK(Long boardId, int page, int size, String sortStr) {
-
+    public Page<PostPagingResponseDTO> findExpertsPostsByBoardPK(Long boardId, int page, int size, String sortStr, List<String> crops) {
         // 정렬 방향 설정: 'ASC' 또는 'DESC' 기준으로 생성일(createdAt)로 정렬 기본이 DESC
         Sort sort = Sort.by(Sort.Direction.fromString(sortStr), "createdAt");
         Pageable pageable = PageRequest.of(page - 1, size, sort);
 
-        // 게시판 PK로 게시글 조회
-        Page<Post> postPages;
+        Page<Post> posts = (crops == null || crops.isEmpty())
+                ? postRepository.findPopularPosts(boardId, pageable)
+                : postRepository.findPostsByBoardIdAndCrops(boardId, crops, pageable);
 
-        // 필터링된 필드 카테고리와 하위 카테고리들만 필터링
-        List<FieldCategoryEntity> selectedFieldCategories = getSelectedFieldCategories();
-
-        // Board 엔티티 조회 (게시판 정보 확인)
-        Optional<Board> boardOptional = boardRepository.findById(boardId);
-        if (!boardOptional.isPresent()) {
-            // Board가 존재하지 않으면 빈 페이지 반환
-            return Page.empty(pageable);
-        }
-
-        // Board의 postType이 QNA인 경우 필터링
-        Board board = boardOptional.get();
-        if ( board.getPostType() != PostType.QNA) {
-            // QNA 게시판이 아닌 경우 빈 페이지 반환
-            return Page.empty(pageable);
-        }
-
-        // 선택된 하위 카테고리들만 필터링하여 게시글 조회
-        if (! selectedFieldCategories.isEmpty()) {
-            postPages = postRepository.findAllByBoardIdAndFieldCategoryEntities(boardId,  selectedFieldCategories, pageable);
-        } else {
-            // 선택된 카테고리가 없으면 전체 게시글 조회
-            postPages = postRepository.findAllByBoardId(boardId, pageable);
-        }
-
-        // Post 객체를 PostPagingResponseDTO로 변환
-        Page<PostPagingResponseDTO> postDTOPages = postPages.map(post -> new PostPagingResponseDTO(post, s3Service.getFullPath(post.getPostImgs())));
-
-        return postDTOPages;
+        return posts.map(post -> new PostPagingResponseDTO(post, s3Service.getFullPath(post.getPostImgs())));
     }
 
-
-
+    ////모든  글 상세 조회
     @Transactional(readOnly = true)
-    public Page<PostPagingResponseDTO> findExpertsPostsByBoardPK(Long boardId, int page, int size, String sortStr) {
+    public PostResponseDTO getBoardIdAndPostById(Long boardId,Long postId) {
+        Board board=boardRepository.findById(boardId)
+                .orElseThrow(() -> new GeneralException(ErrorStatus.BOARD_TYPE_NOT_FOUND));
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new GeneralException(ErrorStatus.POST_NOT_FOUND));
 
-        // 정렬 방향 설정: 'ASC' 또는 'DESC' 기준으로 생성일(createdAt)로 정렬 기본이 DESC
-        Sort sort = Sort.by(Sort.Direction.fromString(sortStr), "createdAt");
-        Pageable pageable = PageRequest.of(page - 1, size, sort);
-
-        // 게시판 PK로 게시글 조회
-        Page<Post> postPages;
-
-        // 필터링된 필드 카테고리와 하위 카테고리들만 필터링
-        List<FieldCategoryEntity> selectedFieldCategories = getSelectedFieldCategories();
-
-        // Board 엔티티 조회 (게시판 정보 확인)
-        Optional<Board> boardOptional = boardRepository.findById(boardId);
-        if (!boardOptional.isPresent()) {
-            // Board가 존재하지 않으면 빈 페이지 반환
-            return Page.empty(pageable);
+        List<PostImg>imgs=post.getPostImgs();
+        List<String>imgUrls=new ArrayList<>();
+        if(imgs !=null){
+            for(PostImg img :imgs){
+                imgUrls.add(s3Service.getFullPath(img.getStoredFileName()));
+            }
         }
 
-        // Board의 postType이 QNA인 경우 필터링
-        Board board = boardOptional.get();
-        if ( board.getPostType() != PostType.EXPERT_COLUMN) {
-            // QNA 게시판이 아닌 경우 빈 페이지 반환
-            return Page.empty(pageable);
-        }
+        // 작성 시간 차이 계산
+        String timeAgo = TimeDifferenceUtil.calculateTimeDifference(post.getCreatedAt());
 
-        // 선택된 하위 카테고리들만 필터링하여 게시글 조회
-        if (! selectedFieldCategories .isEmpty()) {
-            postPages = postRepository.findAllByBoardIdAndFieldCategoryEntities(boardId,  selectedFieldCategories , pageable);
-        } else {
-            // 선택된 카테고리가 없으면 전체 게시글 조회
-            postPages = postRepository.findAllByBoardId(boardId, pageable);
-        }
-
-        // Post 객체를 PostPagingResponseDTO로 변환
-        Page<PostPagingResponseDTO> postDTOPages = postPages.map(post -> new PostPagingResponseDTO(post, s3Service.getFullPath(post.getPostImgs())));
-
-        return postDTOPages;
+        return new PostResponseDTO(post,imgUrls,timeAgo);
     }
 
 }

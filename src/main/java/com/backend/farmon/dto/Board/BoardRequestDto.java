@@ -1,13 +1,15 @@
 package com.backend.farmon.dto.Board;
 
+import com.backend.farmon.domain.Crop;
 import com.backend.farmon.dto.Answer.AnswerRequestDTO;
-import com.backend.farmon.dto.Filter.FieldCategoryDTO;
 import com.backend.farmon.dto.post.PostType;
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
+import lombok.*;
+
+import java.util.List;
 
 public class BoardRequestDto {
     // BasePost는 모든 게시글의 공통적인 속성을 담는 추상 클래스입니다.
@@ -24,8 +26,8 @@ public class BoardRequestDto {
         @Schema(description = "게시글 내용", example = "게시글 내용 예시")
         private String postContent; // 게시글 내용
 
-        @Schema(description = "작성자 ID (userId)", example = "15")
-        private Long userId;        // 작성자 ID (userNo)
+        @Schema(description ="사용자  ID (boardId)", example = "90")
+        private Long userId;
 
         @Schema(description = "게시판 ID (boardId)", example = "90")
         private Long boardId;       // 게시판 ID (boardNo)
@@ -57,9 +59,16 @@ public class BoardRequestDto {
     @Data
     @EqualsAndHashCode(callSuper=false)
     @Schema(description = "QnA 게시판 게시글")
+    @Getter
     public static class QnaPost extends BasePost {
-        @Schema(description = "분야 카테고리", example = "GRAIN")
-        private FieldCategoryDTO fieldCategory;
+        @Schema(description = "상위 분야  카테고리", example = "곡물")
+        @NotBlank
+        @Size(max=30)
+        private String categorytitle;
+
+        @Schema(description = "하위 분야 카테고리", example = "[\"쌀\", \"옥수수\"]")
+        @NotNull
+        private String crop;
 
 //        @Schema(description = "질문 답변")
 //        private AnswerRequestDTO dto;
@@ -79,7 +88,12 @@ public class BoardRequestDto {
     @EqualsAndHashCode(callSuper=false)
     @Schema(description = "전문가 칼럼 게시글")
     public static class ExpertColumn extends BasePost {
-        @Schema(description = "분야 카테고리", example = "GRAIN")
-        private FieldCategoryDTO fieldCategory;
+        @Schema(description = "상위 분야  카테고리", example = "곡물")
+        @NotBlank
+        @Size(max=30)
+        private String categorytitle;
+
+        @Schema(description = "하위 분야  카테고리", example = "쌀,옥수수")
+        private String crop;
     }
 }

@@ -20,7 +20,6 @@ public class PostPagingResponseDTO {
     private int postlike;
     private int postcomment;
 
-
     private List<String> imgUrls;
 
 
@@ -29,7 +28,7 @@ public class PostPagingResponseDTO {
         this.id = post.getId();
         this.postTitle = post.getPostTitle();
         this.postContent = post.getPostContent();
-        this.category = String.valueOf(post.getFieldCategory());
+        this.category = post.getCategory();
         this.postlike = post.getLikeCount();
         this.postcomment = post.getComments().size();
         this.imgUrls = imgUrls;

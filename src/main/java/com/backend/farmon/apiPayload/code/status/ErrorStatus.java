@@ -76,6 +76,9 @@ public enum ErrorStatus implements BaseErrorCode {
     // 검색어 관련 에러
     SEARCH_NOT_EMPTY(HttpStatus.BAD_REQUEST, "SEARCH_4001", "검색어가 비어 있습니다."),
 
+    //게시판
+    BOARD_TYPE_NOT_FOUND(HttpStatus.BAD_REQUEST, "MESSAGE_TYPE4001", "지원되지 게시판 타입입니다."),
+
 
     // 분야 카테고리 에러
 

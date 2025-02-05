@@ -1,11 +1,7 @@
 package com.backend.farmon.repository.PostRepository;
 
-import com.backend.farmon.domain.Post;
-import com.backend.farmon.domain.QBoard;
-import com.backend.farmon.domain.QLikeCount;
-import com.backend.farmon.domain.QPost;
+import com.backend.farmon.domain.*;
 import com.backend.farmon.dto.post.PostType;
-import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
@@ -15,10 +11,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
-import java.util.ArrayList;
-import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Set;
 
 @Slf4j
 @Repository
@@ -28,7 +21,8 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
     QPost post = QPost.post;
     QLikeCount likeCount = QLikeCount.likeCount;
     QBoard board = QBoard.board;
-
+    QPostCrop postCrop = QPostCrop.postCrop;
+    QCrop crop = QCrop.crop;
     // 커뮤니티 전체 게시글 3개 조회
     @Override
     public List<Post> findTop3Posts() {
@@ -98,25 +92,74 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
     }
 
     @Override
-    public Page<Post> findPopularPosts(Long boardId, Pageable pageable) {
+    public Page<Post> findAllByBoardId(Long boardId, Pageable pageable) {
         QPost post = QPost.post;
 
-        // QueryDSL을 사용하여 게시판별 인기 게시글 조회 (좋아요 순 정렬)
+        // 게시판 ID로 게시글 조회
         List<Post> posts = queryFactory
                 .selectFrom(post)
-                .where(post.board.id.eq(boardId)) // boardId 기준 필터링
-                .orderBy(post.postLikes.desc()) // 좋아요 수 기준 정렬
+                .where(post.board.id.eq(boardId)) // 게시판 ID로 필터링
+                .orderBy(post.createdAt.desc()) // 최신순 정렬
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .fetch();
 
         // 전체 게시글 수 조회
         long total = queryFactory
-                .selectFrom(post)
-                .where(post.board.id.eq(boardId)) // boardId 기준 필터링
+                .select(post.id) // countQuery 최적화 (ID만 선택)
+                .from(post)
+                .where(post.board.id.eq(boardId))
                 .fetchCount();
 
         return new PageImpl<>(posts, pageable, total);
     }
+
+    @Override
+    public Page<Post> findPostsByBoardIdAndCrops(Long boardId, List<String> cropNames, Pageable pageable) {
+        List<Post> posts = queryFactory.selectFrom(post)
+                .join(post.postCrops, postCrop)
+                .join(postCrop.crop, crop)
+                .where(post.board.id.eq(boardId)
+                        .and(crop.name.in(cropNames))) // Crop 이름 필터링
+                .groupBy(post.id)
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .fetch();
+
+        long totalCount = queryFactory.selectFrom(post)
+                .join(post.postCrops, postCrop)
+                .join(postCrop.crop, crop)
+                .where(post.board.id.eq(boardId)
+                        .and(crop.name.in(cropNames)))
+                .groupBy(post.id)
+                .fetchCount();
+
+        return new PageImpl<>(posts, pageable, totalCount);
+    }
+
+
+    @Override
+    public Page<Post> findPopularPosts(Long boardId, Pageable pageable) {
+        QPost post = QPost.post;
+
+        // 게시판별 인기 게시글 조회 (좋아요 수 기준 정렬)
+        List<Post> posts = queryFactory
+                .selectFrom(post)
+                .where(post.board.id.eq(boardId)) // 게시판 ID로 필터링
+                .orderBy(post.postLikes.desc()) // 좋아요 수 기준 내림차순 정렬
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .fetch();
+
+        // 전체 게시글 수 조회 (countQuery로 분리하여 성능 최적화)
+        long total = queryFactory
+                .select(post.id) // countQuery를 최적화하기 위해 ID만 선택
+                .from(post)
+                .where(post.board.id.eq(boardId))
+                .fetchCount();
+
+        return new PageImpl<>(posts, pageable, total);
+    }
+
 
 }
