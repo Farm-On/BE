@@ -58,8 +58,6 @@ public class User extends BaseEntity {
     @Column(nullable = false, columnDefinition = "VARCHAR(15) DEFAULT 'ACTIVE'")
     private MemberStatus status;
 
-    private String chatAverageResponseTime; // 채팅 평균 응답 시간
-
     private LocalDate inactiveDate;  // 탈퇴일
 
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
