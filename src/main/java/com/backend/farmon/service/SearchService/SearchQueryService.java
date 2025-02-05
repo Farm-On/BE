@@ -10,4 +10,7 @@ public interface SearchQueryService {
 
     // 추천 검색어 스케줄링
     HomeResponse.RecommendSearchListDTO getRecommendSearchNameRank();
+
+    // 자동 완성 검색어 조회
+    List<String> autoSearchNameList(String keyword);
 }

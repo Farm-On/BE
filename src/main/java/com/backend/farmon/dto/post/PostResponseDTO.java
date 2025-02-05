@@ -15,11 +15,13 @@ import java.util.List;
 @Schema(description = "게시글 목록 응답 DTO")
 public class PostResponseDTO {
 
+
     @Schema(description = "게시글 목록")
     private List<PostSummary> posts;
 
     @Schema(description = "페이지네이션 정보")
     private Pagination pagination;
+
 
     @Getter
     @Setter
@@ -55,6 +57,7 @@ public class PostResponseDTO {
 
 
     }
+
 
     @Getter
     @Setter

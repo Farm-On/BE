@@ -10,6 +10,9 @@ import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
 import java.util.ArrayList;
@@ -94,5 +97,26 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
                 .fetch();
     }
 
+    @Override
+    public Page<Post> findPopularPosts(Long boardId, Pageable pageable) {
+        QPost post = QPost.post;
+
+        // QueryDSL을 사용하여 게시판별 인기 게시글 조회 (좋아요 순 정렬)
+        List<Post> posts = queryFactory
+                .selectFrom(post)
+                .where(post.board.id.eq(boardId)) // boardId 기준 필터링
+                .orderBy(post.postLikes.desc()) // 좋아요 수 기준 정렬
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .fetch();
+
+        // 전체 게시글 수 조회
+        long total = queryFactory
+                .selectFrom(post)
+                .where(post.board.id.eq(boardId)) // boardId 기준 필터링
+                .fetchCount();
+
+        return new PageImpl<>(posts, pageable, total);
+    }
 
 }
