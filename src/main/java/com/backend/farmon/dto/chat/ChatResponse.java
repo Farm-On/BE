@@ -162,11 +162,8 @@ public class ChatResponse {
         @Schema(description = "채팅 상대 역할, 농업인 또는 전문가", example = "농업인")
         String type;
 
-        @Schema(description = "채팅 상대의 마지막 채팅방 접속 시간", example = "28분")
+        @Schema(description = "채팅 상대의 마지막 채팅방 접속 시간", example = "30분")
         String lastEnterTime;
-
-        @Schema(description = "채팅 상대의 평균 메시지 응답 시간, 정보가 없는 사용자이면 null", example = "1시간")
-        String averageResponseTime;
 
         @Schema(description = "채팅 상대의 컨설팅 완료 여부", example = "true")
         Boolean isOtherComplete;
