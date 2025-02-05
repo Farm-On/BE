@@ -34,6 +34,8 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -127,7 +129,7 @@ public class PostController {
             @RequestBody BoardRequestDto.ExpertColumn request,
             @RequestPart(value = "imgList", required = false) List<MultipartFile> imgList
     ) throws Exception {
-
+        log.info(request.getPostTitle());
 
         PostResponseDTO postResponseDTO=boardServiceImpl.save_ExperCol(request, imgList);
 
@@ -179,12 +181,12 @@ public class PostController {
             @Parameter(description = "페이지 번호", required = true) @RequestParam(value = "page") int pageNum,
             @Parameter(description = "페이지 크기", required = false) @RequestParam(defaultValue = "10") int size,
             @Parameter(description = "정렬 방식 (ASC 또는 DESC)", required = false) @RequestParam(defaultValue = "DESC") String sort,
-            @Parameter(description = "필터링조건",required = true) List<String> crops
+            @Parameter(description = "필터링조건",required = false) String [] crops
     ) {
-
+        List<String> cropsList = (crops != null) ? Arrays.asList(crops) : Collections.emptyList();
         try {
             // findPopularPosts는 postLike로 내림차순으로 정리
-            Page<PostPagingResponseDTO> posts = postQueryServiceImpl.findPopularPosts(boardId ,pageNum, size, sort,crops);
+            Page<PostPagingResponseDTO> posts = postQueryServiceImpl.findPopularPosts(boardId ,pageNum, size, sort,cropsList);
 
             return ApiResponse.onSuccess(posts);
         } catch (Exception e) {
@@ -210,13 +212,13 @@ public class PostController {
             @Parameter(description = "페이지 번호", required = true) @RequestParam(value = "page") int pageNum,
             @Parameter(description = "페이지 크기", required = false) @RequestParam(defaultValue = "10") int size,
             @Parameter(description = "정렬 방식 (ASC 또는 DESC)", required = false) @RequestParam(defaultValue = "DESC") String sort,
-            @Parameter(description = "필터링조건",required = true) List<String> crops
+            @Parameter(description = "필터링조건",required = false) String [] crops
     )
     {
-
+        List<String> cropsList = (crops != null) ? Arrays.asList(crops) : Collections.emptyList();
         try{
             // 게시판 ID에 해당하는 게시글을 생성일 순으로 정렬하여 페이징 처리
-            Page<PostPagingResponseDTO> posts =  postQueryServiceImpl.findAllPostsByBoardPK(boardId, pageNum,size,sort,crops);
+            Page<PostPagingResponseDTO> posts =  postQueryServiceImpl.findAllPostsByBoardPK(boardId, pageNum,size,sort,cropsList);
             return ApiResponse.onSuccess(posts);
         } catch (Exception e) {
             // 실패 응답 반환 (예: 게시판을 찾을 수 없음)
@@ -243,12 +245,13 @@ public class PostController {
             @Parameter(description = "페이지 번호", required = true) @RequestParam(value = "page") int pageNum,
             @Parameter(description = "페이지 크기", required = false) @RequestParam(defaultValue = "10") int size,
             @Parameter(description = "정렬 방식 (ASC 또는 DESC)", required = false) @RequestParam(defaultValue = "DESC") String sort,
-            @Parameter(description = "필터링조건",required = true) List<String> crops
+            @Parameter(description = "필터링조건",required =false) String [] crops
     ) {
         log.info("Crops: " + crops);
+        List<String> cropsList = (crops != null) ? Arrays.asList(crops) : Collections.emptyList();
         try{
             // 게시판 ID에 해당하는 게시글을 생성일 순으로 정렬하여 페이징 처리
-            Page<PostPagingResponseDTO> posts =  postQueryServiceImpl.findAllPostsByBoardPK(boardId, pageNum,size,sort,crops);
+            Page<PostPagingResponseDTO> posts =  postQueryServiceImpl.findAllPostsByBoardPK(boardId, pageNum,size,sort,cropsList);
             return ApiResponse.onSuccess(posts);
         } catch (Exception e) {
             // 실패 응답 반환 (예: 게시판을 찾을 수 없음)
@@ -274,11 +277,12 @@ public class PostController {
             @Parameter(description = "페이지 번호", required = true) @RequestParam(value = "page") int pageNum,
             @Parameter(description = "페이지 크기", required = false) @RequestParam(defaultValue = "10") int size,
             @Parameter(description = "정렬 방식 (ASC 또는 DESC)", required = false) @RequestParam(defaultValue = "DESC") String sort,
-            @Parameter(description = "필터링조건",required = true) List<String> crops
+            @Parameter(description = "필터링조건",required =false) String [] crops
             ) {
+        List<String> cropsList = (crops != null) ? Arrays.asList(crops) : Collections.emptyList();
         try {
             // 게시판 ID에 해당하는 게시글을 생성일 순으로 정렬하여 페이징 처리
-            Page<PostPagingResponseDTO> posts = postQueryServiceImpl.findQnaPostsByBoardPK(boardId, pageNum, size, sort, crops);
+            Page<PostPagingResponseDTO> posts = postQueryServiceImpl.findQnaPostsByBoardPK(boardId, pageNum, size, sort, cropsList);
             return ApiResponse.onSuccess(posts);
         } catch (Exception e) {
             // 실패 응답 반환 (예: 게시판을 찾을 수 없음)
@@ -305,12 +309,13 @@ public class PostController {
             @RequestParam(defaultValue = "1") int pageNum,
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(defaultValue = "DESC") String sort,
-            @Parameter(description = "필터링조건",required = true) List<String> crops
+            @Parameter(description = "필터링조건",required = false) String [] crops
     ) {
         // 여기는 무조건 작물 정보를 String으로 받아서 처리하거나 boolean으로 처리할수 있는데 일단 해보고 말씀드려보겠습니다.
+        List<String> cropsList = (crops != null) ? Arrays.asList(crops) : Collections.emptyList();
         try{
             // 게시판 ID에 해당하는 게시글을 생성일 순으로 정렬하여 페이징 처리
-            Page<PostPagingResponseDTO> posts =  postQueryServiceImpl.findExpertsPostsByBoardPK(boardId, pageNum,size,sort,crops);
+            Page<PostPagingResponseDTO> posts =  postQueryServiceImpl.findExpertsPostsByBoardPK(boardId, pageNum,size,sort,cropsList);
             return ApiResponse.onSuccess(posts);
         } catch (Exception e) {
             // 실패 응답 반환 (예: 게시판을 찾을 수 없음)

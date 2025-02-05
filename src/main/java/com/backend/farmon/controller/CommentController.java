@@ -36,7 +36,6 @@ public class CommentController {
             @Parameter(description = "게시물 ID", required = true) @PathVariable Long postId,
             @RequestBody @Valid CommentRequestDTO.CommentSaveParentRequestDto request) {
         String resultCode;
-        // String resultMsg;
 
         try{
             commentService.saveParentComment(postId, request);

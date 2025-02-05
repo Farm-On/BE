@@ -102,7 +102,7 @@ public class BoardServiceImpl implements BoardService {
         }
 
         String timeAgo = TimeDifferenceUtil.calculateTimeDifference(post.getCreatedAt());
-
+        log.info("완료됨");
         return new PostResponseDTO(post, imgUrls, timeAgo);
     }
 
@@ -131,7 +131,7 @@ public class BoardServiceImpl implements BoardService {
             }
         }
         String timeAgo = TimeDifferenceUtil.calculateTimeDifference(post.getCreatedAt());
-
+        log.info("완료됨");
         return new PostResponseDTO(post, imgUrls, timeAgo);
     }
 
