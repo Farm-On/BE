@@ -7,6 +7,7 @@ import com.backend.farmon.domain.User;
 import com.backend.farmon.dto.Comment.CommentRequestDTO;
 import com.backend.farmon.dto.Comment.CommentResponseDTO;
 
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -24,6 +25,7 @@ public class CommentConverter {
                 .childComments(comment.getChildren().stream()
                         .map(CommentConverter::toChildResponseDto)
                         .collect(Collectors.toList()))
+                .createdAt(comment.getCreatedAt().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")))
                 .build();
     }
 
@@ -34,6 +36,7 @@ public class CommentConverter {
                 .commentContent(comment.getCommentContent())
                 .userId(comment.getUser() != null ? comment.getUser().getId() : null)  // 전문가 ID
                 .parentId(comment.getParent() != null ? comment.getParent().getId() : null)  // 부모 댓글 ID
+                .createdAt(comment.getCreatedAt().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")))
                 .build();
     }
 

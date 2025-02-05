@@ -9,10 +9,10 @@ import java.util.List;
 @Getter
 @Setter
 @Builder
+@NoArgsConstructor
 public class CommentResponseDTO {
 
-
-
+    // 댓글 조회 응답 DTO
     @Getter
     @NoArgsConstructor
     @AllArgsConstructor
@@ -26,14 +26,15 @@ public class CommentResponseDTO {
         private boolean hasNext;
     }
 
+    // 부모 댓글 정보 DTO
     @Getter
     @NoArgsConstructor
     @AllArgsConstructor
     @Builder
-    @Schema(description = " 댓글 조회용 DTO")
+    @Schema(description = "부모 댓글 조회용 DTO")
     public static class CommentParentResponseDto {
 
-        @Schema(description = " 댓글 ID", example = "1")
+        @Schema(description = "댓글 ID", example = "1")
         private Long commentId;
 
         @Schema(description = "부모 댓글 내용", example = "This is a parent comment")
@@ -48,8 +49,24 @@ public class CommentResponseDTO {
 
         @Schema(description = "대댓글 목록")
         private List<CommentChildResponseDto> childComments; // 대댓글 리스트 포함
+
+        @Schema(description = "시간")
+        private String createdAt;
     }
 
+    // 댓글 삭제 성공 여부를 판단하는 DTO
+    @Getter
+    @Setter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Builder
+    @Schema(description = "댓글 삭제 여부 정보")
+    public static class CommentDeleteDTO {
+        @Schema(description = "삭제 여부 / 삭제에 성공했다면 true, 실패했다면 false", example = "true")
+        Boolean isDeleteSuccess;
+    }
+
+    // 대댓글 정보 DTO
     @Getter
     @NoArgsConstructor
     @AllArgsConstructor
@@ -69,10 +86,11 @@ public class CommentResponseDTO {
         @Schema(description = "부모댓글 ID", example = "2")
         private Long parentId;
 
+        @Schema(description = "시간")
+        private String createdAt;
     }
 
-
-
+    // 커서 페이징 요청 DTO
     @Getter
     @NoArgsConstructor
     @AllArgsConstructor
@@ -90,6 +108,7 @@ public class CommentResponseDTO {
         private Long postId; // 특정 게시글의 댓글을 조회하기 위해 필요
     }
 
+    // 커서 페이징 응답 DTO
     @Getter
     @NoArgsConstructor
     @AllArgsConstructor

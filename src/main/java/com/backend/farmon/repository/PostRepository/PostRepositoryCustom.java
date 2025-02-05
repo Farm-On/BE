@@ -2,6 +2,8 @@ package com.backend.farmon.repository.PostRepository;
 
 import com.backend.farmon.domain.Post;
 import com.backend.farmon.dto.post.PostType;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
@@ -17,4 +19,7 @@ public interface PostRepositoryCustom {
 
     // 인기 전문가 칼럼 6개 조회
     public List<Post> findTop6ExpertColumnPostsByPostId(List<Long> popularPostsIdList);
+
+    // 인기 게시판 목록 조회
+    Page<Post> findPopularPosts(Long boardId, Pageable pageable);
 }

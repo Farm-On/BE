@@ -34,9 +34,6 @@ public class LikeCount extends BaseEntity {
     @JoinColumn(name = "user_id")
     private User user;
 
-    @Column(name="좋아요 누른 시간")
-    private LocalDateTime likeTime;
-
 
     public LikeCount(Post post, User user) {
         this.post = post;
