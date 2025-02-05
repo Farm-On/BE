@@ -33,12 +33,12 @@ public interface EstimateQueryService {
     EstimateResponseDTO.ListDTO getRecent5EstimateListByUserId(Long userId);
 
     // 10) 전문가-견적찾기-필터링 견적서카테고리, 예산범위, 지역 으로 필터링
-    EstimateResponseDTO.FilteredListDTO searchEstimateListByFilter(EstimateRequestDTO.FilterDTO requestDTO, int page);
+    //EstimateResponseDTO.FilteredListDTO searchEstimateListByFilter(EstimateRequestDTO.FilterDTO requestDTO, int page);
 
     // 10) 전문가-견적찾기-필터링 견적서카테고리, 예산범위, 지역 으로 필터링2
-    EstimateResponseDTO.FilteredListDTO searchEstimateListByFilter2(Long expertId, String cropCategory, String cropName, EstimateRequestDTO.FilterDTO requestDTO, int page);
+    EstimateResponseDTO.FilteredListDTO searchEstimateListByFilter(Long expertId, String cropCategory, String cropName, EstimateRequestDTO.FilterDTO requestDTO, int page);
 
-    EstimateResponseDTO.OfferListDTO getEstimateOffers(Long estimateId);
+    EstimateResponseDTO.OfferListDTO getEstimateOffers(Long estimateId, int page);
 
     EstimateResponseDTO.ExpertCardListDTO getExpertProfileCards(int page);
 }

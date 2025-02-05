@@ -183,6 +183,26 @@ public class EstimateQueryServiceImpl implements EstimateQueryService {
         return estimateConverter.toListDTO(estimateList);
     }
 
+
+//    @Override
+//    public EstimateResponseDTO.FilteredListDTO searchEstimateListByFilter(EstimateRequestDTO.FilterDTO requestDTO, int page) {
+//        if(requestDTO == null) {
+//            return EstimateResponseDTO.FilteredListDTO.builder().build();
+//        };
+//
+//        // Repository를 호출하여 조건에 맞는 견적서를 조회
+//        // 1) 레포지토리에서 데이터 조회
+//        Page<Estimate> estimatePage = estimateRepository.findFilteredEstimates(
+//                requestDTO.getEstimateCategory(),
+//                requestDTO.getBudget(),
+//                requestDTO.getAreaName(),
+//                requestDTO.getAreaNameDetail(),
+//                PageRequest.of(page -1, 10, Sort.by(Sort.Direction.DESC, "createdAt"))
+//        );
+//
+//        return estimateConverter.toFilteredListDTO(estimatePage, requestDTO.getEstimateCategory(), requestDTO.getBudget(), requestDTO.getAreaName(), requestDTO.getAreaNameDetail());
+//
+//    }
     /**
      * 필터링 조건에 따른 견적서 목록 조회
      *
@@ -190,7 +210,7 @@ public class EstimateQueryServiceImpl implements EstimateQueryService {
      * @return 필터링된 견적서 목록
      */
     @Override
-    public EstimateResponseDTO.FilteredListDTO searchEstimateListByFilter(EstimateRequestDTO.FilterDTO requestDTO, int page) {
+    public EstimateResponseDTO.FilteredListDTO searchEstimateListByFilter(Long expertId, String cropCategory, String cropName, EstimateRequestDTO.FilterDTO requestDTO, int page) {
         if(requestDTO == null) {
             return EstimateResponseDTO.FilteredListDTO.builder().build();
         };
@@ -198,26 +218,6 @@ public class EstimateQueryServiceImpl implements EstimateQueryService {
         // Repository를 호출하여 조건에 맞는 견적서를 조회
         // 1) 레포지토리에서 데이터 조회
         Page<Estimate> estimatePage = estimateRepository.findFilteredEstimates(
-                requestDTO.getEstimateCategory(),
-                requestDTO.getBudget(),
-                requestDTO.getAreaName(),
-                requestDTO.getAreaNameDetail(),
-                PageRequest.of(page -1, 10, Sort.by(Sort.Direction.DESC, "createdAt"))
-        );
-
-        return estimateConverter.toFilteredListDTO(estimatePage, requestDTO.getEstimateCategory(), requestDTO.getBudget(), requestDTO.getAreaName(), requestDTO.getAreaNameDetail());
-
-    }
-
-    @Override
-    public EstimateResponseDTO.FilteredListDTO searchEstimateListByFilter2(Long expertId, String cropCategory, String cropName, EstimateRequestDTO.FilterDTO requestDTO, int page) {
-        if(requestDTO == null) {
-            return EstimateResponseDTO.FilteredListDTO.builder().build();
-        };
-
-        // Repository를 호출하여 조건에 맞는 견적서를 조회
-        // 1) 레포지토리에서 데이터 조회
-        Page<Estimate> estimatePage = estimateRepository.findFilteredEstimates2(
                 expertId,
                 cropCategory,
                 cropName,
@@ -233,20 +233,22 @@ public class EstimateQueryServiceImpl implements EstimateQueryService {
     }
 
     @Override
-    public EstimateResponseDTO.OfferListDTO getEstimateOffers(Long estimateId) {
+    public EstimateResponseDTO.OfferListDTO getEstimateOffers(Long estimateId, int page) {
         //견적서 존재 여부 확인
         Estimate estimate = estimateRepository.findById(estimateId)
                 .orElseThrow(() -> new IllegalArgumentException("유효하지 않은 견적서 ID 입니다."));
 
-        //해당 견적서와 매핑된 채팅방 목록 조회
-        List<ChatRoom> chatRoomList = chatRoomRepository.findChatRoomByEstimateId(estimateId);
+        Pageable pageable = PageRequest.of(page -1, 4, Sort.by(Sort.Direction.DESC, "createdAt"));
 
-        if(chatRoomList == null || chatRoomList.isEmpty()) {
+        //해당 견적서와 매핑된 채팅방 목록 조회
+        Page<ChatRoom> chatRoomPage = chatRoomRepository.findChatRoomByEstimateId(estimateId, pageable);
+
+        if(chatRoomPage == null || chatRoomPage.isEmpty()) {
             return EstimateResponseDTO.OfferListDTO.builder().build();
         }
 
         //OfferListDTO 반환
-        return estimateConverter.toOfferListDTO(estimateId, chatRoomList, estimateRepository);
+        return estimateConverter.toOfferListDTO(estimateId, chatRoomPage, estimateRepository);
     }
 
     @Override
