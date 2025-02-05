@@ -179,7 +179,7 @@ public class PostController {
             @Parameter(description = "페이지 번호", required = true) @RequestParam(value = "page") int pageNum,
             @Parameter(description = "페이지 크기", required = false) @RequestParam(defaultValue = "10") int size,
             @Parameter(description = "정렬 방식 (ASC 또는 DESC)", required = false) @RequestParam(defaultValue = "DESC") String sort,
-            @Parameter(description = "필터링조건",required = true) List<Crop> crops
+            @Parameter(description = "필터링조건",required = true) List<String> crops
     ) {
 
         try {
@@ -210,7 +210,7 @@ public class PostController {
             @Parameter(description = "페이지 번호", required = true) @RequestParam(value = "page") int pageNum,
             @Parameter(description = "페이지 크기", required = false) @RequestParam(defaultValue = "10") int size,
             @Parameter(description = "정렬 방식 (ASC 또는 DESC)", required = false) @RequestParam(defaultValue = "DESC") String sort,
-            @Parameter(description = "필터링조건",required = true) List<Crop> crops
+            @Parameter(description = "필터링조건",required = true) List<String> crops
     )
     {
 
@@ -243,7 +243,7 @@ public class PostController {
             @Parameter(description = "페이지 번호", required = true) @RequestParam(value = "page") int pageNum,
             @Parameter(description = "페이지 크기", required = false) @RequestParam(defaultValue = "10") int size,
             @Parameter(description = "정렬 방식 (ASC 또는 DESC)", required = false) @RequestParam(defaultValue = "DESC") String sort,
-            @Parameter(description = "필터링조건",required = true) List<Crop>crops
+            @Parameter(description = "필터링조건",required = true) List<String> crops
     ) {
         log.info("Crops: " + crops);
         try{

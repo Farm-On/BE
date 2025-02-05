@@ -90,13 +90,13 @@ public class PostQueryServiceImpl implements PostQueryService {
 
     //전체 게시판 좋아요 순
     @Transactional(readOnly = true)
-    public Page<PostPagingResponseDTO> findAllPostsByBoardPK(Long boardId, int page, int size, String sortStr, List<Crop> crops) {
+    public Page<PostPagingResponseDTO> findAllPostsByBoardPK(Long boardId, int page, int size, String sortStr, List<String> crops) {
         Sort sort = Sort.by(Sort.Direction.fromString(sortStr), "createdAt");
         Pageable pageable = PageRequest.of(page - 1, size, sort);
 
         Page<Post> postPages = (crops == null || crops.isEmpty())
                 ? postRepository.findAllByBoardId(boardId, pageable)
-                : postRepository.findPostsByBoardIdAndCrops(boardId, crops.stream().map(Crop::getName).collect(Collectors.toList()), pageable);
+                :postRepository.findPostsByBoardIdAndCrops(boardId, crops, pageable);
 
         // Post 객체를 PostPagingResponseDTO로 변환하고 S3 URL을 포함하여 반환
         return postPages.map(post -> new PostPagingResponseDTO(post, s3Service.getFullPath(post.getPostImgs())));
@@ -104,13 +104,13 @@ public class PostQueryServiceImpl implements PostQueryService {
 
     // 인기 게시판 좋아요 순
     @Transactional(readOnly = true)
-    public Page<PostPagingResponseDTO> findPopularPosts(Long boardId, int pageNum, int size, String sort, List<Crop> crops) {
+    public Page<PostPagingResponseDTO> findPopularPosts(Long boardId, int pageNum, int size, String sort, List<String> crops) {
         Sort.Direction direction = Sort.Direction.fromString(sort);
         Pageable pageable = PageRequest.of(pageNum - 1, size, Sort.by(direction, "postLikes"));
 
         Page<Post> posts = (crops == null || crops.isEmpty())
                 ? postRepository.findPopularPosts(boardId, pageable)
-                : postRepository.findPostsByBoardIdAndCrops(boardId, crops.stream().map(Crop::getName).collect(Collectors.toList()), pageable);
+                : postRepository.findPostsByBoardIdAndCrops(boardId, crops, pageable);
 
         return posts.map(post -> new PostPagingResponseDTO(post, s3Service.getFullPath(post.getPostImgs())));
     }
