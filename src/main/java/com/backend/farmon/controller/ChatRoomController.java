@@ -104,7 +104,7 @@ public class ChatRoomController {
     })
     @Parameters({
             @Parameter(name = "userId", description = "로그인한 유저의 아이디(pk)", example = "1", required = true),
-            @Parameter(name = "chatRoomId", description = "입장하려는 채팅방의 아이디", example = "1", required = true),
+            @Parameter(name = "chatRoomId", description = "조회하려는 채팅방의 아이디", example = "1", required = true),
     })
     @GetMapping("/room")
     public ApiResponse<ChatResponse.ChatRoomDataDTO> getChatRoomData (@RequestParam(name = "userId") @EqualsUserId  Long userId,
