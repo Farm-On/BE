@@ -22,6 +22,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Base64;
 import java.util.List;
 
 import java.util.stream.Collectors;
@@ -40,10 +41,9 @@ public class BoardServiceImpl implements BoardService {
 
 
     @Override
-    public PostResponseDTO save_FreePost( BoardRequestDto.FreePost postDto, List<MultipartFile> multipartFiles) throws Exception {
+    public PostResponseDTO save_FreePost(BoardRequestDto.FreePost postDto) throws Exception {
 
         log.info("저장 시작");
-        log.info("postDto"+postDto.getUserId());
         User user = userRepository.findById(postDto.getUserId())
                 .orElseThrow(() -> new GeneralException(ErrorStatus.USER_NOT_FOUND));
         Board board = boardRepository.findById(postDto.getBoardId())
@@ -57,29 +57,42 @@ public class BoardServiceImpl implements BoardService {
         postRepository.save(post);
 
         List<String> imgUrls = new ArrayList<>();
-        if (multipartFiles != null && !multipartFiles.isEmpty()) {
-            for (MultipartFile file : multipartFiles) {
-                PostImg img =  s3Service.saveImage(file, post);
-                String storedFilename=img.getStoredFileName();
-                String imgUrl = s3Service.getFullPath(storedFilename); // 저장된 이미지 URL 가져오기
-                imgUrls.add(imgUrl);
+        if (postDto.getImgList() != null && !postDto.getImgList().isEmpty()) {
+            for (String base64Image : postDto.getImgList()) {
+                try {
+                    // Base64 데이터 부분 추출 (이미지 앞부분의 'data:image/png;base64,' 등의 부분을 제거)
+                    if (base64Image.contains(",")) {
+                        base64Image = base64Image.split(",")[1]; // Base64 데이터 부분만 추출
+                    }
+
+                    // Base64 문자열에 대해 공백 제거 및 유효성 검사
+                    base64Image = base64Image.trim();
+
+                    // Base64 디코딩 (에러 처리 추가)
+                    byte[] decodedBytes = Base64.getDecoder().decode(base64Image);
+
+                    // 이미지 업로드 로직 (S3 업로드 등)
+                    PostImg postImg = s3Service.saveImage(decodedBytes, post); // S3 업로드 로직 호출
+                    String imgUrl = s3Service.getFullPath(postImg.getStoredFileName()); // 저장된 파일명에서 URL 생성
+                    imgUrls.add(imgUrl);
+                } catch (IllegalArgumentException e) {
+                    // Base64 디코딩 오류가 발생하면 로그를 남기고 해당 이미지를 무시하거나 예외 처리
+                    log.info("Base64 decoding error for image: " + base64Image);
+                    // 필요시 로그를 남기거나 해당 이미지를 무시
+                }
             }
         }
-
         String timeAgo = TimeDifferenceUtil.calculateTimeDifference(post.getCreatedAt());
-
         return new PostResponseDTO(post, imgUrls, timeAgo);
     }
 
     // 분야 선택 안 할 시 에러가 일어나게 에러 전문가 칼럼 과 qna 게시판에 추가
     @Override
-    public PostResponseDTO save_QnaPost( BoardRequestDto.QnaPost postDto, List<MultipartFile> multipartFiles) throws Exception {
+    public PostResponseDTO save_QnaPost(BoardRequestDto.QnaPost postDto) throws Exception {
         validateFieldCategory(postDto.getCrop());
-        log.info("검증은 완료");
 
         User user = userRepository.findById(postDto.getUserId())
                 .orElseThrow(() -> new GeneralException(ErrorStatus.USER_NOT_FOUND));
-        log.info("에러");
         Board board = boardRepository.findById(postDto.getBoardId())
                 .orElseThrow(() -> new GeneralException(ErrorStatus.POST_TYPE_NOT_FOUND));
 
@@ -91,23 +104,41 @@ public class BoardServiceImpl implements BoardService {
         postRepository.save(post);
 
         List<String> imgUrls = new ArrayList<>();
-        if (multipartFiles != null && !multipartFiles.isEmpty()) {
-            for (MultipartFile file : multipartFiles) {
-                PostImg img =  s3Service.saveImage(file, post);
-                String storedFilename=img.getStoredFileName();
-                String imgUrl = s3Service.getFullPath(storedFilename); // 저장된 이미지 URL 가져오기
-                imgUrls.add(imgUrl);
+        if (postDto.getImgList() != null && !postDto.getImgList().isEmpty()) {
+            for (String base64Image : postDto.getImgList()) {
+                try {
+                    // Base64 데이터 부분 추출 (이미지 앞부분의 'data:image/png;base64,' 등의 부분을 제거)
+                    if (base64Image.contains(",")) {
+                        base64Image = base64Image.split(",")[1]; // Base64 데이터 부분만 추출
+                    }
+
+                    // Base64 문자열에 대해 공백 제거 및 유효성 검사
+                    base64Image = base64Image.trim();
+
+                    // Base64 디코딩 (에러 처리 추가)
+                    byte[] decodedBytes = Base64.getDecoder().decode(base64Image);
+
+                    // 이미지 업로드 로직 (S3 업로드 등)
+                    PostImg postImg = s3Service.saveImage(decodedBytes, post); // S3 업로드 로직 호출
+                    String imgUrl = s3Service.getFullPath(postImg.getStoredFileName()); // 저장된 파일명에서 URL 생성
+                    imgUrls.add(imgUrl);
+                } catch (IllegalArgumentException e) {
+                    // Base64 디코딩 오류가 발생하면 로그를 남기고 해당 이미지를 무시하거나 예외 처리
+                    log.info("Base64 decoding error for image: " + base64Image);
+                    // 필요시 로그를 남기거나 해당 이미지를 무시
+                }
             }
         }
-
         String timeAgo = TimeDifferenceUtil.calculateTimeDifference(post.getCreatedAt());
-        log.info("완료됨");
         return new PostResponseDTO(post, imgUrls, timeAgo);
     }
 
+
+
     @Override
-    public PostResponseDTO save_ExperCol(BoardRequestDto.ExpertColumn postDto, List<MultipartFile> multipartFiles) throws Exception {
+    public PostResponseDTO save_ExperCol(BoardRequestDto.ExpertColumn postDto) throws Exception {
         validateFieldCategory(postDto.getCrop());
+
         User user = userRepository.findById(postDto.getUserId())
                 .orElseThrow(() -> new GeneralException(ErrorStatus.USER_NOT_FOUND));
         Board board = boardRepository.findById(postDto.getBoardId())
@@ -121,16 +152,32 @@ public class BoardServiceImpl implements BoardService {
         postRepository.save(post);
 
         List<String> imgUrls = new ArrayList<>();
-        if (multipartFiles != null && !multipartFiles.isEmpty()) {
-            for (MultipartFile file : multipartFiles) {
-                PostImg img =  s3Service.saveImage(file, post);
-                String storedFilename=img.getStoredFileName();
-                String imgUrl = s3Service.getFullPath(storedFilename); // 저장된 이미지 URL 가져오기
-                imgUrls.add(imgUrl);
+        if (postDto.getImgList() != null && !postDto.getImgList().isEmpty()) {
+            for (String base64Image : postDto.getImgList()) {
+                try {
+                    // Base64 데이터 부분 추출 (이미지 앞부분의 'data:image/png;base64,' 등의 부분을 제거)
+                    if (base64Image.contains(",")) {
+                        base64Image = base64Image.split(",")[1]; // Base64 데이터 부분만 추출
+                    }
+
+                    // Base64 문자열에 대해 공백 제거 및 유효성 검사
+                    base64Image = base64Image.trim();
+
+                    // Base64 디코딩 (에러 처리 추가)
+                    byte[] decodedBytes = Base64.getDecoder().decode(base64Image);
+
+                    // 이미지 업로드 로직 (S3 업로드 등)
+                    PostImg postImg = s3Service.saveImage(decodedBytes, post); // S3 업로드 로직 호출
+                    String imgUrl = s3Service.getFullPath(postImg.getStoredFileName()); // 저장된 파일명에서 URL 생성
+                    imgUrls.add(imgUrl);
+                } catch (IllegalArgumentException e) {
+                    // Base64 디코딩 오류가 발생하면 로그를 남기고 해당 이미지를 무시하거나 예외 처리
+                    log.info("Base64 decoding error for image: " + base64Image);
+                    // 필요시 로그를 남기거나 해당 이미지를 무시
+                }
             }
         }
         String timeAgo = TimeDifferenceUtil.calculateTimeDifference(post.getCreatedAt());
-        log.info("완료됨");
         return new PostResponseDTO(post, imgUrls, timeAgo);
     }
 
@@ -140,29 +187,20 @@ public class BoardServiceImpl implements BoardService {
 
     private void validateFieldCategory(String crops) {
         log.info("검증 시작");
-        log.info(crops);
-        if (crops == null ) {
+
+        if (crops == null) {
             throw new GeneralException(ErrorStatus.CROP_NOT_FOUND); // 존재하지 않는 작물 에러 발생
         }
 
-        List<String> cropList = Arrays.stream(crops.split(",")) // 쉼표로 분리
-                .map(String::trim) // 각 항목 공백 제거
-                .filter(crop -> !crop.isEmpty()) // 빈 항목 제거
-                .collect(Collectors.toList());
-
-        log.info("에러1");
-        if (cropList.isEmpty()) {
-            throw new GeneralException(ErrorStatus.CROP_NOT_FOUND); // 잘못된 이름 에러 발생
-        }
-        log.info("에러2");
-
-        for (String cropName : cropList) {
-            if (!cropRepository.findByName(cropName).isPresent()) {
-                throw new GeneralException(ErrorStatus.CROP_NOT_FOUND); // 존재하지 않는 작물 에러 발생
+        // crops가 단일 문자열인지 확인 (쉼표 포함 여부)
+        if (!crops.contains(",")) {
+            log.info("단일 작물 검증: {}", crops);
+            if (!cropRepository.findByName(crops.trim()).isPresent()) {
+                throw new GeneralException(ErrorStatus.CROP_NOT_FOUND);
             }
         }
-    }
 
+    }
 
 
     // 자유게시판 분야 지정X
@@ -181,8 +219,8 @@ public class BoardServiceImpl implements BoardService {
         return Post.builder()
                 .postTitle(postDTO.getPostTitle())
                 .postContent(postDTO.getPostContent())
-                .Category(postDTO.getCategorytitle()) // ✅ 상위 카테고리 저장
-                .subCategories(postDTO.getCrop()) // ✅ 하위 카테고리 리스트 저장
+                .Category(postDTO.getCategorytitle())
+                .subCategories(postDTO.getCrop())
                 .user(user)
                 .board(board)
                 .build();
@@ -191,8 +229,8 @@ public class BoardServiceImpl implements BoardService {
         return Post.builder()
                 .postTitle(postDTO.getPostTitle())
                 .postContent(postDTO.getPostContent())
-                .Category(postDTO.getCategorytitle()) // ✅ 상위 카테고리 저장
-                .subCategories(postDTO.getCrop()) // ✅ 하위 카테고리 리스트 저장
+                .Category(postDTO.getCategorytitle())
+                .subCategories(postDTO.getCrop())
                 .user(user)
                 .board(board)
                 .build();

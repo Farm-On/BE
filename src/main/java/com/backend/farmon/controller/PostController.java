@@ -70,10 +70,10 @@ public class PostController {
     })
     @PostMapping("/free/save")
     public ApiResponse<PostResponseDTO> save_Free_Post(
-            @RequestBody BoardRequestDto.FreePost request,
-            @RequestPart(value = "imgList", required = false) List<MultipartFile> imgList) throws Exception {
+            @RequestBody BoardRequestDto.FreePost request
+          ) throws Exception {
         log.info("FreePost에서 request 로 온 정보 "+request.getPostContent());
-        PostResponseDTO postResponseDTO=boardServiceImpl.save_FreePost(request, imgList);
+        PostResponseDTO postResponseDTO=boardServiceImpl.save_FreePost(request);
 
         return ApiResponse.onSuccess(postResponseDTO);
     }
@@ -96,10 +96,9 @@ public class PostController {
     })
     @PostMapping("/qna/save")
     public  ApiResponse<PostResponseDTO>  save_QnA_Post(
-            @RequestBody  BoardRequestDto.QnaPost request,
-            @RequestPart(value = "imgList", required = false) List<MultipartFile> imgList
+            @RequestBody  BoardRequestDto.QnaPost request
     ) throws Exception {
-        PostResponseDTO postResponseDTO=boardServiceImpl.save_QnaPost(request, imgList);
+        PostResponseDTO postResponseDTO=boardServiceImpl.save_QnaPost(request);
 
         return ApiResponse.onSuccess(postResponseDTO);
     }
@@ -126,12 +125,11 @@ public class PostController {
     })
     @PostMapping("/expertCol/save")
     public  ApiResponse<PostResponseDTO> save_exper_Post(
-            @RequestBody BoardRequestDto.ExpertColumn request,
-            @RequestPart(value = "imgList", required = false) List<MultipartFile> imgList
+            @RequestBody BoardRequestDto.ExpertColumn request
     ) throws Exception {
         log.info(request.getPostTitle());
 
-        PostResponseDTO postResponseDTO=boardServiceImpl.save_ExperCol(request, imgList);
+        PostResponseDTO postResponseDTO=boardServiceImpl.save_ExperCol(request);
 
         return ApiResponse.onSuccess(postResponseDTO);
 
@@ -278,7 +276,7 @@ public class PostController {
             @Parameter(description = "페이지 크기", required = false) @RequestParam(defaultValue = "10") int size,
             @Parameter(description = "정렬 방식 (ASC 또는 DESC)", required = false) @RequestParam(defaultValue = "DESC") String sort,
             @Parameter(description = "필터링조건",required =false) String [] crops
-            ) {
+    ) {
         List<String> cropsList = (crops != null) ? Arrays.asList(crops) : Collections.emptyList();
         try {
             // 게시판 ID에 해당하는 게시글을 생성일 순으로 정렬하여 페이징 처리

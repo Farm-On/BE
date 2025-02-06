@@ -4,6 +4,7 @@ import com.backend.farmon.domain.commons.BaseEntity;
 import com.backend.farmon.dto.post.PostType;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -35,8 +36,10 @@ public class Post extends BaseEntity {
 //    private PostType postType;
 
     // 상위 분야 이름
+    @JsonProperty("categorytitle")
     private String Category;
 
+    // 하위분야 이름 저장
     @CollectionTable(name = "post_sub_categories", joinColumns = @JoinColumn(name = "post_id"))
     @Column(name = "sub_category")
     private String subCategories;

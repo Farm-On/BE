@@ -2,7 +2,6 @@ package com.backend.farmon.service.PostService;
 
 import com.backend.farmon.domain.Post;
 import com.backend.farmon.dto.Board.BoardRequestDto;
-import com.backend.farmon.dto.Filter.FieldCategoryDTO;
 import com.backend.farmon.dto.home.HomeResponse;
 import com.backend.farmon.dto.post.PostRequestDTO;
 import com.backend.farmon.dto.post.PostType;
