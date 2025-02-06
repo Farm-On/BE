@@ -43,14 +43,8 @@ public class BoardRequestDto {
         @NotNull
         private PostType postType; // 게시글 종류
 
-       //private List<MultipartFile> imgList; // 이미지 리스트 (Base64 또는 URL)
-        // Json으로 처리 불가
 
-        @Schema(
-                description = "이미지 리스트 (Base64 인코딩, 'data:image/png;base64,' 프리픽스가 없는 순수 Base64 문자열만 허용)",
-                example = "[\"iVBORw0KGgoAAAANSUhEUgAA...\"]"
-        )
-        private List<String> imgList; // Base64 문자열 리스트
+
 
     }
 

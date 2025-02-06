@@ -7,6 +7,7 @@ import com.backend.farmon.domain.Crop;
 import com.backend.farmon.domain.Post;
 import com.backend.farmon.dto.Answer.AnswerRequestDTO;
 import com.backend.farmon.dto.Board.BoardRequestDto;
+import com.backend.farmon.dto.estimate.EstimateRequestDTO;
 import com.backend.farmon.dto.post.PostPagingResponseDTO;
 import com.backend.farmon.dto.post.PostRequestDTO;
 import com.backend.farmon.dto.post.PostResponseDTO;
@@ -16,6 +17,7 @@ import com.backend.farmon.service.PostService.PostQueryServiceImpl;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -28,6 +30,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -50,7 +53,6 @@ public class PostController {
     private final S3Service s3Service;
     private final PostQueryServiceImpl postQueryServiceImpl;
 
-    // 농업인인 경우 자유 게시판 과 Qna에 글을 쓸 수 있음 인증 토큰 자체를 여기에 넣어야 할 거 같다.
     @Operation(
             summary = "자유게시판에서 글을 저장",
             description = "사용자는 자유게시판에서 글을 저장할 수 있습니다."
@@ -61,19 +63,22 @@ public class PostController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON400", description = "잘못된 요청입니다.", content = @Content(schema = @Schema(implementation = ApiResponse.class))),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "POST_TYPE4002", description = "글이 저장되지 않았습니다.", content = @Content(schema = @Schema(implementation = ApiResponse.class))),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "POST_TYPE4003", description = "게시판을 찾을 수 없습니다.", content = @Content(schema = @Schema(implementation = ApiResponse.class)))
-
     })
-
-    @Parameters({
-            @Parameter(name = "userId", description = "로그인한 유저의 아이디(pk)", required = true),
-            @Parameter(name = "imgList", description = "첨부된 이미지 목록 (optional)", required = false)
-    })
-    @PostMapping("/free/save")
+    @PostMapping(value="/free/save",  consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ApiResponse<PostResponseDTO> save_Free_Post(
-            @RequestBody BoardRequestDto.FreePost request
-          ) throws Exception {
-        log.info("FreePost에서 request 로 온 정보 "+request.getPostContent());
-        PostResponseDTO postResponseDTO=boardServiceImpl.save_FreePost(request);
+            @RequestPart("request")
+            @Parameter(
+                    description = "자유 게시판 데이터",
+                    content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
+                            schema = @Schema(implementation = BoardRequestDto.FreePost.class)))BoardRequestDto.FreePost request, // RequestBody -> RequestPart로 변경
+            @RequestPart(value = "imgList", required = false)
+            @Parameter(description = "업로드할 이미지 파일들", content = @Content(mediaType = MediaType.MULTIPART_FORM_DATA_VALUE,
+                    array = @ArraySchema(schema = @Schema(type = "string", format = "binary"))))List<MultipartFile> imgList // 파일 리스트 추가
+    ) throws Exception {
+        log.info("FreePost에서 request로 온 정보: " + request.getPostContent());
+
+        // 이미지를 함께 저장할 수 있도록 boardServiceImpl 메소드 수정 필요
+        PostResponseDTO postResponseDTO = boardServiceImpl.save_FreePost(request, imgList); // 이미지 파일도 같이 전달
 
         return ApiResponse.onSuccess(postResponseDTO);
     }
@@ -89,23 +94,23 @@ public class PostController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "POST_TYPE4002", description = "글이 저장되지 않았습니다.", content = @Content(schema = @Schema(implementation = ApiResponse.class))),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "POST_TYPE4003", description = "게시판을 찾을 수 없습니다.", content = @Content(schema = @Schema(implementation = ApiResponse.class)))
     })
+    @PostMapping(value="/qna/save",  consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ApiResponse<PostResponseDTO> save_QnA_Post(
+            @RequestPart("request")      @Parameter(
+                    description = "자유 게시판 데이터",
+                    content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
+                            schema = @Schema(implementation = BoardRequestDto.QnaPost.class))) BoardRequestDto.QnaPost request,
+            @RequestPart(value = "imgList", required = false) @Parameter(
+                    description = "업로드할 이미지 파일들",
+                    content = @Content(mediaType = MediaType.MULTIPART_FORM_DATA_VALUE,
+                            array = @ArraySchema(schema = @Schema(type = "string", format = "binary"))))List<MultipartFile> imgList
 
-    @Parameters({
-            @Parameter(name = "userId", description = "로그인한 유저의 아이디(pk)", required = true),
-            @Parameter(name = "imgList", description = "첨부된 이미지 목록 (optional)", required = false),
-    })
-    @PostMapping("/qna/save")
-    public  ApiResponse<PostResponseDTO>  save_QnA_Post(
-            @RequestBody  BoardRequestDto.QnaPost request
     ) throws Exception {
-        PostResponseDTO postResponseDTO=boardServiceImpl.save_QnaPost(request);
+        // 이미지를 함께 저장할 수 있도록 boardServiceImpl 메소드 수정 필요
+        PostResponseDTO postResponseDTO = boardServiceImpl.save_QnaPost(request, imgList); // 이미지 파일도 같이 전달
 
         return ApiResponse.onSuccess(postResponseDTO);
     }
-
-
-
-    // 전문가인 경우 자유게시판 과 전문가 칼럼에 글을 쓸 수 있음 (위에 꺼에서 추가해야함)
 
     @Operation(
             summary = "전문가 칼럼 글에서 정보를 저장",
@@ -118,22 +123,29 @@ public class PostController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "POST_TYPE4002", description = "글이 저장되지 않았습니다.", content = @Content(schema = @Schema(implementation = ApiResponse.class))),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "POST_TYPE4003", description = "게시판을 찾을 수 없습니다.", content = @Content(schema = @Schema(implementation = ApiResponse.class)))
     })
-
-    @Parameters({
-            @Parameter(name = "userId", description = "로그인한 유저의 아이디(pk)", required = true),
-            @Parameter(name = "imgList", description = "첨부된 이미지 목록 (optional)", required = false),
-    })
-    @PostMapping("/expertCol/save")
-    public  ApiResponse<PostResponseDTO> save_exper_Post(
-            @RequestBody BoardRequestDto.ExpertColumn request
+    @PostMapping(value="/expertCol/save",  consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ApiResponse<PostResponseDTO> save_exper_Post(
+            @RequestPart("request")
+            @Parameter(
+                    description = "전문가 칼럼 생성 요청 데이터",
+                    content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
+                            schema = @Schema(implementation = BoardRequestDto.ExpertColumn.class)))
+            BoardRequestDto.ExpertColumn request,
+            @RequestPart(value = "imgList", required = false)
+            @Parameter(
+                    description = "업로드할 이미지 파일들",
+                    content = @Content(mediaType = MediaType.MULTIPART_FORM_DATA_VALUE,
+                            array = @ArraySchema(schema = @Schema(type = "string", format = "binary"))))
+            List<MultipartFile> imgList
     ) throws Exception {
-        log.info(request.getPostTitle());
+        log.info("전문가 칼럼 게시글 저장: " + request.getPostTitle());
 
-        PostResponseDTO postResponseDTO=boardServiceImpl.save_ExperCol(request);
+        // 이미지를 함께 저장할 수 있도록 boardServiceImpl 메소드 수정 필요
+        PostResponseDTO postResponseDTO = boardServiceImpl.save_ExperCol(request, imgList); // 이미지 파일도 같이 전달
 
         return ApiResponse.onSuccess(postResponseDTO);
-
     }
+
 
 //    @Operation(
 //            summary = "QnA 답변 저장",

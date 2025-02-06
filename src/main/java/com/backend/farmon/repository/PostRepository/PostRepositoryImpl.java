@@ -94,10 +94,12 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
     @Override
     public Page<Post> findAllByBoardId(Long boardId, Pageable pageable) {
         QPost post = QPost.post;
+        QPostImg postImg = QPostImg.postImg;
 
-        // 게시판 ID로 게시글 조회
+        // 게시판 ID로 게시글 및 관련 이미지 조회
         List<Post> posts = queryFactory
                 .selectFrom(post)
+                .leftJoin(post.postImgs, postImg).fetchJoin() // Post와 PostImg를 Join
                 .where(post.board.id.eq(boardId)) // 게시판 ID로 필터링
                 .orderBy(post.createdAt.desc()) // 최신순 정렬
                 .offset(pageable.getOffset())
@@ -114,11 +116,18 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
         return new PageImpl<>(posts, pageable, total);
     }
 
+
     @Override
     public Page<Post> findPostsByBoardIdAndCrops(Long boardId, List<String> cropNames, Pageable pageable) {
+        QPost post = QPost.post;
+        QPostImg postImg = QPostImg.postImg;
+        QCrop crop = QCrop.crop;
+
+        // 게시판 ID와 Crop 이름으로 게시글 및 관련 이미지 조회
         List<Post> posts = queryFactory.selectFrom(post)
-                .join(post.postCrops, postCrop)
-                .join(postCrop.crop, crop)
+                .leftJoin(post.postImgs, postImg).fetchJoin()
+                .join(post.postCrops, QPostCrop.postCrop)
+                .join(QPostCrop.postCrop.crop, crop)
                 .where(post.board.id.eq(boardId)
                         .and(crop.name.in(cropNames))) // Crop 이름 필터링
                 .groupBy(post.id)
@@ -127,8 +136,8 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
                 .fetch();
 
         long totalCount = queryFactory.selectFrom(post)
-                .join(post.postCrops, postCrop)
-                .join(postCrop.crop, crop)
+                .join(post.postCrops, QPostCrop.postCrop)
+                .join(QPostCrop.postCrop.crop, crop)
                 .where(post.board.id.eq(boardId)
                         .and(crop.name.in(cropNames)))
                 .groupBy(post.id)
@@ -138,13 +147,16 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
     }
 
 
+
     @Override
     public Page<Post> findPopularPosts(Long boardId, Pageable pageable) {
         QPost post = QPost.post;
+        QPostImg postImg = QPostImg.postImg;
 
-        // 게시판별 인기 게시글 조회 (좋아요 수 기준 정렬)
+        // 게시판별 인기 게시글 및 관련 이미지 조회 (좋아요 수 기준 정렬)
         List<Post> posts = queryFactory
                 .selectFrom(post)
+                .leftJoin(post.postImgs, postImg).fetchJoin() // Post와 PostImg를 Join
                 .where(post.board.id.eq(boardId)) // 게시판 ID로 필터링
                 .orderBy(post.postLikes.desc()) // 좋아요 수 기준 내림차순 정렬
                 .offset(pageable.getOffset())
@@ -160,6 +172,7 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
 
         return new PageImpl<>(posts, pageable, total);
     }
+
 
 
 }

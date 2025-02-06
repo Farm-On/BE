@@ -20,9 +20,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.util.UriUtils;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -50,35 +48,33 @@ public class S3Service {
     }
 
 
-
     @Transactional
-    public PostImg saveImage(byte[] imageBytes, Post post) throws Exception {
-        if (imageBytes == null || imageBytes.length == 0) {
-            throw new IllegalArgumentException("업로드할 파일이 없습니다.");
+    public PostImg saveImage(MultipartFile multipartFile, Post post) throws Exception {
+        if (multipartFile.isEmpty()) {
+            return null;
         }
 
-        // 저장할 파일명 생성 (UUID + 확장자)
-        String storedFileName = UUID.randomUUID() + ".jpg"; // Base64 이미지 확장자 지정
+        String originalFileName = multipartFile.getOriginalFilename();
+        // 원본 파일명을 서버에 저장된 파일명으로 변경하여 storedFileName에 저장하기 위함 (중복 비허용)
+        // 파일명이 중복되지 않도록 UUID를 붙여 설정, 확장자 유지
+        String storedFileName = UUID.randomUUID() + "." + extractExt(originalFileName);
 
         ObjectMetadata metadata = new ObjectMetadata();
-        metadata.setContentLength(imageBytes.length);
-        metadata.setContentType("image/jpeg"); // 기본 이미지 타입 설정
+        metadata.setContentLength(multipartFile.getSize());
+        metadata.setContentType(multipartFile.getContentType());
 
         // S3에 파일 업로드
-        try (InputStream inputStream = new ByteArrayInputStream(imageBytes)) {
-            amazonS3.putObject(bucket, storedFileName, inputStream, metadata);
-        }
+        amazonS3.putObject(bucket, storedFileName, multipartFile.getInputStream(), metadata);
 
         // PostImg 객체 저장
         PostImg img = imgRepository.save(PostImg.builder()
-                .originalFileName(storedFileName) // Base64에서 원본 파일명을 알 수 없으므로 저장된 파일명 사용
+                .originalFileName(originalFileName)
                 .storedFileName(storedFileName)
                 .build());
 
         img.changePost(post); // 게시글과 연결
         return img;
     }
-
     // Amazon S3에서 다운로드 가능한 URL로 변환해 반환합니다. 반환된 URL을 통해 사용자는 이미지를 직접 다운로드할 수 있습니다.
     public List<ResponseEntity<UrlResource>> downloadImg(Long postId) {
         // boardId에 해당하는 게시글이 없으면 null return

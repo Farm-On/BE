@@ -154,12 +154,9 @@ public class PostQueryServiceImpl implements PostQueryService {
                 .orElseThrow(() -> new GeneralException(ErrorStatus.POST_NOT_FOUND));
 
         List<PostImg>imgs=post.getPostImgs();
-        List<String>imgUrls=new ArrayList<>();
-        if(imgs !=null){
-            for(PostImg img :imgs){
-                imgUrls.add(s3Service.getFullPath(img.getStoredFileName()));
-            }
-        }
+        List<String> imgUrls = imgs.stream()
+                .map(img -> s3Service.getFullPath(img.getStoredFileName())) // S3 URL 생성
+                .collect(Collectors.toList());
 
         // 작성 시간 차이 계산
         String timeAgo = TimeDifferenceUtil.calculateTimeDifference(post.getCreatedAt());
