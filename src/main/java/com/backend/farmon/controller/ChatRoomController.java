@@ -2,7 +2,6 @@ package com.backend.farmon.controller;
 
 import com.backend.farmon.apiPayload.ApiResponse;
 import com.backend.farmon.dto.chat.ChatResponse;
-import com.backend.farmon.service.ChatImageService.ChatImageService;
 import com.backend.farmon.service.ChatMessageService.ChatMessageQueryService;
 import com.backend.farmon.service.ChatRoomService.ChatRoomCommandService;
 import com.backend.farmon.service.ChatRoomService.ChatRoomQueryService;
@@ -35,7 +34,6 @@ public class ChatRoomController {
     private final ChatRoomCommandService chatRoomCommandService;
     private final ChatRoomQueryService chatRoomQueryService;
     private final ChatMessageQueryService chatMessageQueryService;
-    private final ChatImageService chatImageService;
 
     // 전체 채팅 목록 조회
     @Operation(
@@ -223,7 +221,7 @@ public class ChatRoomController {
                                                                  @RequestParam(name = "chatRoomId") Long chatRoomId,
                                                                  @RequestPart("chatImage") MultipartFile imageFile) {
         try{
-            ChatResponse.ChatImageDTO response = chatImageService.uploadChatImage(userId, chatRoomId, imageFile);
+            ChatResponse.ChatImageDTO response = chatRoomQueryService.uploadChatImage(userId, chatRoomId, imageFile);
             return ApiResponse.onSuccess(response);
         } catch (Exception e){
             log.error(e.getMessage());
