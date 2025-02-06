@@ -72,7 +72,7 @@ public class BoardRequestDto {
     @Schema(description = "QnA 게시판 게시글")
     public static class QnaPost extends BasePost {
         @Schema(description = "상위 분야 카테고리", example = "곡물")
-        private String Categorytitle;
+        private String categoryTitle;
 
         @Schema(description = "하위 분야 카테고리", example = "쌀")
         @NotBlank
@@ -98,7 +98,7 @@ public class BoardRequestDto {
     public static class ExpertColumn extends BasePost {
 
         @Schema(description = "상위 분야 카테고리", example = "옥수수")
-        private String  Categorytitle;
+        private String   categoryTitle;
 
         @Schema(description = "하위 분야 카테고리", example = "쌀")
         private String crop;
