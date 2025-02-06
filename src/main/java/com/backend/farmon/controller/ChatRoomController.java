@@ -197,8 +197,8 @@ public class ChatRoomController {
     // 채팅에 전송할 이미지 업로드
     @Operation(
             summary = "채팅에 전송할 이미지 업로드",
-            description = "채팅방에서 이미지 전송 시, 전송할 이미지 파일을 업로드 후, 해당 이미지 파일의 URL을 응답으로 받는 API 입니다." +
-                    "반환 받은 URL을 채팅방에서 메시지 전송 시 사용하시면 됩니다." +
+            description = "채팅방에서 이미지 전송 시, 전송할 이미지 파일을 업로드 후, 해당 이미지 파일의 URL을 응답으로 받는 API 입니다. " +
+                    "반환 받은 URL을 채팅방에서 메시지 전송 시 사용하시면 됩니다. " +
                     "유저 아이디, 채팅방 아이디를 쿼리 스트링으로 입력해주세요. " +
                     "이미지 파일을 multipart/form-data로 Request Body에 포함시켜 주세요."
     )
