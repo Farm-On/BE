@@ -29,11 +29,6 @@ public class PostRequestDTO {
         @Schema(description = "좋아요 수", defaultValue = "0")
         private int postLike = 0;
 
-        // 여기는 확신 못함
-        @Schema(description = "해시태그")
-        private String hashTag;
-
-
 
         @Schema(description = "좋아요수" ,defaultValue = "1")
         private int liked=0;

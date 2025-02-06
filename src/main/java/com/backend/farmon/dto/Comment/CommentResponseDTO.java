@@ -44,7 +44,7 @@ public class CommentResponseDTO {
         @Schema(description = "작성자 유저 아이디", example = "1")
         private Long userId;
 
-        @Schema(description = "전문가", example = "곡물")
+        @Schema(description = "전문가 분야", example = "곡물")
         private String expertCategory;
 
         @Schema(description = "대댓글 목록")

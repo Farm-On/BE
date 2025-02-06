@@ -1,9 +1,10 @@
 package com.backend.farmon.domain;
 
 import com.backend.farmon.domain.commons.BaseEntity;
-import com.backend.farmon.dto.Filter.FieldCategory; // FieldCategory Enum import
+import com.backend.farmon.dto.post.PostType;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -31,14 +32,36 @@ public class Post extends BaseEntity {
 
     private String postContent;
 
-    @Enumerated(EnumType.STRING) // Enum을 String으로 저장
-    @Column(name = "field_category")
-    private FieldCategory fieldCategory; // 카테고리 (예: GRAIN, VEGETABLE 등)
+//
+//    private PostType postType;
 
-    @ElementCollection
-    @CollectionTable(name = "post_subcategories", joinColumns = @JoinColumn(name = "post_id"))
-    @Column(name = "sub_category_name")
-    private List<String> selectedSubCategories; // 선택된 하위 카테고리 리스트
+    // 상위 분야 이름
+    @JsonProperty("categorytitle")
+    private String Category;
+
+    // 하위분야 이름 저장
+    @CollectionTable(name = "post_sub_categories", joinColumns = @JoinColumn(name = "post_id"))
+    @Column(name = "sub_category")
+    private String subCategories;
+
+    // 하위 카테고리
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<PostCrop> postCrops = new ArrayList<>();
+
+    // 편의 메서드: Crop 추가
+    public void addCrop(Crop crop) {
+        PostCrop postCrop = new PostCrop();
+        postCrop.setPost(this);
+        postCrop.setCrop(crop);
+        this.postCrops.add(postCrop);
+        crop.getPostCrops().add(postCrop);
+    }
+
+
+//    @ElementCollection
+//    @CollectionTable(name = "post_subcategories", joinColumns = @JoinColumn(name = "post_id"))
+//    @Column(name = "sub_category_name")
+//    private List<String> selectedSubCategories; // 선택된 하위 카테고리 리스트
 
     @ManyToOne
     @JoinColumn(name = "board_id")

@@ -3,13 +3,16 @@ package com.backend.farmon.domain;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.DynamicInsert;
+import org.hibernate.annotations.DynamicUpdate;
 
 @Entity
 @Getter
-@Setter
+@DynamicUpdate
+@DynamicInsert
 @Builder
-@AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor
 public class AnswerImg {
 
     @Id
@@ -24,10 +27,9 @@ public class AnswerImg {
     // Img:Post = N:1
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "answer_id")
-    @JsonBackReference
     private Answer answer;
 
-    public void changePost(Answer answer){
+    public void changeAnswer(Answer answer){
         if(this.answer!=null){
             this.answer.getAnswerImgList().remove(this);
         }
