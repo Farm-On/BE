@@ -8,7 +8,11 @@ import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
 import java.util.Set;
+import org.springframework.data.repository.query.Param;
+
+import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 public interface CropRepository extends JpaRepository<Crop, Long> {
     Optional<Crop> findByName(String name);
