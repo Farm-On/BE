@@ -40,7 +40,6 @@ public class CommentController {
         try{
             commentService.saveParentComment(postId, request);
             resultCode = SuccessStatus._OK.getCode(); // 성공 상태 코드 가져오기
-            //  resultMsg = SuccessStatus._OK.getMessage(); // 성공 메시지 가져오기
             return ApiResponse.onSuccess(resultCode);
 
         }catch (Exception e){

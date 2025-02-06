@@ -23,6 +23,8 @@ public class CommentRequestDTO {
         @Schema(description = "게시글 아이디", example = "hjunew", required = true)
         private Long postId;
 
+        @Schema(description = "삭제여부 ", example = "처음부터 false", required = true)
+        private boolean isDeleted;
 
     }
 
@@ -45,6 +47,9 @@ public class CommentRequestDTO {
 
         @Schema(description = "부모 댓글 ID", example = "1", required = true)
         private Long parentCommentId;
+
+        @Schema(description = "삭제여부 ", example = "처음부터 false", required = true)
+        private boolean isDeleted;
     }
 
 

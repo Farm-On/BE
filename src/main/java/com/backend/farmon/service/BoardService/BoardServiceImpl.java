@@ -26,7 +26,6 @@ import java.util.List;
 
 import java.util.stream.Collectors;
 
-import static com.backend.farmon.domain.QBoard.board;
 
 @Service
 @Slf4j
@@ -84,7 +83,7 @@ public class BoardServiceImpl implements BoardService {
         Board board = boardRepository.findById(postDto.getBoardId())
                 .orElseThrow(() -> new GeneralException(ErrorStatus.POST_TYPE_NOT_FOUND));
 
-        if (board.getPostType() != PostType.EXPERT_COLUMN) {
+        if (board.getPostType() != PostType.QNA) {
             throw new GeneralException(ErrorStatus.POST_NOT_FOUND);
         }
 

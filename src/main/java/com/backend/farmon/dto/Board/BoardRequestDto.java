@@ -20,22 +20,22 @@ public class BoardRequestDto {
     public static abstract class BasePost {
 
         // 기존 코드 동일
-        @Schema(description = "게시글 제목", example = "게시글 제목 예시")
+        @Schema(description = "게시글 제목", example = "농촌에서 살아남기")
         private String postTitle;   // 게시글 제목
 
-        @Schema(description = "게시글 내용", example = "게시글 내용 예시")
+        @Schema(description = "게시글 내용", example = "쌀을 기르는 법")
         private String postContent; // 게시글 내용
 
-        @Schema(description ="사용자  ID (boardId)", example = "90")
+        @Schema(description ="사용자  ID (boardId)", example = "1")
         private Long userId;
 
-        @Schema(description = "게시판 ID (boardId)", example = "90")
+        @Schema(description = "게시판 ID (boardId)", example = "1")
         private Long boardId;       // 게시판 ID (boardNo)
 
         @Schema(description = "게시글에 대한 댓글 수", example = "5")
         private int comment = 0; // 댓글 수, 기본값 0
 
-        @Schema(description = "게시글 종류 (예: QnA, 일반 게시글 등)", example = "QnA")
+        @Schema(description = "게시글 종류 (예: QnA, 일반 게시글 등)", example = "QNA")
         public PostType postType;   // 게시글 종류 (예: QnA, 일반 게시글 등)
     }
 
@@ -66,7 +66,7 @@ public class BoardRequestDto {
         @Size(max=30)
         private String categorytitle;
 
-        @Schema(description = "하위 분야 카테고리", example = "[\"쌀\", \"옥수수\"]")
+        @Schema(description = "하위 분야 카테고리",example="쌀")
         @NotNull
         private String crop;
 
@@ -93,7 +93,7 @@ public class BoardRequestDto {
         @Size(max=30)
         private String categorytitle;
 
-        @Schema(description = "하위 분야  카테고리", example = "쌀,옥수수")
+        @Schema(description = "하위 분야  카테고리", example = "쌀")
         private String crop;
     }
 }
