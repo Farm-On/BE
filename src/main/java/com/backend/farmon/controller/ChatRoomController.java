@@ -2,6 +2,7 @@ package com.backend.farmon.controller;
 
 import com.backend.farmon.apiPayload.ApiResponse;
 import com.backend.farmon.dto.chat.ChatResponse;
+import com.backend.farmon.service.ChatImageService.ChatImageService;
 import com.backend.farmon.service.ChatMessageService.ChatMessageQueryService;
 import com.backend.farmon.service.ChatRoomService.ChatRoomCommandService;
 import com.backend.farmon.service.ChatRoomService.ChatRoomQueryService;
@@ -16,8 +17,12 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.MediaType;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
 
 @Tag(name = "채팅 페이지", description = "채팅에 관한 API")
 @Slf4j
@@ -30,6 +35,7 @@ public class ChatRoomController {
     private final ChatRoomCommandService chatRoomCommandService;
     private final ChatRoomQueryService chatRoomQueryService;
     private final ChatMessageQueryService chatMessageQueryService;
+    private final ChatImageService chatImageService;
 
     // 전체 채팅 목록 조회
     @Operation(
@@ -189,5 +195,39 @@ public class ChatRoomController {
         ChatResponse.ChatRoomEstimateDTO response = chatRoomQueryService.findChatRoomEstimate(userId, chatRoomId);
 
         return ApiResponse.onSuccess(response);
+    }
+
+    // 채팅에 전송할 이미지 업로드
+    @Operation(
+            summary = "채팅에 전송할 이미지 업로드",
+            description = "채팅방에서 이미지 전송 시, 전송할 이미지 파일을 업로드 후, 해당 이미지 파일의 URL을 응답으로 받는 API 입니다." +
+                    "반환 받은 URL을 채팅방에서 메시지 전송 시 사용하시면 됩니다." +
+                    "유저 아이디, 채팅방 아이디를 쿼리 스트링으로 입력해주세요. " +
+                    "이미지 파일을 multipart/form-data로 Request Body에 포함시켜 주세요."
+    )
+    @ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200", description = "OK, 성공"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "USER4001", description = "아이디와 일치하는 사용자가 없습니다.", content = @Content(schema = @Schema(implementation = ApiResponse.class))),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "AUTHORIZATION_4031", description = "인증된 사용자 정보와 요청된 리소스의 사용자 정보가 다릅니다. (userId 불일치)", content = @Content(schema = @Schema(implementation = ApiResponse.class))),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "CHATROOM4001", description = "채팅방 아이디와 일치하는 채팅방이 없습니다.", content = @Content(schema = @Schema(implementation = ApiResponse.class))),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "ERROR_UPLOAD_CHAT_IMG", description = "채팅용 이미지 업로드에 실패하였습니다. 관리자에게 문의 바랍니다.", content = @Content(schema = @Schema(implementation = ApiResponse.class))),
+    })
+    @Parameters({
+            @Parameter(name = "userId", description = "로그인한 유저의 아이디(pk)", example = "1", required = true),
+            @Parameter(name = "chatRoomId", description = "채팅방의 아이디", example = "1", required = true),
+
+    })
+    @PostMapping(value = "/image", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
+    public ApiResponse<ChatResponse.ChatImageDTO> postChatImage (@Parameter(content = @Content(mediaType = MediaType.MULTIPART_FORM_DATA_VALUE))
+                                                                     @RequestParam(name = "userId") @EqualsUserId Long userId,
+                                                                 @RequestParam(name = "chatRoomId") Long chatRoomId,
+                                                                 @RequestPart("chatImage") MultipartFile imageFile) {
+        try{
+            ChatResponse.ChatImageDTO response = chatImageService.uploadChatImage(userId, chatRoomId, imageFile);
+            return ApiResponse.onSuccess(response);
+        } catch (Exception e){
+            log.error(e.getMessage());
+            return ApiResponse.onFailure("ERROR_UPLOAD_CHAT_IMG","채팅용 이미지 업로드에 실패하였습니다. 관리자에게 문의 바랍니다.",null);
+        }
     }
 }

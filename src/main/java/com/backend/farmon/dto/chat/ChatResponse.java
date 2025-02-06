@@ -221,23 +221,6 @@ public class ChatResponse {
         List<String> estimateImageList;
     }
 
-    @Getter
-    @Setter
-    @NoArgsConstructor
-    @AllArgsConstructor
-    @Builder
-    @Schema(description = "채팅방 컨설팅 완료 정보")
-    public static class ChatRoomCompleteDTO {
-        @Schema(description = "사용자의 컨설팅 완료 여부", example = "true")
-        Boolean isComplete;
-
-        @Schema(description = "채팅 상대의 컨설팅 완료 여부", example = "true")
-        Boolean isOtherComplete;
-
-        @Schema(description = "견적 완료 여부, 농업인 전문가 모두 컨설팅 완료 시 true", example = "true")
-        Boolean isEstimateComplete;
-    }
-
     @ToString
     @Getter
     @Setter
@@ -253,7 +236,7 @@ public class ChatResponse {
         @Schema(description = "보낸 사람 타입", example = "농업인")
         String senderType;
 
-        @Schema(description = "메시지 내용, 이미지일 경우 클라이언트에서 이미지 파일을 Base64로 인코딩하여 전송 필요", example = "안녕하세요. 견적 신청하셨나요?")
+        @Schema(description = "메시지 내용, 이미지 전송의 경우 이미지 URL", example = "안녕하세요. 견적 신청하셨나요?")
         String messageContent;
 
         @Schema(description = "메시지 타입, " +
@@ -269,7 +252,20 @@ public class ChatResponse {
         @Schema(description = "상대방이 메시지 읽음 여부", example = "false")
         Boolean isOtherRead;
 
-        @Schema(description = "상대방이 채팅방에 접속해 있는지 여부", example = "false")
-        Boolean isOtherEnter;
+//        @Schema(description = "상대방이 채팅방에 접속해 있는지 여부", example = "false")
+//        Boolean isOtherEnter;
+    }
+
+    @ToString
+    @Getter
+    @Setter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Builder
+    @Schema(description = "채팅 시 필요한 이미지 업로드 시 반환 정보")
+    public static class ChatImageDTO {
+
+        @Schema(description = "업로드한 이미지 파일 URL")
+        String chatImageURL;
     }
 }

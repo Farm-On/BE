@@ -3,6 +3,7 @@ package com.backend.farmon.service.AWS;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.backend.farmon.apiPayload.code.status.ErrorStatus;
+import com.backend.farmon.apiPayload.exception.handler.ChatRoomHandler;
 import com.backend.farmon.apiPayload.exception.handler.ExpertHandler;
 import com.backend.farmon.domain.*;
 import com.backend.farmon.repository.ExpertReposiotry.ExpertRepository;
@@ -180,5 +181,37 @@ public class S3Service {
         Expert expert = expertRepository.findById(expertId).orElseThrow(() -> new ExpertHandler(ErrorStatus.EXPERT_NOT_FOUND));
         amazonS3.deleteObject(bucket, expert.getProfileImageUrl());
         expert.setProfileImageUrl(null);
+    }
+
+    // 채팅용 이미지 업로드
+    public String putChatImage(Long userId, Long chatRoomId, MultipartFile multipartFile) throws IOException {
+        if (multipartFile.isEmpty())
+            throw new IllegalArgumentException("이미지 파일이 비어있습니다.");
+
+        // 허용된 이미지 확장자 목록
+        List<String> allowedExtensions = Arrays.asList("jpg", "jpeg", "png", "gif", "webp");
+
+        // 원본 파일명 추출
+        String originalFileName = multipartFile.getOriginalFilename();
+
+        // 파일 확장자 추출
+        String fileExtension = extractExt(originalFileName).toLowerCase();
+
+        // 확장자 검사
+        if (!allowedExtensions.contains(fileExtension)) {
+            throw new IllegalArgumentException("지원하지 않는 파일 형식입니다. 이미지 파일(jpg, jpeg, png, gif, webp)만 업로드 가능합니다.");
+        }
+
+        // 원본 파일명을 서버에 저장된 파일명으로 변경하여 storedFileName에 저장하기 위함 (중복 비허용)
+        String storedFileName = "Chatting/" + UUID.randomUUID() + "user" + userId + "chatRoom" + chatRoomId + "." + extractExt(originalFileName);
+
+        ObjectMetadata metadata = new ObjectMetadata();
+        metadata.setContentLength(multipartFile.getSize());
+        metadata.setContentType(multipartFile.getContentType());
+
+        // S3에 파일 업로드
+        amazonS3.putObject(bucket, storedFileName, multipartFile.getInputStream(), metadata);
+
+        return getFullPath(storedFileName);
     }
 }
