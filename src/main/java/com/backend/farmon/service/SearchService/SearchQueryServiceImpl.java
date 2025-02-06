@@ -1,7 +1,5 @@
 package com.backend.farmon.service.SearchService;
 
-import com.backend.farmon.converter.ConvertTime;
-import com.backend.farmon.domain.Crop;
 import com.backend.farmon.dto.home.HomeResponse;
 import com.backend.farmon.repository.CropRepository.CropRepository;
 import lombok.RequiredArgsConstructor;
@@ -10,9 +8,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ZSetOperations;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
