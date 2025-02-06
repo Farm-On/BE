@@ -22,8 +22,6 @@ public class PostImg extends BaseEntity {
 
     private String originalFileName;
 
-
-
     // Img:Post = N:1
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "post_id")

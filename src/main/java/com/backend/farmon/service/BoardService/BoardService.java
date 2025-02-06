@@ -1,5 +1,7 @@
 package com.backend.farmon.service.BoardService;
 
+import com.backend.farmon.dto.Answer.AnswerRequestDTO;
+import com.backend.farmon.dto.Answer.AnswerResponseDTO;
 import com.backend.farmon.dto.Board.BoardRequestDto;
 import com.backend.farmon.dto.post.PostRequestDTO;
 import com.backend.farmon.dto.post.PostResponseDTO;
@@ -17,4 +19,6 @@ public interface BoardService {
     PostResponseDTO save_QnaPost(BoardRequestDto.QnaPost postDto, List<MultipartFile> multipartFiles) throws Exception;
 
     PostResponseDTO save_ExperCol(BoardRequestDto.ExpertColumn postDto, List<MultipartFile> multipartFiles) throws Exception;
+
+    AnswerResponseDTO saveQnAAnswer(AnswerRequestDTO dto, List<MultipartFile> multipartFiles)throws Exception;
 }

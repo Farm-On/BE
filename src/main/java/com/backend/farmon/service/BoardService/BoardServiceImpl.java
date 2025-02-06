@@ -3,11 +3,15 @@ package com.backend.farmon.service.BoardService;
 import com.backend.farmon.apiPayload.code.status.ErrorStatus;
 import com.backend.farmon.apiPayload.exception.GeneralException;
 import com.backend.farmon.aws.s3.AmazonS3Manager;
+import com.backend.farmon.converter.AnswerConverter;
 import com.backend.farmon.domain.*;
 import com.backend.farmon.domain.commons.TimeDifferenceUtil;
+import com.backend.farmon.dto.Answer.AnswerRequestDTO;
+import com.backend.farmon.dto.Answer.AnswerResponseDTO;
 import com.backend.farmon.dto.Board.BoardRequestDto;
 import com.backend.farmon.dto.post.PostResponseDTO;
 import com.backend.farmon.dto.post.PostType;
+import com.backend.farmon.repository.AnswerImgRepository.AnswerImgRepository;
 import com.backend.farmon.repository.BoardRepository.BoardRepository;
 import com.backend.farmon.repository.CropRepository.CropRepository;
 import com.backend.farmon.repository.PostRepository.PostImgRepository;
@@ -39,6 +43,8 @@ public class BoardServiceImpl implements BoardService {
     private final CropRepository cropRepository;
     private final AmazonS3Manager amazonS3Manager;
     private  final PostImgRepository postImgRepository;
+    private final AnswerConverter answerConverter;
+    private final AnswerImgRepository answerImgRepository;
 
 
     @Override
@@ -75,7 +81,7 @@ public class BoardServiceImpl implements BoardService {
 
                 // PostImg 객체 생성
                 PostImg postImg = PostImg.builder()
-                        .storedFileName(imageKey)
+                        .storedFileName(imageUrl)
                         .originalFileName(imageFile.getOriginalFilename())
                         .post(post)  // 현재 포스트와 연관
                         .build();
@@ -126,7 +132,7 @@ public class BoardServiceImpl implements BoardService {
 
                 // PostImg 객체 생성
                 PostImg postImg = PostImg.builder()
-                        .storedFileName(imageKey)
+                        .storedFileName(imageUrl)
                         .originalFileName(imageFile.getOriginalFilename())
                         .post(post)  // 현재 포스트와 연관
                         .build();
@@ -171,7 +177,7 @@ public class BoardServiceImpl implements BoardService {
 
                 // PostImg 객체 생성
                 PostImg postImg = PostImg.builder()
-                        .storedFileName(imageKey)
+                        .storedFileName(imageUrl)
                         .originalFileName(imageFile.getOriginalFilename())
                         .post(post)  // 현재 포스트와 연관
                         .build();
@@ -190,7 +196,45 @@ public class BoardServiceImpl implements BoardService {
     }
 
 
+    @Override
+    public AnswerResponseDTO saveQnAAnswer(AnswerRequestDTO dto, List<MultipartFile> multipartFiles) throws Exception {
+        User user = userRepository.findById(dto.getUserId())
+                .orElseThrow(() -> new GeneralException(ErrorStatus.USER_NOT_FOUND));
+        // 글 쓴 사람 로직 파악
+        Post post = postRepository.findById(dto.getPostId())
+                .orElseThrow(() -> new IllegalArgumentException("게시글을 찾을 수 없습니다."));
 
+        // DTO -> 엔티티 변환 (답변)
+        Answer answer = answerConverter.toEntity(dto);
+        // 이미지 업로드 처리 및 변환 (최대 5개 제한)
+            List<String> imgUrls = new ArrayList<>();
+
+            if (multipartFiles != null && !multipartFiles.isEmpty()) {
+                if (multipartFiles.size() > 5) {
+                    throw new IllegalArgumentException("사진은 최대 5개 까지만 업로드할 수 있습니다.");
+                }
+                for (MultipartFile imageFile : multipartFiles) {
+                    // 파일을 S3에 업로드
+                    String imageKey = "AnswerImg/" + UUID.randomUUID() + "_" + imageFile.getOriginalFilename();
+                    String imageUrl = amazonS3Manager.uploadFile(imageKey, imageFile);
+                    // PostImg 객체 생성
+                    AnswerImg answerImg = AnswerImg.builder()
+                            .storedFileName(imageKey)
+                            .originalFileName(imageFile.getOriginalFilename())
+                            .answer(answer)
+                            .build();
+
+
+                    answerImgRepository.save(answerImg);
+                    imgUrls.add(imageUrl);
+
+                }
+
+            }
+        String timeAgo = TimeDifferenceUtil.calculateTimeDifference(answer.getCreatedAt());
+
+        return new AnswerResponseDTO(answer, imgUrls, timeAgo);
+    }
 
 
     private void validateFieldCategory(String crops) {

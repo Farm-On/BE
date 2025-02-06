@@ -1,6 +1,10 @@
 package com.backend.farmon.dto.Answer;
 
+
+import com.backend.farmon.domain.Answer;
+import com.backend.farmon.domain.Post;
 import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -11,18 +15,7 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @Schema(description = "답변 요청 DTO")
-public class AnswerRequestDTO {
-    @Schema(description = "답변을 쓰는 사람의 Id")
-    Long userId;
-
-    @Schema(description="게시글의 사람의 Id")
-    Long questionId;
-
-    @Schema(description="QnA게시판 id")
-    Long boardId;
-
-    @Schema(description="post 글 id")
-    Long postId;
+public class AnswerResponseDTO {
 
     @Schema(description = "답변 제목")
     private String title;
@@ -35,4 +28,18 @@ public class AnswerRequestDTO {
 
     @Schema(description = "답변자가 올린 답글 사진")
     private List<String> imgUrl;
+
+    @Schema(description = "작성 시간", example = "몇 분전 ,한 시간 전")
+    private String createdAt;
+
+    @Builder
+    public AnswerResponseDTO(Answer answer, List<String> imgUrls, String timeAgo){
+        this.title = answer.getTitle();
+        this.content = answer.getContent();
+        this.answeredUserId=answer.getId();
+        this.createdAt =timeAgo;
+        this.imgUrl = imgUrls;
+    }
+
+
 }

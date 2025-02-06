@@ -145,7 +145,7 @@ public class PostQueryServiceImpl implements PostQueryService {
         return posts.map(post -> new PostPagingResponseDTO(post, s3Service.getFullPath(post.getPostImgs())));
     }
 
-    ////모든  글 상세 조회
+    ////모든  글 상세 조회(QnA 빼고)
     @Transactional(readOnly = true)
     public PostResponseDTO getBoardIdAndPostById(Long boardId,Long postId) {
         Board board=boardRepository.findById(boardId)

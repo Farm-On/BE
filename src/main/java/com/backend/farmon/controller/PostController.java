@@ -6,6 +6,7 @@ import com.backend.farmon.apiPayload.code.status.SuccessStatus;
 import com.backend.farmon.domain.Crop;
 import com.backend.farmon.domain.Post;
 import com.backend.farmon.dto.Answer.AnswerRequestDTO;
+import com.backend.farmon.dto.Answer.AnswerResponseDTO;
 import com.backend.farmon.dto.Board.BoardRequestDto;
 import com.backend.farmon.dto.estimate.EstimateRequestDTO;
 import com.backend.farmon.dto.post.PostPagingResponseDTO;
@@ -111,6 +112,36 @@ public class PostController {
 
         return ApiResponse.onSuccess(postResponseDTO);
     }
+
+    @Operation(
+            summary = "QnA 답변 저장",
+            description = "사용자는 QnA 질문에 대한 답변을 저장할 수 있습니다."
+    )
+    @ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200", description = "OK, 성공"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "USER4001", description = "아이디와 일치하는 사용자가 없습니다.", content = @Content(schema = @Schema(implementation = ApiResponse.class))),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON400", description = "잘못된 요청입니다.", content = @Content(schema = @Schema(implementation = ApiResponse.class))),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "POST_TYPE4002", description = "답변이 저장되지 않았습니다.", content = @Content(schema = @Schema(implementation = ApiResponse.class))),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "POST_TYPE4003", description = "질문을 찾을 수 없습니다.", content = @Content(schema = @Schema(implementation = ApiResponse.class)))
+    })
+    @PostMapping("/qna/answer/save")
+    public ApiResponse <AnswerResponseDTO> saveQnAAnswer(
+            @RequestPart("request")      @Parameter(
+                    description = "자유 게시판 데이터",
+                    content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
+                            schema = @Schema(implementation = BoardRequestDto.QnaPost.class)))  AnswerRequestDTO answerRequestDTO ,// 답변 데이터
+                  @RequestPart(value = "imgList", required = false) @Parameter(
+                          description = "업로드할 이미지 파일들",
+                          content = @Content(mediaType = MediaType.MULTIPART_FORM_DATA_VALUE,
+                                  array = @ArraySchema(schema = @Schema(type = "string", format = "binary"))))List<MultipartFile> imgList
+    ) throws Exception {
+
+        AnswerResponseDTO responseDTO = boardServiceImpl.saveQnAAnswer(answerRequestDTO,imgList);
+
+
+        return ApiResponse.onSuccess(responseDTO);
+    }
+
 
     @Operation(
             summary = "전문가 칼럼 글에서 정보를 저장",
