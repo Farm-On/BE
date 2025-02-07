@@ -1,6 +1,5 @@
 package com.backend.farmon.service.ChatMessageService;
 
-import com.amazonaws.services.s3.model.CannedAccessControlList;
 import com.backend.farmon.apiPayload.code.status.ErrorStatus;
 import com.backend.farmon.apiPayload.exception.handler.ChatMessageHandler;
 import com.backend.farmon.apiPayload.exception.handler.ChatRoomHandler;

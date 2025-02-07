@@ -161,11 +161,9 @@ public class ChatConverter {
                 .build();
     }
 
-    public static ChatResponse.ChatRoomCompleteDTO toChatRoomCompleteDTO(ChatRoom chatRoom, Boolean isOtherComplete, Boolean isEstimateComplete) {
-        return ChatResponse.ChatRoomCompleteDTO.builder()
-                .isOtherComplete(isOtherComplete)
-                .isComplete(true)
-                .isEstimateComplete(isEstimateComplete)
+    public static ChatResponse.ChatImageDTO toChatImageDTO(String chatImageURL){
+        return ChatResponse.ChatImageDTO.builder()
+                .chatImageURL(chatImageURL)
                 .build();
     }
 }

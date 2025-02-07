@@ -14,6 +14,7 @@ import com.backend.farmon.repository.ChatMessageRepository.ChatMessageRepository
 import com.backend.farmon.repository.ChatRoomReposiotry.ChatRoomRepository;
 import com.backend.farmon.repository.EstimateRepository.EstimateRepository;
 import com.backend.farmon.repository.UserRepository.UserRepository;
+import com.backend.farmon.service.AWS.S3Service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -22,7 +23,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -36,6 +39,7 @@ public class ChatRoomQueryServiceImpl implements ChatRoomQueryService {
     private final UserRepository userRepository;
     private final EstimateRepository estimateRepository;
     private final UserAuthorizationUtil userAuthorizationUtil;
+    private final S3Service s3Service;
 
     private static final Integer PAGE_SIZE=10;
 
@@ -128,5 +132,21 @@ public class ChatRoomQueryServiceImpl implements ChatRoomQueryService {
         log.info("채팅방의 견적 조회 완료 - userId: {}, estimateId: {}", userId, estimate.getId());
 
         return ChatConverter.toChatRoomEstimateDTO(estimate, estimate.getEstimateImageList());
+    }
+
+    // 채팅용 이미지 업로드
+    @Override
+    public ChatResponse.ChatImageDTO uploadChatImage(Long userId, Long chatRoomId, MultipartFile imageFile) throws IOException {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserHandler(ErrorStatus.USER_NOT_FOUND));
+
+        ChatRoom chatRoom = chatRoomRepository.findById(chatRoomId)
+                .orElseThrow(() -> new ChatRoomHandler(ErrorStatus.CHATROOM_NOT_FOUND));
+
+        // 채팅용 이미지 업로드
+        String imageURL = s3Service.putChatImage(userId, chatRoomId, imageFile);
+        log.info("채팅용 이미지 업로드 성공, 이미지 URL: {}", imageURL);
+
+        return ChatConverter.toChatImageDTO(imageURL);
     }
 }

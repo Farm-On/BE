@@ -1,6 +1,9 @@
 package com.backend.farmon.service.ChatRoomService;
 
 import com.backend.farmon.dto.chat.ChatResponse;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
 
 public interface ChatRoomQueryService {
     // 검색어 별 채팅방 목록 조회
@@ -11,4 +14,7 @@ public interface ChatRoomQueryService {
 
     // 채팅방의 견적 조회
     ChatResponse.ChatRoomEstimateDTO findChatRoomEstimate(Long userId, Long chatRoomId);
+
+    // 채팅용 이미지 업로드
+    ChatResponse.ChatImageDTO uploadChatImage(Long userId, Long chatRoomId, MultipartFile imageFile) throws IOException;
 }
