@@ -187,7 +187,7 @@ public class EstimateRestController {
             @Parameter(name = "expertId", description = "전문가 ID", example = "10", required = true),
             @Parameter(name = "page", description = "페이지 번호(1부터 시작)", example = "1", required = true)
     })
-    @GetMapping("expert/{expertId}/by-crop")
+    @GetMapping("/expert/{expertId}/by-crop")
     public ApiResponse<EstimateResponseDTO.ListDTO> getEstimatesByExpertCropId(
             @PathVariable Long expertId,
             @RequestParam(name = "page", defaultValue = "1") Integer page
