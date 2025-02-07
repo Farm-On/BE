@@ -61,10 +61,10 @@ public interface EstimateRepository extends JpaRepository<Estimate, Long>, Estim
     Page<Estimate> findCompletedEstimatesByUserId(@Param("userId") Long userId, Pageable pageable);
 
     // 7) estimate  user_id와 일치하는 estimates 목록 중 최신순 5개 목록을 전달
-    @Query("SELECT e FROM Estimate e WHERE e.user.id = :userId " +
-            "ORDER BY e.createdAt DESC")
-    List<Estimate> findTop5ByUserIdOrderByCreatedAtDesc(@Param("userId") Long userId);
-
+//    @Query("SELECT e FROM Estimate e WHERE e.user.id = :userId " +
+//            "ORDER BY e.createdAt DESC")
+//    List<Estimate> findTop5ByUserIdOrderByCreatedAtDesc(@Param("userId") Long userId);
+    List<Estimate> findTop5ByUserIdOrderByCreatedAtDesc(Long userId);
     // 특정 전문가에 대한 모든 Estimate 수를 반환하는 메서드
     long countByExpert(Expert expert);
 }
