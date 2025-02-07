@@ -24,6 +24,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
@@ -78,8 +79,8 @@ public class HomeController {
 
     // 홈 화면 검색 - 자동 완성
     @Operation(
-            summary = "홈 화면 검색어 목록 조회 API",
-            description = "홈 화면 검색어 입력 시 사용자가 입력한 검색어와 관련된 작물 이름들을 반환합니다. " +
+            summary = "홈 화면 자동 완성 검색어 목록 조회 API",
+            description = "홈 화면에서 검색어 입력 시 사용자가 입력한 검색어와 관련된 작물 카테고리, 이름들을 반환합니다. " +
                     "유저 아이디와 검색어를 쿼리 스트링으로 입력해 주세요."
     )
     @ApiResponses({
@@ -89,13 +90,13 @@ public class HomeController {
     })
     @Parameters({
             @Parameter(name = "userId", description = "로그인한 유저의 아이디(pk)", example = "1"),
-            @Parameter(name = "name", description = "검색어", example = "1"),
+            @Parameter(name = "name", description = "검색어", example = "곡"),
     })
     @GetMapping("/search")
     public ApiResponse<HomeResponse.AutoCompleteSearchDTO> getHomeAutoCompleteSearchNameList (@RequestParam(name = "userId") @EqualsUserId Long userId,
                                                                                               @RequestParam(name = "name") String searchName){
-        HomeResponse.AutoCompleteSearchDTO response = HomeResponse.AutoCompleteSearchDTO.builder().build();
-        return ApiResponse.onSuccess(response);
+        List<String> searchList = searchQueryService.autoSearchNameList(searchName);
+        return ApiResponse.onSuccess(HomeConverter.toAutoCompleteSearchDTO(searchList));
     }
 
 
@@ -193,7 +194,7 @@ public class HomeController {
     }
 
     // 추천 검색어 스케줄링
-    // 매일 1일 오전 1시에 스케줄링된 작업, 추천 검색어 리스트 불러오기 실행
+    // 매월 1일 오전 1시에 스케줄링된 작업, 추천 검색어 리스트 불러오기 실행
     @Scheduled(cron = "0 0 1 1 * *", zone = "Asia/Seoul")
     @Async("customAsyncExecutor")
     public void recommendSearchListSchedule() {

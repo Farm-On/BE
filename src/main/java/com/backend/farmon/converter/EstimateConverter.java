@@ -147,9 +147,9 @@ public class EstimateConverter {
                 .build();
     }
     //OfferListDTO로 전환
-    public EstimateResponseDTO.OfferListDTO toOfferListDTO(Long estimateId, List<ChatRoom> chatRoomList, EstimateRepository estimateRepository) {
+    public EstimateResponseDTO.OfferListDTO toOfferListDTO(Long estimateId, Page<ChatRoom> chatRoomPage, EstimateRepository estimateRepository) {
         //제안 리스트로 변환
-        List<EstimateResponseDTO.OfferDTO> offerDTOList = chatRoomList.stream()
+        List<EstimateResponseDTO.OfferDTO> offerDTOList = chatRoomPage.getContent().stream()
                 .map(chatRoom -> {
                     Long consultingCount = estimateRepository.countByExpert(chatRoom.getExpert());
                     return toOfferDTO(estimateId, chatRoom, consultingCount);
@@ -158,6 +158,11 @@ public class EstimateConverter {
 
         return EstimateResponseDTO.OfferListDTO.builder()
                 .listSize(offerDTOList.size())
+                .totalPage(chatRoomPage.getTotalPages())
+                .totalElements(chatRoomPage.getTotalElements())
+                .currentPage(chatRoomPage.getNumber() + 1)
+                .isFirst(chatRoomPage.isFirst())
+                .isLast(chatRoomPage.isLast())
                 .offerList(offerDTOList)
                 .build();
     }

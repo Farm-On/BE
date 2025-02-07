@@ -1,6 +1,5 @@
 package com.backend.farmon.repository.CropRepository;
 
-import com.backend.farmon.domain.Area;
 import com.backend.farmon.domain.Crop;
 import io.lettuce.core.dynamic.annotation.Param;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -8,6 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
 import java.util.Set;
+
 import java.util.Optional;
 
 public interface CropRepository extends JpaRepository<Crop, Long> {

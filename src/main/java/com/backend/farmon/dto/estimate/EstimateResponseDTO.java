@@ -130,7 +130,7 @@ public class EstimateResponseDTO {
     }
 
     // 7) 견적서에 매핑된 채팅과 전문가 정보 dto
-    @Schema(description = "견적서 상세 보기 밑 제안받은 견적용 DTO")
+    @Schema(description = "견적서 상세 보기 아래 제안받은 견적용 DTO")
     @Getter
     @Setter
     @AllArgsConstructor
@@ -158,7 +158,11 @@ public class EstimateResponseDTO {
     @Builder
     public static class OfferListDTO {
         Integer listSize;
-
+        Integer totalPage;
+        Long totalElements;
+        Integer currentPage;
+        Boolean isFirst;
+        Boolean isLast;
         List<OfferDTO> offerList;
     }
 

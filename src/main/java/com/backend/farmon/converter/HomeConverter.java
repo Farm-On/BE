@@ -66,4 +66,10 @@ public class HomeConverter {
                 .isSearchDelete(true)
                 .build();
     }
+
+    public static HomeResponse.AutoCompleteSearchDTO toAutoCompleteSearchDTO(List<String> searchList){
+        return HomeResponse.AutoCompleteSearchDTO.builder()
+                .searchList(searchList)
+                .build();
+    }
 }

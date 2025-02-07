@@ -53,7 +53,6 @@ public class ChatConverter {
 //                    .profileImage(chatRoom.getFarmer().getProfileImageUrl())
                     .type("농업인")
                     .lastEnterTime(ConvertTime.convertLocalDatetimeToTime(chatRoom.getFarmerLastEnter()))
-                    .averageResponseTime(chatRoom.getFarmer().getChatAverageResponseTime())
                     .isComplete(chatRoom.getIsExpertComplete())
                     .isOtherComplete(chatRoom.getIsFarmerComplete())
                     .isEstimateComplete(chatRoom.getEstimate().getStatus().equals(1))
@@ -71,7 +70,6 @@ public class ChatConverter {
                         : null)
                 .type("전문가")
                 .lastEnterTime(ConvertTime.convertLocalDatetimeToTime(chatRoom.getExpertLastEnter()))
-                .averageResponseTime(chatRoom.getExpert().getUser().getChatAverageResponseTime())
                 .isComplete(chatRoom.getIsFarmerComplete())
                 .isOtherComplete(chatRoom.getIsExpertComplete())
                 .isEstimateComplete(chatRoom.getEstimate().getStatus().equals(1))
@@ -163,11 +161,9 @@ public class ChatConverter {
                 .build();
     }
 
-    public static ChatResponse.ChatRoomCompleteDTO toChatRoomCompleteDTO(ChatRoom chatRoom, Boolean isOtherComplete, Boolean isEstimateComplete) {
-        return ChatResponse.ChatRoomCompleteDTO.builder()
-                .isOtherComplete(isOtherComplete)
-                .isComplete(true)
-                .isEstimateComplete(isEstimateComplete)
+    public static ChatResponse.ChatImageDTO toChatImageDTO(String chatImageURL){
+        return ChatResponse.ChatImageDTO.builder()
+                .chatImageURL(chatImageURL)
                 .build();
     }
 }
