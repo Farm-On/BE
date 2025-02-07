@@ -12,8 +12,13 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class AnswerConverter {
-    private UserRepository userRepository;
-    private PostRepository postRepository;
+    private final UserRepository userRepository;
+    private final PostRepository postRepository;
+
+    public AnswerConverter(UserRepository userRepository, PostRepository postRepository) {
+        this.userRepository = userRepository;
+        this.postRepository = postRepository;
+    }
 
 
     public Answer toEntity(AnswerRequestDTO dto) {

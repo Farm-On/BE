@@ -23,6 +23,8 @@ public class Answer extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+
+
     @Column(nullable = false)
     private String title;
 
@@ -35,12 +37,13 @@ public class Answer extends BaseEntity {
     @JsonBackReference
     private User user;
 
+    // 게시물 Id 랑 엮어야 함
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "post_id")
     @JsonBackReference
     private Post post;
 
-    @OneToMany(mappedBy = "answer", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "answer", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<AnswerImg> answerImgList=new ArrayList<>();
 
 

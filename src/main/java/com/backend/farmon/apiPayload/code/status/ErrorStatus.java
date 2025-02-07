@@ -79,6 +79,8 @@ public enum ErrorStatus implements BaseErrorCode {
     //게시판
     BOARD_TYPE_NOT_FOUND(HttpStatus.BAD_REQUEST, "MESSAGE_TYPE4001", "지원되지 게시판 타입입니다."),
 
+    // QNA게시판 조회 에러
+    QNA_NOT_FOUND(HttpStatus.BAD_REQUEST, "QNA_TYPE4001", "QNA게시판이 아닙니다."),
 
     // 분야 카테고리 에러
 

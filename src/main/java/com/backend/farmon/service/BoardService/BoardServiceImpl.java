@@ -11,7 +11,8 @@ import com.backend.farmon.dto.Answer.AnswerResponseDTO;
 import com.backend.farmon.dto.Board.BoardRequestDto;
 import com.backend.farmon.dto.post.PostResponseDTO;
 import com.backend.farmon.dto.post.PostType;
-import com.backend.farmon.repository.AnswerImgRepository.AnswerImgRepository;
+import com.backend.farmon.repository.AnswerRepository.AnswerImgRepository;
+import com.backend.farmon.repository.AnswerRepository.AnswerRepository;
 import com.backend.farmon.repository.BoardRepository.BoardRepository;
 import com.backend.farmon.repository.CropRepository.CropRepository;
 import com.backend.farmon.repository.PostRepository.PostImgRepository;
@@ -45,7 +46,7 @@ public class BoardServiceImpl implements BoardService {
     private  final PostImgRepository postImgRepository;
     private final AnswerConverter answerConverter;
     private final AnswerImgRepository answerImgRepository;
-
+    private final AnswerRepository answerRepository;
 
     @Override
     public PostResponseDTO save_FreePost(BoardRequestDto.FreePost postDto, List<MultipartFile> multipartFiles) throws Exception {
@@ -97,7 +98,7 @@ public class BoardServiceImpl implements BoardService {
         // 게시글 작성 시간을 기준으로 시간 차 계산
         String timeAgo = TimeDifferenceUtil.calculateTimeDifference(post.getCreatedAt());
 
-        return new PostResponseDTO(post, imgUrls, timeAgo);
+        return new PostResponseDTO(post,imgUrls, timeAgo);
     }
 
 
@@ -146,7 +147,7 @@ public class BoardServiceImpl implements BoardService {
         }
 
         String timeAgo = TimeDifferenceUtil.calculateTimeDifference(post.getCreatedAt());
-
+        // null 넣어도 상관없지 않음?
         return new PostResponseDTO(post, imgUrls, timeAgo);
     }
 
@@ -198,20 +199,27 @@ public class BoardServiceImpl implements BoardService {
 
     @Override
     public AnswerResponseDTO saveQnAAnswer(AnswerRequestDTO dto, List<MultipartFile> multipartFiles) throws Exception {
+        // 글 쓴 사람 로직 파악
+        log.info("User의 Id는 "+String.valueOf(dto.getUserId()));
         User user = userRepository.findById(dto.getUserId())
                 .orElseThrow(() -> new GeneralException(ErrorStatus.USER_NOT_FOUND));
-        // 글 쓴 사람 로직 파악
+
+        if(dto.getBoardId()!=1){
+            throw new GeneralException(ErrorStatus.BOARD_TYPE_NOT_FOUND);
+        }
+
+        // 답변을 달 글이 실제로 존재하는가
         Post post = postRepository.findById(dto.getPostId())
                 .orElseThrow(() -> new IllegalArgumentException("게시글을 찾을 수 없습니다."));
-
         // DTO -> 엔티티 변환 (답변)
         Answer answer = answerConverter.toEntity(dto);
+        answerRepository.save(answer);
         // 이미지 업로드 처리 및 변환 (최대 5개 제한)
-            List<String> imgUrls = new ArrayList<>();
+        List<String> imgUrls = new ArrayList<>();
 
             if (multipartFiles != null && !multipartFiles.isEmpty()) {
-                if (multipartFiles.size() > 5) {
-                    throw new IllegalArgumentException("사진은 최대 5개 까지만 업로드할 수 있습니다.");
+                if (multipartFiles.size() > 2) {
+                    throw new IllegalArgumentException("사진은 최대 2개 까지만 업로드할 수 있습니다.");
                 }
                 for (MultipartFile imageFile : multipartFiles) {
                     // 파일을 S3에 업로드
@@ -219,11 +227,10 @@ public class BoardServiceImpl implements BoardService {
                     String imageUrl = amazonS3Manager.uploadFile(imageKey, imageFile);
                     // PostImg 객체 생성
                     AnswerImg answerImg = AnswerImg.builder()
-                            .storedFileName(imageKey)
+                            .storedFileName(imageUrl)
                             .originalFileName(imageFile.getOriginalFilename())
                             .answer(answer)
                             .build();
-
 
                     answerImgRepository.save(answerImg);
                     imgUrls.add(imageUrl);
@@ -231,9 +238,8 @@ public class BoardServiceImpl implements BoardService {
                 }
 
             }
-        String timeAgo = TimeDifferenceUtil.calculateTimeDifference(answer.getCreatedAt());
 
-        return new AnswerResponseDTO(answer, imgUrls, timeAgo);
+        return new AnswerResponseDTO(answer, imgUrls);
     }
 
 
