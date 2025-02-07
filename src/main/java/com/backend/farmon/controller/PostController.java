@@ -3,6 +3,7 @@ package com.backend.farmon.controller;
 import com.backend.farmon.apiPayload.ApiResponse;
 import com.backend.farmon.apiPayload.code.status.ErrorStatus;
 import com.backend.farmon.apiPayload.code.status.SuccessStatus;
+import com.backend.farmon.apiPayload.exception.GeneralException;
 import com.backend.farmon.domain.Crop;
 import com.backend.farmon.domain.Post;
 import com.backend.farmon.dto.Answer.AnswerRequestDTO;
@@ -12,6 +13,7 @@ import com.backend.farmon.dto.estimate.EstimateRequestDTO;
 import com.backend.farmon.dto.post.PostPagingResponseDTO;
 import com.backend.farmon.dto.post.PostRequestDTO;
 import com.backend.farmon.dto.post.PostResponseDTO;
+import com.backend.farmon.dto.post.PostWithAnswersResponseDTO;
 import com.backend.farmon.service.AWS.S3Service;
 import com.backend.farmon.service.BoardService.BoardServiceImpl;
 import com.backend.farmon.service.PostService.PostQueryServiceImpl;
@@ -124,19 +126,19 @@ public class PostController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "POST_TYPE4002", description = "답변이 저장되지 않았습니다.", content = @Content(schema = @Schema(implementation = ApiResponse.class))),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "POST_TYPE4003", description = "질문을 찾을 수 없습니다.", content = @Content(schema = @Schema(implementation = ApiResponse.class)))
     })
-    @PostMapping("/qna/answer/save")
+    @PostMapping(value="/qna/answer/save",  consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ApiResponse <AnswerResponseDTO> saveQnAAnswer(
             @RequestPart("request")      @Parameter(
-                    description = "자유 게시판 데이터",
+                    description = "Qna 답글 데이터",
                     content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
-                            schema = @Schema(implementation = BoardRequestDto.QnaPost.class)))  AnswerRequestDTO answerRequestDTO ,// 답변 데이터
-                  @RequestPart(value = "imgList", required = false) @Parameter(
-                          description = "업로드할 이미지 파일들",
-                          content = @Content(mediaType = MediaType.MULTIPART_FORM_DATA_VALUE,
-                                  array = @ArraySchema(schema = @Schema(type = "string", format = "binary"))))List<MultipartFile> imgList
+                            schema = @Schema(implementation = AnswerRequestDTO.class)))  AnswerRequestDTO answer ,// 답변 데이터
+            @RequestPart(value = "imgList", required = false) @Parameter(
+                  description = "업로드할 이미지 파일들",
+                  content = @Content(mediaType = MediaType.MULTIPART_FORM_DATA_VALUE,
+                          array = @ArraySchema(schema = @Schema(type = "string", format = "binary"))))List<MultipartFile> imgList
     ) throws Exception {
 
-        AnswerResponseDTO responseDTO = boardServiceImpl.saveQnAAnswer(answerRequestDTO,imgList);
+        AnswerResponseDTO responseDTO = boardServiceImpl.saveQnAAnswer(answer,imgList);
 
 
         return ApiResponse.onSuccess(responseDTO);
@@ -177,30 +179,6 @@ public class PostController {
         return ApiResponse.onSuccess(postResponseDTO);
     }
 
-
-//    @Operation(
-//            summary = "QnA 답변 저장",
-//            description = "사용자는 QnA 질문에 대한 답변을 저장할 수 있습니다."
-//    )
-//    @ApiResponses({
-//            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200", description = "OK, 성공"),
-//            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "USER4001", description = "아이디와 일치하는 사용자가 없습니다.", content = @Content(schema = @Schema(implementation = ApiResponse.class))),
-//            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON400", description = "잘못된 요청입니다.", content = @Content(schema = @Schema(implementation = ApiResponse.class))),
-//            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "POST_TYPE4002", description = "글이 저장되지 않았습니다.", content = @Content(schema = @Schema(implementation = ApiResponse.class))),
-//            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "POST_TYPE4003", description = "게시판을 찾을 수 없습니다.", content = @Content(schema = @Schema(implementation = ApiResponse.class)))
-//
-//    })
-//    @PostMapping("/qna/answer/save")
-//    public ApiResponse<PostResponseDTO> saveQnAAnswer(
-//            @RequestParam("userId") Long userId, // 답변자의 ID
-//            @RequestParam("questionId") Long questionId, // 질문 ID
-//            @RequestBody AnswerRequestDTO answerRequestDTO // 답변 데이터
-//    ) {
-//        // 게시글 저장 서비스 호출
-//        String resultcode = SuccessStatus._OK.getCode();
-//        // 성공적인 응답 반환
-//        return ApiResponse.onSuccess(SuccessStatus._OK.getCode());
-//    }
 
 
 ///// 게시글 목록 그냥 조회 (상세조회X) 리스트 형식으로 돌아옴
@@ -452,11 +430,12 @@ public class PostController {
             @Parameter(name = "postId", description = "게시글 작성한 사람 Id", required = true)
     })
     @GetMapping("qna/list/{postId}/detail")
-    public ApiResponse getQnaPostById(Long boardId,@PathVariable  Long postId) {
+    public ApiResponse  getQnaPostById(Long boardId,@PathVariable  Long postId) {
         String resultCode;
-        PostResponseDTO postDetail = postQueryServiceImpl.getBoardIdAndPostById(boardId,postId);
+        PostWithAnswersResponseDTO postDetail = postQueryServiceImpl.getBoardIdAndQnAPostById(boardId,postId);
         resultCode=SuccessStatus._OK.getCode();
-        return ApiResponse.onSuccess(resultCode);
+        return ApiResponse.onSuccess(postDetail);
+
     }
 
 

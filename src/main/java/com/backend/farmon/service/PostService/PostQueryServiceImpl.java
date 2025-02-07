@@ -4,15 +4,15 @@ import com.backend.farmon.apiPayload.code.status.ErrorStatus;
 import com.backend.farmon.apiPayload.exception.GeneralException;
 import com.backend.farmon.converter.HomeConverter;
 import com.backend.farmon.converter.PostConverter;
-import com.backend.farmon.domain.Board;
-import com.backend.farmon.domain.Crop;
-import com.backend.farmon.domain.Post;
-import com.backend.farmon.domain.PostImg;
+import com.backend.farmon.domain.*;
 import com.backend.farmon.domain.commons.TimeDifferenceUtil;
+import com.backend.farmon.dto.Answer.AnswerResponseDTO;
 import com.backend.farmon.dto.home.HomeResponse;
 import com.backend.farmon.dto.post.PostPagingResponseDTO;
 import com.backend.farmon.dto.post.PostResponseDTO;
 import com.backend.farmon.dto.post.PostType;
+import com.backend.farmon.dto.post.PostWithAnswersResponseDTO;
+import com.backend.farmon.repository.AnswerRepository.AnswerRepository;
 import com.backend.farmon.repository.BoardRepository.BoardRepository;
 import com.backend.farmon.repository.CommentRepository.CommentRepository;
 import com.backend.farmon.repository.LikeCountRepository.LikeCountRepository;
@@ -36,6 +36,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import static com.backend.farmon.dto.post.PostType.QNA;
+
 @Slf4j
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -48,6 +50,7 @@ public class PostQueryServiceImpl implements PostQueryService {
     private final PostRepository postRepository;
     private final BoardRepository boardRepository;
     private final S3Service s3Service;
+    private final AnswerRepository answerRepository;
 
     // 홈 화면 카테고리에 따른 커뮤니티 게시글 3개씩 조회
     // 인기, 전체, QNA, 전문가 칼럼
@@ -161,7 +164,60 @@ public class PostQueryServiceImpl implements PostQueryService {
         // 작성 시간 차이 계산
         String timeAgo = TimeDifferenceUtil.calculateTimeDifference(post.getCreatedAt());
 
-        return new PostResponseDTO(post,imgUrls,timeAgo);
+        return new PostResponseDTO(post, imgUrls, timeAgo);
     }
+
+    // Qna 게시판용 상세 조회
+    @Transactional(readOnly = true)
+    public PostWithAnswersResponseDTO getBoardIdAndQnAPostById(Long boardId, Long postId) {
+        // 1. Board 조회
+        Board board = boardRepository.findById(boardId)
+                .orElseThrow(() -> new GeneralException(ErrorStatus.BOARD_TYPE_NOT_FOUND));
+
+        // 2. Post 조회
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new GeneralException(ErrorStatus.POST_NOT_FOUND));
+
+        // 3. Board 타입 검증 (QNA 타입인지 확인)
+        if (board.getPostType() != PostType.QNA) {
+            throw new GeneralException(ErrorStatus.BOARD_TYPE_NOT_FOUND);
+        }
+
+        // 4. Post에 연결된 Answer 리스트 가져오기
+        List<Answer> answers = post.getAnswers();
+
+        // 5. Answer 리스트를 AnswerResponseDTO로 변환
+        List<AnswerResponseDTO> answerResponseDTOs = answers.stream()
+                .map(answer -> {
+                    // 이미지 URL 리스트 생성
+                    List<String> imgUrls = answer.getAnswerImgList().stream()
+                            .map(img -> s3Service.getFullPath(img.getStoredFileName())) // S3 URL 생성
+                            .collect(Collectors.toList());
+
+                    // DTO 생성
+                    return AnswerResponseDTO.builder()
+                            .answer(answer)
+                            .imgUrls(imgUrls)
+                            .build();
+                })
+                .collect(Collectors.toList());
+
+        // 6. Post 정보 DTO 변환
+        PostResponseDTO postResponseDTO = PostResponseDTO.builder()
+                .postId(post.getId())
+                .postTitle(post.getPostTitle())
+                .postContent(post.getPostContent())
+                .Category(post.getCategory())
+                .subCategory(post.getSubCategories())
+                .createdAt(String.valueOf(post.getCreatedAt()))
+                .build();
+
+        // 7. 최종 DTO 반환
+        return PostWithAnswersResponseDTO.builder()
+                .post(postResponseDTO)
+                .answers(answerResponseDTOs)
+                .build();
+    }
+
 
 }

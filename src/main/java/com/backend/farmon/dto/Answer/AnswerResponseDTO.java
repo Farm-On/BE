@@ -3,6 +3,7 @@ package com.backend.farmon.dto.Answer;
 
 import com.backend.farmon.domain.Answer;
 import com.backend.farmon.domain.Post;
+import com.backend.farmon.domain.commons.DateFormatUtil;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 import lombok.Getter;
@@ -29,15 +30,15 @@ public class AnswerResponseDTO {
     @Schema(description = "답변자가 올린 답글 사진")
     private List<String> imgUrl;
 
-    @Schema(description = "작성 시간", example = "몇 분전 ,한 시간 전")
+    @Schema(description = "작성 시간")
     private String createdAt;
 
     @Builder
-    public AnswerResponseDTO(Answer answer, List<String> imgUrls, String timeAgo){
+    public AnswerResponseDTO(Answer answer, List<String> imgUrls){
         this.title = answer.getTitle();
         this.content = answer.getContent();
         this.answeredUserId=answer.getId();
-        this.createdAt =timeAgo;
+        this.createdAt = DateFormatUtil.formatDate(answer.getCreatedAt()); // 날짜 포맷 적용
         this.imgUrl = imgUrls;
     }
 

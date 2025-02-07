@@ -1,6 +1,7 @@
 package com.backend.farmon.repository.UserRepository;
 
 import com.backend.farmon.domain.User;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;
