@@ -9,16 +9,27 @@ import com.backend.farmon.domain.*;
 import com.backend.farmon.domain.enums.Role;
 import com.backend.farmon.dto.expert.ExpertCareerRequest;
 import com.backend.farmon.dto.expert.ExpertProfileRequest;
+import com.backend.farmon.dto.expert.PortfolioRequest;
+import com.backend.farmon.dto.expert.PortfolioResponse;
 import com.backend.farmon.dto.user.SignupRequest;
 import com.backend.farmon.dto.user.SignupResponse;
 import com.backend.farmon.repository.AreaRepository.AreaRepository;
 import com.backend.farmon.repository.CropRepository.CropRepository;
 import com.backend.farmon.repository.ExpertCareerRepository.ExpertCareerRepository;
 import com.backend.farmon.repository.ExpertReposiotry.ExpertRepository;
+import com.backend.farmon.repository.PortfolioRepository.PortfolioRepository;
 import com.backend.farmon.repository.UserRepository.UserRepository;
+import com.backend.farmon.service.AWS.S3Service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Service
 @RequiredArgsConstructor
@@ -30,6 +41,8 @@ public class ExpertCommandServiceImpl implements ExpertCommandService {
     private final CropRepository cropRepository;
     private final ExpertCareerRepository expertCareerRepository;
     private final UserAuthorizationUtil userAuthorizationUtil;
+    private final S3Service s3Service;
+    private final PortfolioRepository portfolioRepository;
 
     // 전문가 등록 로직
     @Override
@@ -117,4 +130,76 @@ public class ExpertCommandServiceImpl implements ExpertCommandService {
 
         return expertRepository.save(expert);
     }
+
+    // 포트폴리오 등록 서비스
+    public PortfolioResponse.PostPortfolioResultDTO savePortfolio(Long expertId, PortfolioRequest.PostPortfolioDTO postPortfolioDTO,
+                                                                      List<MultipartFile> ImgList, MultipartFile thumbnailImg) {
+        // 1. 썸네일 이미지 업로드
+        String thumbnailImgUrl = s3Service.putPortfolioImg(thumbnailImg);
+
+        // 2. 포트폴리오 엔티티 생성
+        Portfolio newPortfolio = Portfolio.builder()
+                .thumbnailImg(thumbnailImgUrl)
+                .title(postPortfolioDTO.getTitle())
+                .text("")
+                .build();
+
+        // 3. 전문가와 매핑
+        Expert expert = expertRepository.findById(expertId)
+                .orElseThrow(() -> new ExpertHandler(ErrorStatus.EXPERT_NOT_FOUND));
+        newPortfolio.setExpert(expert);
+
+        // 4. 포트폴리오 이미지 처리 (이미지 파일 리스트)
+        List<PortfolioImg> portfolioImgs = new ArrayList<>();
+        for (MultipartFile img : ImgList) {
+            String s3ImageUrl = s3Service.putPortfolioImg(img);
+            PortfolioImg portfolioImg = PortfolioImg.builder() // 포트폴리오 이미지 엔티티 생성
+                    .imageUrl(s3ImageUrl)
+                    .build();
+            portfolioImg.setPortfolio(newPortfolio); // 포트폴리오 엔티티와 양방매핑
+            portfolioImgs.add(portfolioImg);
+        }
+
+        // 5. 본문 이미지 URL 수정
+        String updatedText = updateTextWithImageUrls(postPortfolioDTO.getText(), portfolioImgs);
+        newPortfolio.setText(updatedText); // 수정된 본문 텍스트 저장
+
+        // 6. 포트폴리오와 이미지들을 DB에 저장
+//        newPortfolio.setPortfolioImgList(portfolioImgs);
+        Portfolio savedPortfolio = portfolioRepository.save(newPortfolio);
+
+        // 7. 결과 반환
+        return ExpertConverter.toPortfolioGetResultDTO(savedPortfolio);
+    }
+
+    public String updateTextWithImageUrls(String text, List<PortfolioImg> imageUrls) {
+        // 본문 텍스트에서 이미지 태그를 찾아서 S3 URL로 변경
+        StringBuilder updatedText = new StringBuilder(text);
+        int imageIndex = 0;
+
+        // 이미지 태그를 찾기 위한 정규 표현식 패턴 정의
+        // <img> 태그에서 src 속성만을 추출하는 패턴
+        Pattern pattern = Pattern.compile("<img[^>]*src=['\"](http[^\"]*)['\"][^>]*>");
+
+        // text에서 패턴에 맞는 부분을 찾을 수 있는 Matcher 객체 생성
+        Matcher matcher = pattern.matcher(updatedText);
+
+        // 텍스트 내의 모든 이미지 태그를 순차적으로 찾아서 교체
+        while (matcher.find() && imageIndex < imageUrls.size()) {
+            // 현재 이미지 URL을 imageUrls 리스트에서 가져옴
+            String s3Url = imageUrls.get(imageIndex).getImageUrl();
+
+            // 이미지 태그를 기존 src URL에서 S3 URL로 교체
+            // 예) <img src="http://example.com/old-image.jpg">를 <img src="s3://bucket/path/image.jpg">로 교체
+            updatedText.replace(matcher.start(), matcher.end(), "<img src=\"" + s3Url + "\">");
+
+            // imageUrls 리스트에서 다음 이미지를 사용할 수 있도록 인덱스 증가
+            imageIndex++;
+        }
+
+
+        return updatedText.toString();
+    }
+
+
 }

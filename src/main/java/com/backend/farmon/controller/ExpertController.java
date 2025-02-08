@@ -7,18 +7,23 @@ import com.backend.farmon.apiPayload.exception.handler.ExpertHandler;
 import com.backend.farmon.converter.ExpertConverter;
 import com.backend.farmon.domain.Expert;
 import com.backend.farmon.domain.ExpertCareer;
+import com.backend.farmon.domain.Portfolio;
 import com.backend.farmon.domain.User;
+import com.backend.farmon.dto.estimate.EstimateRequestDTO;
 import com.backend.farmon.dto.estimate.EstimateResponseDTO;
 import com.backend.farmon.dto.expert.*;
 import com.backend.farmon.repository.ExpertCareerRepository.ExpertCareerRepository;
 import com.backend.farmon.repository.ExpertReposiotry.ExpertRepository;
+import com.backend.farmon.repository.PortfolioRepository.PortfolioRepository;
 import com.backend.farmon.service.AWS.S3Service;
 import com.backend.farmon.service.ExpertService.ExpertCommandService;
 import com.backend.farmon.service.ExpertService.ExpertQueryService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -29,6 +34,8 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.util.List;
 
 @Tag(name = "전문가 정보", description = "전문가 관련 정보 CRUD API")
 @RestController
@@ -41,6 +48,7 @@ public class ExpertController {
     private final ExpertRepository expertRepository;
     private final ExpertQueryService expertQueryService;
     private final S3Service s3Service;
+    private final PortfolioRepository portfolioRepository;
 
     // 전문가 내 프로필 페이지 조회
     @GetMapping("/api/expert/{expert-id}")
@@ -234,4 +242,43 @@ public class ExpertController {
         return ApiResponse.onSuccess(response);
     }
 
+    // 포트폴리오 등록 api
+    @PostMapping(value = "/api/expert/{expert-id}/portfolio", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
+    @Operation(summary = "전문가 포트폴리오 등록 API")
+    @ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200", description = "OK, 성공"),
+    })
+    public ApiResponse<PortfolioResponse.PostPortfolioResultDTO> savePortfolio(
+            @Parameter(description = "포트폴리오를 등록하려는 전문가의 id", required = true)
+            @PathVariable(name = "expert-id") Long expertId,
+
+            @Parameter(description = "대표 이미지", content = @Content(mediaType = MediaType.MULTIPART_FORM_DATA_VALUE,
+                    schema = @Schema(type = "string", format = "binary")))
+            @RequestPart("thumbnailImg") MultipartFile thumbnailImg,
+
+            @Parameter(description = "포트폴리오 등록 데이터", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = PortfolioRequest.PostPortfolioDTO.class)))
+            @RequestPart("request") @Valid PortfolioRequest.PostPortfolioDTO postPortfolioDTO,
+
+            @Parameter(description = "본문에 포함된 이미지 파일들. 이 파일들은 S3에 저장되며, 본문 내용에서 이미지 주소가 자동으로 S3 URL로 변환되어 저장됩니다.", content = @Content(mediaType = MediaType.MULTIPART_FORM_DATA_VALUE,
+                    array = @ArraySchema(schema = @Schema(type = "string", format = "binary"))))
+            @RequestPart(value = "ImgList", required = false) List<MultipartFile> ImgList){
+
+        PortfolioResponse.PostPortfolioResultDTO resultDTO = expertCommandService.savePortfolio(expertId, postPortfolioDTO, ImgList, thumbnailImg);
+
+        return ApiResponse.onSuccess(resultDTO);
+    }
+
+    // 포트폴리오 조회 api
+    @GetMapping("/api/expert/portfolio/{portfolio-id}")
+    @Operation(summary = "전문가 특정 포트폴리오 조회 API")
+    @ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200", description = "OK, 성공"),
+    })
+    public ApiResponse<PortfolioResponse.PostPortfolioResultDTO> savePortfolio(
+            @PathVariable(name = "portfolio-id") Long portfolioId){
+        Portfolio portfolio = portfolioRepository.findById(portfolioId)
+                .orElseThrow(() -> new ExpertHandler(ErrorStatus.PORTFOLIO_NOT_FOUND));
+
+        return ApiResponse.onSuccess(ExpertConverter.toPortfolioGetResultDTO(portfolio));
+    }
 }

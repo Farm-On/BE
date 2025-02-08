@@ -223,4 +223,15 @@ public class ExpertConverter {
                 .detailContent4(expertCareer.getDetailContent4())
                 .build();
     }
+
+    // 전문가 포트폴리오 GET 응답 DTO 생성
+    public static PortfolioResponse.PostPortfolioResultDTO toPortfolioGetResultDTO(Portfolio portfolio) {
+        return PortfolioResponse.PostPortfolioResultDTO.builder()
+                .portfolioId(portfolio.getId())
+                .title(portfolio.getTitle())
+                .text(portfolio.getText())
+                .thumbnailImg(portfolio.getThumbnailImg())
+                .createdAt(LocalDateTime.now())
+                .build();
+    }
 }

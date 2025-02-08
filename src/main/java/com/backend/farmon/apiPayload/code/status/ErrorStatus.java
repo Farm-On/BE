@@ -70,6 +70,9 @@ public enum ErrorStatus implements BaseErrorCode {
     // 전문가 경력 관련 에러
     EXPERT_CAREER_NOT_FOUND(HttpStatus.BAD_REQUEST, "EXPERT_CAREER4001", "해당 경력 아이디와 일치하는 경력이 존재하지 않습니다."),
 
+    // 전문가 포트폴리오 관련 에러
+    PORTFOLIO_NOT_FOUND(HttpStatus.BAD_REQUEST, "PORTFOLIO4001", "해당 포트폴리오 아이디와 일치하는 포트폴리오가 존재하지 않습니다."),
+
     // 채팅 메시지 타입
     MESSAGE_TYPE_NOT_FOUND(HttpStatus.BAD_REQUEST, "MESSAGE_TYPE4001", "지원되지 않는 채팅 메시지 타입입니다."),
 
