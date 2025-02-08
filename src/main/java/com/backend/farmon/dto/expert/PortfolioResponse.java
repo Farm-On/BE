@@ -31,4 +31,14 @@ public class PortfolioResponse {
         LocalDateTime createdAt;
     }
 
+    @Builder
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Schema(description = "전문가 포트폴리오 삭제 DTO")
+    public static class DeletePortfolioResultDTO {
+        @Schema(description = "삭제된 포트폴리오 아이디")
+        Long portfolioId;
+    }
+
 }

@@ -281,4 +281,48 @@ public class ExpertController {
 
         return ApiResponse.onSuccess(ExpertConverter.toPortfolioGetResultDTO(portfolio));
     }
+
+    // 포트폴리오 수정 api
+    @PatchMapping(value = "/api/expert/portfolio/{portfolio-id}", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
+    @Operation(summary = "전문가 포트폴리오 수정 API")
+    @ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200", description = "OK, 성공"),
+    })
+    public ApiResponse<PortfolioResponse.PostPortfolioResultDTO> updatePortfolio(
+            @Parameter(description = "수정하려는 포트폴리오의 id", required = true)
+            @PathVariable(name = "portfolio-id") Long portfolioId,
+
+            @Parameter(description = "대표 이미지 변경 없을시 null값으로 보내주세요.", content = @Content(mediaType = MediaType.MULTIPART_FORM_DATA_VALUE,
+                    schema = @Schema(type = "string", format = "binary")))
+            @RequestPart(value = "thumbnailImg", required = false) MultipartFile thumbnailImg,
+
+            @Parameter(description = "포트폴리오 등록 데이터", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = PortfolioRequest.PostPortfolioDTO.class)))
+            @RequestPart("request") @Valid PortfolioRequest.PostPortfolioDTO postPortfolioDTO,
+
+            @Parameter(description = "추가된 이미지 파일만 넣어주세요.", content = @Content(mediaType = MediaType.MULTIPART_FORM_DATA_VALUE,
+                    array = @ArraySchema(schema = @Schema(type = "string", format = "binary"))))
+            @RequestPart(value = "ImgList", required = false) List<MultipartFile> ImgList){
+
+        PortfolioResponse.PostPortfolioResultDTO resultDTO = expertCommandService.updatePortfolio(portfolioId, postPortfolioDTO, ImgList, thumbnailImg);
+
+        return ApiResponse.onSuccess(resultDTO);
+    }
+
+    // 전문가 특정 포트폴리오 삭제
+    @DeleteMapping("/api/expert/portfolio/{portfolio-id}")
+    @Operation(summary = "전문가 특정 포트폴리오 삭제 API")
+    @ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200", description = "OK, 성공"),
+    })
+    @Parameters({
+            @Parameter(name = "portfolio-id", description = "삭제하려는 포트폴리오의 id", required = true)
+    })
+    public ApiResponse<String> deletePortfolio(@PathVariable(name = "portfolio-id") Long portfolioId) {
+        try {
+            expertCommandService.deletePortfolio(portfolioId);
+            return ApiResponse.onSuccess("포트폴리오가 성공적으로 삭제되었습니다.");
+        } catch (Exception e) {
+            return ApiResponse.onFailure("ERROR_DELETE_PORTFOLIO","포트폴리오 삭제에 실패했습니다.",null);
+        }
+    }
 }

@@ -81,6 +81,9 @@ dependencies {
 
 	// 문자인증 api coolSMS
 	implementation 'net.nurigo:sdk:4.3.2'
+
+	// HTML 파싱 라이브러리
+	implementation 'org.jsoup:jsoup:1.15.3'
 }
 
 tasks.named('test') {

@@ -21,4 +21,8 @@ public interface ExpertCommandService {
     PortfolioResponse.PostPortfolioResultDTO savePortfolio(Long expertId, PortfolioRequest.PostPortfolioDTO postPortfolioDTO,
                                                            List<MultipartFile> ImgList, MultipartFile thumbnailImg);
     String updateTextWithImageUrls(String text, List<PortfolioImg> imageUrls);
+    PortfolioResponse.PostPortfolioResultDTO updatePortfolio(Long expertId, PortfolioRequest.PostPortfolioDTO postPortfolioDTO,
+                                                             List<MultipartFile> ImgList, MultipartFile thumbnailImg);
+    String updateImageSrcWithS3(String text, List<PortfolioImg> newImageUrls);
+    PortfolioResponse.DeletePortfolioResultDTO deletePortfolio(Long portfolioId);
 }
