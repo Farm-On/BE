@@ -1,5 +1,6 @@
 package com.backend.farmon.service.EstimateService;
 
+import com.backend.farmon.apiPayload.ApiResponse;
 import com.backend.farmon.converter.EstimateConverter;
 import com.backend.farmon.domain.ChatRoom;
 import com.backend.farmon.domain.Estimate;
@@ -16,8 +17,11 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
+import java.net.http.HttpClient;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -184,25 +188,6 @@ public class EstimateQueryServiceImpl implements EstimateQueryService {
     }
 
 
-//    @Override
-//    public EstimateResponseDTO.FilteredListDTO searchEstimateListByFilter(EstimateRequestDTO.FilterDTO requestDTO, int page) {
-//        if(requestDTO == null) {
-//            return EstimateResponseDTO.FilteredListDTO.builder().build();
-//        };
-//
-//        // Repository를 호출하여 조건에 맞는 견적서를 조회
-//        // 1) 레포지토리에서 데이터 조회
-//        Page<Estimate> estimatePage = estimateRepository.findFilteredEstimates(
-//                requestDTO.getEstimateCategory(),
-//                requestDTO.getBudget(),
-//                requestDTO.getAreaName(),
-//                requestDTO.getAreaNameDetail(),
-//                PageRequest.of(page -1, 10, Sort.by(Sort.Direction.DESC, "createdAt"))
-//        );
-//
-//        return estimateConverter.toFilteredListDTO(estimatePage, requestDTO.getEstimateCategory(), requestDTO.getBudget(), requestDTO.getAreaName(), requestDTO.getAreaNameDetail());
-//
-//    }
     /**
      * 필터링 조건에 따른 견적서 목록 조회
      *
@@ -215,6 +200,9 @@ public class EstimateQueryServiceImpl implements EstimateQueryService {
             return EstimateResponseDTO.FilteredListDTO.builder().build();
         };
 
+        if (expertId == null && cropCategory == null && cropName == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "선택된 작물 탭 정보를 함께 보내주세요.");
+        }
         // Repository를 호출하여 조건에 맞는 견적서를 조회
         // 1) 레포지토리에서 데이터 조회
         Page<Estimate> estimatePage = estimateRepository.findFilteredEstimates(
@@ -263,3 +251,24 @@ public class EstimateQueryServiceImpl implements EstimateQueryService {
     }
 
 }
+
+
+//    @Override
+//    public EstimateResponseDTO.FilteredListDTO searchEstimateListByFilter(EstimateRequestDTO.FilterDTO requestDTO, int page) {
+//        if(requestDTO == null) {
+//            return EstimateResponseDTO.FilteredListDTO.builder().build();
+//        };
+//
+//        // Repository를 호출하여 조건에 맞는 견적서를 조회
+//        // 1) 레포지토리에서 데이터 조회
+//        Page<Estimate> estimatePage = estimateRepository.findFilteredEstimates(
+//                requestDTO.getEstimateCategory(),
+//                requestDTO.getBudget(),
+//                requestDTO.getAreaName(),
+//                requestDTO.getAreaNameDetail(),
+//                PageRequest.of(page -1, 10, Sort.by(Sort.Direction.DESC, "createdAt"))
+//        );
+//
+//        return estimateConverter.toFilteredListDTO(estimatePage, requestDTO.getEstimateCategory(), requestDTO.getBudget(), requestDTO.getAreaName(), requestDTO.getAreaNameDetail());
+//
+//    }
