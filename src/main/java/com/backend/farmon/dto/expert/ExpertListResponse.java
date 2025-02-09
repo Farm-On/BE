@@ -50,6 +50,12 @@ public class ExpertListResponse {
         @Schema(description = "이름")
         String name;
 
+        @Schema(description = "닉네임")
+        String nickName;
+
+        @Schema(description = "닉네임만 보여주기 여부")
+        Boolean isNickNameOnly;
+
         @Schema(description = "평점")
         Float rate;
 

@@ -140,7 +140,23 @@ public class ExpertCommandServiceImpl implements ExpertCommandService {
         return expertRepository.save(expert);
     }
 
+    // 전문가 내 프로필 변경 로직
+    @Override
+    @Transactional
+    public Expert updateExpertProfile(Long expertId, ExpertProfileRequest.UpdateProfileDTO request) {
+        Expert expert = expertRepository.findById(expertId)
+                .orElseThrow(() -> new ExpertHandler(ErrorStatus.EXPERT_NOT_FOUND));
+
+        if (request.getNickName() != null) {expert.setNickName(request.getNickName());}
+        if (request.getIsNickNameOnly() != null) {expert.setIsNickNameOnly(request.getIsNickNameOnly());}
+        if (request.getExpertDescription() != null) {expert.setExpertDescription(request.getExpertDescription());}
+
+        return expertRepository.save(expert);
+    }
+
     // 포트폴리오 등록 서비스
+    @Override
+    @Transactional
     public PortfolioResponse.PostPortfolioResultDTO savePortfolio(Long expertId, PortfolioRequest.PostPortfolioDTO postPortfolioDTO,
                                                                       List<MultipartFile> ImgList, MultipartFile thumbnailImg) {
         // 1. 썸네일 이미지 업로드
@@ -180,6 +196,8 @@ public class ExpertCommandServiceImpl implements ExpertCommandService {
         return ExpertConverter.toPortfolioGetResultDTO(savedPortfolio);
     }
 
+    @Override
+    @Transactional
     public String updateTextWithImageUrls(String text, List<PortfolioImg> imageUrls) {
         // HTML 텍스트를 JSoup으로 파싱
         Document doc = Jsoup.parse(text);
@@ -203,6 +221,8 @@ public class ExpertCommandServiceImpl implements ExpertCommandService {
     }
 
     // 포트폴리오 등록 서비스
+    @Override
+    @Transactional
     public PortfolioResponse.PostPortfolioResultDTO updatePortfolio(Long portfolioId, PortfolioRequest.PostPortfolioDTO postPortfolioDTO,
                                                                   List<MultipartFile> ImgList, MultipartFile thumbnailImg) {
         Portfolio portfolio = portfolioRepository.findById(portfolioId)
@@ -247,6 +267,8 @@ public class ExpertCommandServiceImpl implements ExpertCommandService {
         return ExpertConverter.toPortfolioGetResultDTO(portfolio);
     }
 
+    @Override
+    @Transactional
     public String updateImageSrcWithS3(String text, List<PortfolioImg> newImageUrls) {
         int imageIndex = 0;
         Document document = Jsoup.parse(text);
@@ -263,6 +285,8 @@ public class ExpertCommandServiceImpl implements ExpertCommandService {
     }
 
     // 포트폴리오 삭제 서비스
+    @Override
+    @Transactional
     public PortfolioResponse.DeletePortfolioResultDTO deletePortfolio(Long portfolioId){
         Portfolio portfolio = portfolioRepository.findById(portfolioId)
                 .orElseThrow(() -> new PortfolioHandler(ErrorStatus.PORTFOLIO_NOT_FOUND));

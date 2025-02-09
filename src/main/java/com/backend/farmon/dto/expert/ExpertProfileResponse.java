@@ -22,6 +22,12 @@ public class ExpertProfileResponse {
         @Schema(description = "이름")
         String name;
 
+        @Schema(description = "닉네임")
+        String nickName;
+
+        @Schema(description = "닉네임만 표시 여부")
+        Boolean isNickNameOnly;
+
         @Schema(description = "전문가 한 줄 소개")
         String expertDescription;
 
@@ -170,5 +176,22 @@ public class ExpertProfileResponse {
         Boolean isAvailableEverywhere;
         @Schema(description = "도서 지방 제외 여부")
         Boolean isExcludeIsland;
+    }
+
+    @Builder
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class UpdateProfileResultDTO { // 내 프로필 변경시 응답 DTO
+        @Schema(description = "전문가 아이디")
+        Long expertId;
+        @Schema(description = "닉네임")
+        String nickName;
+        @Schema(description = "닉네임만 보여주기 여부")
+        Boolean isNickNameOnly;
+        @Schema(description = "한 줄 소개")
+        String expertDescription;
+
+
     }
 }

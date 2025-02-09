@@ -18,6 +18,7 @@ public interface ExpertCommandService {
     ExpertCareer postExpertCareer(Long expertId, ExpertCareerRequest.ExpertCareerPostDTO request);
     Expert updateExpertSpecialty(Long expertId, ExpertProfileRequest.UpdateSpecialtyDTO request);
     Expert updateExpertArea(Long expertId, ExpertProfileRequest.UpdateAreaDTO request);
+    Expert updateExpertProfile(Long expertId, ExpertProfileRequest.UpdateProfileDTO request);
     PortfolioResponse.PostPortfolioResultDTO savePortfolio(Long expertId, PortfolioRequest.PostPortfolioDTO postPortfolioDTO,
                                                            List<MultipartFile> ImgList, MultipartFile thumbnailImg);
     String updateTextWithImageUrls(String text, List<PortfolioImg> imageUrls);

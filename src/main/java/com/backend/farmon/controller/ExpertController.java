@@ -52,7 +52,7 @@ public class ExpertController {
 
     // 전문가 내 프로필 페이지 조회
     @GetMapping("/api/expert/{expert-id}")
-    @Operation(summary = "전문가 내 프로필 페이지 조회 API")
+    @Operation(summary = "전문가 내 프로필 페이지 조회 API", description = "isNickNameOnly(닉네임만 보이기 활성화 여부)가 true이면 name항목이 null값으로 반환됩니다.")
     @ApiResponses({
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200", description = "OK, 성공"),
     })
@@ -224,14 +224,14 @@ public class ExpertController {
     @Operation(
             summary = "전문가 프로필 목록 조회 API",
             description = "전문가 프로필 목록을 조회하는 API이며, 페이징을 포함합니다. " +
-                    "서비스, 지역, 페이지를 query String 으로 주세요."
+                    "서비스, 지역, 페이지를 query String 으로 주세요. " + "isNickNameOnly(닉네임만 보이기 활성화 여부)가 true이면 name항목이 null값으로 반환됩니다."
     )
     @ApiResponses({
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200",description = "OK, 성공")
     })
     @Parameters({
-            @Parameter(name = "crop", description = "전문가 분야 필터링", required = false),
-            @Parameter(name = "area", description = "전문가 지역 필터링", required = false),
+            @Parameter(name = "crop", description = "전문가 분야 필터링", example = "옥수수", required = false),
+            @Parameter(name = "area", description = "전문가 지역 필터링", example = "경기전체", required = false),
             @Parameter(name = "page", description = "페이지 번호, 1부터 시작입니다.", example = "1", required = true)
     })
     public ApiResponse<ExpertListResponse.ExpertProfileListDTO> getExpertList (@RequestParam(name = "crop", required = false) String crop,
@@ -324,5 +324,21 @@ public class ExpertController {
         } catch (Exception e) {
             return ApiResponse.onFailure("ERROR_DELETE_PORTFOLIO","포트폴리오 삭제에 실패했습니다.",null);
         }
+    }
+
+    // 전문가 내 프로필 편집
+    @PatchMapping("/api/expert/{expert-id}/profile")
+    @Operation(summary = "전문가 내 프로필 편집 API")
+    @ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200", description = "OK, 성공"),
+    })
+    @Parameters({
+            @Parameter(name = "expert-id", description = "내 프로필을 변경하려는 전문가의 id", required = true),
+    })
+    public ApiResponse<ExpertProfileResponse.UpdateProfileResultDTO> updateExpertProfile(
+            @RequestBody ExpertProfileRequest.UpdateProfileDTO updateProfileDTO,
+            @PathVariable(name = "expert-id") Long expertId) {
+        Expert updatedExpert = expertCommandService.updateExpertProfile(expertId, updateProfileDTO);
+        return ApiResponse.onSuccess(ExpertConverter.updateProfileDTO(updatedExpert));
     }
 }
