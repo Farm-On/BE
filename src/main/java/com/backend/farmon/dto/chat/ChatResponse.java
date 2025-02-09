@@ -45,6 +45,15 @@ public class ChatResponse {
         @Schema(description = "채팅 중인 상대방 이름", example = "김팜온")
         String name;
 
+        @Schema(description = "채팅 중인 상대방 닉네임 (채팅 상대가 전문가일 경우에만 해당) / 채팅 상대가 농업인이면 null", example = "병해충전문가")
+        String nickName;
+
+        @Schema(description = "채팅 중인 상대가 전문가일 경우, 닉네임만 보이게 활성화 여부 / 채팅 상대가 농업인이면 null", example = "true")
+        Boolean isExpertNickNameOnly;
+
+        @Schema(description = "채팅 상대 역할, 농업인 또는 전문가", example = "농업인")
+        String type;
+
         @Schema(description = "채팅 중인 상대방 프로필 이미지")
         String profileImage;
 
@@ -54,8 +63,11 @@ public class ChatResponse {
         @Schema(description = "신청 견적 종류", example = "스마트팜")
         String estimateCategory;
 
-        @Schema(description = "신청 견적 주소", example = "경기 이천시 마장면")
-        String estimateAddress;
+        @Schema(description = "신청 견적 주소", example = "경기")
+        String estimateAreaName;
+
+        @Schema(description = "신청 견적 주소 디테일", example = "이천시")
+        String estimateAreaDetail;
 
         @Schema(description = "안 읽은 채팅 개수", example = "3")
         Integer unreadMessageCount;
@@ -123,17 +135,8 @@ public class ChatResponse {
         @Schema(description = "채팅 중인 상대방 이름", example = "김팜온")
         String name;
 
-        @Schema(description = "채팅 중인 상대방 프로필 이미지")
-        String profileImage;
-
-        @Schema(description = "채팅 상대 역할, 농업인 또는 전문가", example = "농업인")
+        @Schema(description = "채팅 상대 역할, 채팅방 생성은 전문가만 가능하므로 항상 농업인 반환", example = "농업인")
         String type;
-
-        @Schema(description = "채팅 상대의 마지막 채팅방 접속 시간, 채팅방 생성시에는 null", example = "28분")
-        String lastEnterTime;
-
-        @Schema(description = "채팅 상대의 평균 메시지 응답 시간, 채팅방 생성시에는 null", example = "1시간")
-        String averageResponseTime;
     }
 
     @Getter
@@ -141,11 +144,17 @@ public class ChatResponse {
     @NoArgsConstructor
     @AllArgsConstructor
     @Builder
-    @Schema(description = "채팅방 입장 성공")
-    public static class ChatRoomEnterDTO {
+    @Schema(description = "채팅방 정보")
+    public static class ChatRoomDataDTO {
 
         @Schema(description = "채팅 중인 상대방 이름", example = "김팜온")
         String name;
+
+        @Schema(description = "채팅 중인 상대방 닉네임 (채팅 상대가 전문가일 경우에만 해당)", example = "병해충전문가")
+        String nickName;
+
+        @Schema(description = "채팅 중인 상대가 전문가일 경우, 닉네임만 보이게 활성화 여부", example = "true")
+        Boolean isExpertNickNameOnly;
 
         @Schema(description = "채팅 중인 상대방 프로필 이미지")
         String profileImage;
@@ -153,11 +162,17 @@ public class ChatResponse {
         @Schema(description = "채팅 상대 역할, 농업인 또는 전문가", example = "농업인")
         String type;
 
-        @Schema(description = "채팅 상대의 마지막 채팅방 접속 시간", example = "28분")
+        @Schema(description = "채팅 상대의 마지막 채팅방 접속 시간", example = "30분")
         String lastEnterTime;
 
-        @Schema(description = "채팅 상대의 평균 메시지 응답 시간", example = "1시간")
-        String averageResponseTime;
+        @Schema(description = "채팅 상대의 컨설팅 완료 여부", example = "true")
+        Boolean isOtherComplete;
+
+        @Schema(description = "사용자의 컨설팅 완료 여부", example = "true")
+        Boolean isComplete;
+
+        @Schema(description = "견적 완료 여부, 농업인 전문가 모두 컨설팅 완료 시 true", example = "true")
+        Boolean isEstimateComplete;
     }
 
     @Getter
@@ -178,28 +193,79 @@ public class ChatResponse {
     @Builder
     @Schema(description = "채팅방 견적 응답 정보")
     public static class ChatRoomEstimateDTO {
-        @Schema(description = "작물 카테고리", example = "곡물, 채소작물, 과일 등")
-        String cropCategory;
+        @Schema(description = "견적 작물 카테고리", example = "곡물, 채소작물, 과일 등")
+        String estimateCropCategory;
 
-        @Schema(description = "작물 이름", example = "쌀, 고구마, 사과 등")
-        String cropName;
+        @Schema(description = "견적 작물 이름", example = "쌀, 고구마, 사과 등")
+        String estimateCropName;
 
         @Schema(description = "견적 신청자")
-        String applyName;
+        String estimateApplyName;
 
         @Schema(description = "견적 카테고리", example = "작물 관리, 스마트팜 등")
         String estimateCategory;
 
-        @Schema(description = "견적 주소", example = "서울 강동구")
-        String address;
+        @Schema(description = "신청 견적 주소", example = "경기")
+        String estimateAreaName;
+
+        @Schema(description = "신청 견적 주소 디테일", example = "이천시")
+        String estimateAreaDetail;
 
         @Schema(description = "견적 예산", example = "50만원 ~ 100만원")
-        String budget;
+        String estimateBudget;
 
         @Schema(description = "컨설팅 내용")
-        String content;
+        String estimateContent;
 
         @Schema(description = "견적 이미지 리스트")
         List<String> estimateImageList;
+    }
+
+    @ToString
+    @Getter
+    @Setter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Builder
+    @Schema(description = "수신할 채팅 메시지 정보")
+    public static class ChatMessageReceiveDTO {
+
+        @Schema(description = "보낸 사람 아이디, 현재 로그인한 사용자의 userId와 동일", example = "1")
+        Long senderId;
+
+        @Schema(description = "보낸 사람 타입", example = "농업인")
+        String senderType;
+
+        @Schema(description = "메시지 내용, 이미지 전송의 경우 이미지 URL", example = "안녕하세요. 견적 신청하셨나요?")
+        String messageContent;
+
+        @Schema(description = "메시지 타입, " +
+                "텍스트 메시지 전송이라면 TEXT, 이미지 전송이라면 IMAGE, 컨설팅 완료라면 COMPLETE, 채팅방 퇴장이라면 EXIT", example = "TEXT")
+        String messageType;
+
+        @Schema(description = "보낸 시간", example = "2025-01-10")
+        String sendTime;
+
+        @Schema(description = "내가 보낸 메시지인지 여부, 내가 보낸 메시지라면 true, 받은 메시지라면 false", example = "true")
+        Boolean isMine;
+
+        @Schema(description = "상대방이 메시지 읽음 여부", example = "false")
+        Boolean isOtherRead;
+
+//        @Schema(description = "상대방이 채팅방에 접속해 있는지 여부", example = "false")
+//        Boolean isOtherEnter;
+    }
+
+    @ToString
+    @Getter
+    @Setter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Builder
+    @Schema(description = "채팅 시 필요한 이미지 업로드 시 반환 정보")
+    public static class ChatImageDTO {
+
+        @Schema(description = "업로드한 이미지 파일 URL")
+        String chatImageURL;
     }
 }

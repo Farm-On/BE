@@ -1,13 +1,18 @@
 package com.backend.farmon.config.security;
 
+import com.backend.farmon.apiPayload.code.status.ErrorStatus;
+import com.backend.farmon.apiPayload.exception.handler.AuthorizationHandler;
+import com.backend.farmon.apiPayload.exception.handler.UserHandler;
 import com.backend.farmon.repository.UserRepository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
+@Slf4j
 @RequiredArgsConstructor
 @Component
 public class UserAuthorizationUtil {
@@ -43,11 +48,18 @@ public class UserAuthorizationUtil {
     public boolean isCurrentUserIdMatching(Long userId) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
-        if (authentication == null || authentication.getPrincipal() == null) {
-            throw new AuthenticationCredentialsNotFoundException("Authentication or principal is null");
+        if (authentication == null || authentication.getPrincipal() == null ||
+                "anonymousUser".equals(authentication.getPrincipal())) {
+            throw new AuthorizationHandler(ErrorStatus._UNAUTHORIZED);
         }
 
-        Long currentUserId = (Long) authentication.getPrincipal();
+        Object principal = authentication.getPrincipal();
+
+        if (!(principal instanceof Long)) {
+            throw new AuthorizationHandler(ErrorStatus._UNAUTHORIZED);
+        }
+
+        Long currentUserId = (Long) principal;
         return currentUserId.equals(userId);
     }
 

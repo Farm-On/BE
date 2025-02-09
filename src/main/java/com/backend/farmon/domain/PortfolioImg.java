@@ -28,4 +28,12 @@ public class PortfolioImg extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "portfolio_id")
     private Portfolio portfolio;
+
+    public void setPortfolio(Portfolio portfolio) {
+        if (this.portfolio != null) {
+            portfolio.getPortfolioImgList().remove(this);
+        }
+        this.portfolio = portfolio;
+        portfolio.getPortfolioImgList().add(this);
+    }
 }

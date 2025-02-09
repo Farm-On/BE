@@ -1,18 +1,25 @@
 package com.backend.farmon.controller;
 
+import com.backend.farmon.converter.HomeConverter;
+import com.backend.farmon.dto.home.HomeResponse;
+import com.backend.farmon.service.SearchService.SearchCommandService;
+import com.backend.farmon.service.SearchService.SearchQueryService;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @Slf4j
+@RequiredArgsConstructor
 @RestController
 public class TestController {
 
-    @Autowired
-    private RedisTemplate<String, String> redisTemplate;
+    private final RedisTemplate<String, String> stringRedisTemplate;
+    private final SearchCommandService searchCommandService;
+    private final SearchQueryService searchQueryService;
 
     @GetMapping("/test")
     public String test(){
@@ -20,16 +27,15 @@ public class TestController {
     }
 
     @GetMapping("/test-redis/set")
-    public String testRedis(@RequestParam String key) {
+    public String testRedis(@RequestParam String key, @RequestParam String value) {
         try {
             // Redis에 데이터 저장
-            redisTemplate.opsForValue().set(key, "Hello, Redis!");
+            stringRedisTemplate.opsForValue().set(key, value);
 
             // Redis에서 데이터 가져오기
-            String value = redisTemplate.opsForValue().get("testKey");
+            String redisValue = stringRedisTemplate.opsForValue().get(key);
 
-            // 결과 반환
-            return value != null ? "Redis 연결 성공! Value: " + value : "Redis 연결 실패!";
+            return redisValue != null ? "Redis 연결 성공! Value: " + redisValue : "Redis 연결 실패!";
         } catch (Exception e) {
             log.error(e.getMessage());
             return "Redis 오류: " + e.getMessage();
@@ -40,7 +46,7 @@ public class TestController {
     public String checkKey(@RequestParam String key) {
         try {
             // Redis에 해당 키가 존재하는지 확인
-            Boolean exists = redisTemplate.hasKey(key);
+            Boolean exists = stringRedisTemplate.hasKey(key);
 
             // 결과 반환
             if (exists != null && exists) {
@@ -54,4 +60,18 @@ public class TestController {
         }
     }
 
+    @GetMapping("/test-redis/set/recommend")
+    public  HomeResponse.RecommendSearchListDTO testRecommendRedis(@RequestParam Long userId, @RequestParam String value) {
+        // Redis에 데이터 저장
+        searchCommandService.saveRecommendSearchLog(userId, value);
+
+        return HomeConverter.toRecommendSearchListDTO(searchQueryService.findRecommendSearchNameList());
+    }
+
+    @DeleteMapping("/test-redis/delete/recommend")
+    public  HomeResponse.RecommendSearchListDTO testDeleteRecommendRedis(@RequestParam Long userId, @RequestParam String value) {
+        searchCommandService.deleteRecommendSearchLog(userId, value);
+
+        return HomeConverter.toRecommendSearchListDTO(searchQueryService.findRecommendSearchNameList());
+    }
 }

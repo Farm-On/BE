@@ -33,6 +33,9 @@ public class AmazonConfig {
     @Value("${cloud.aws.s3.bucket}")
     private String bucket;
 
+//    @Value("${cloud.aws.s3.path.estimate}")
+//    private String estimatePath;
+
     @PostConstruct
     public void init() {
         this.awsCredentials = new BasicAWSCredentials(accessKey, secretKey);

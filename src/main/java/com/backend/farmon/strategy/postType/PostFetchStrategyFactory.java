@@ -22,7 +22,7 @@ public class PostFetchStrategyFactory {
                 return popularPostFetchStrategy;
             case ALL:
                 return allPostFetchStrategy;
-            case QNA, EXPERT_COLUMN, EXPERT_LOUNGE:
+            case QNA, EXPERT_COLUMN, FREE:
                 return categoryPostFetchStrategy;
             default:
                 throw new PostTypeHandler(POST_TYPE_NOT_FOUND);

@@ -1,8 +1,16 @@
 package com.backend.farmon.converter;
 
 import com.backend.farmon.domain.Expert;
+import com.backend.farmon.domain.ExpertCareer;
+import com.backend.farmon.domain.User;
+import com.backend.farmon.domain.enums.Gender;
 import com.backend.farmon.domain.enums.Role;
+import com.backend.farmon.dto.expert.ExpertCareerResponse;
 import com.backend.farmon.dto.user.ExchangeResponse;
+import com.backend.farmon.dto.user.MypageResponse;
+import com.backend.farmon.dto.user.SignupRequest;
+
+import java.time.LocalDate;
 
 public class UserConverter {
     public static ExchangeResponse toExchangeResponse(Long userId, String role, Expert expert, String token) {
@@ -17,5 +25,16 @@ public class UserConverter {
         }
 
         return responseBuilder.build();
+    }
+
+    // 유저 마이페이지 응답 DTO 생성
+    public static MypageResponse.UserInfoDTO toUserInfoGetResultDTO(User user) {
+        return MypageResponse.UserInfoDTO.builder()
+                .name(user.getUserName())
+                .birth(user.getBirthDate())
+                .gender(user.getGender())
+                .phone(user.getPhoneNum())
+                .email(user.getEmail())
+                .build();
     }
 }

@@ -11,7 +11,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
-@Tag(name = "로그인", description = "로그인에 관한 API. userId와 토큰을 반환합니다.")
+@Tag(name = "로그인", description = "로그인에 관한 API.")
 @RestController
 @RequiredArgsConstructor
 public class LoginController {
@@ -20,7 +20,7 @@ public class LoginController {
     private final UserAuthorizationUtil userAuthorizationUtil;
 
     @PostMapping("/api/login")
-    @Operation(summary = "공동로그인 API")
+    @Operation(summary = "공동로그인 API", description = " userId와 토큰을 반환합니다.")
     @ApiResponses({
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200", description = "OK, 성공")
     })

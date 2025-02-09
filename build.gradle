@@ -49,6 +49,7 @@ dependencies {
 
 	// websocket
 	implementation 'org.springframework.boot:spring-boot-starter-websocket'
+	implementation 'org.springframework:spring-websocket'
 
 	// STOMP
 	implementation 'org.webjars:stomp-websocket:2.3.4'
@@ -77,6 +78,12 @@ dependencies {
 
 	//redis
 	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+
+	// 문자인증 api coolSMS
+	implementation 'net.nurigo:sdk:4.3.2'
+
+	// HTML 파싱 라이브러리
+	implementation 'org.jsoup:jsoup:1.15.3'
 }
 
 tasks.named('test') {

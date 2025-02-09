@@ -4,6 +4,7 @@ import com.backend.farmon.apiPayload.code.status.ErrorStatus;
 import com.backend.farmon.apiPayload.exception.handler.UserHandler;
 import com.backend.farmon.config.security.JWTUtil;
 import com.backend.farmon.domain.User;
+import com.backend.farmon.domain.enums.Role;
 import com.backend.farmon.dto.user.LoginResponseDTO;
 import com.backend.farmon.repository.UserRepository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -29,6 +30,8 @@ public class LoginService {
     public LoginResponseDTO attemptLogin(String email, String password) {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new UserHandler(ErrorStatus.USER_NOT_FOUND));
+
+        user.setRole(Role.FARMER);// 최초 로그인시 role 농업인으로 초기화
 
         // authenticationManager에서 사용자 인증 후 authentication객체에 저장
         Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(email, password));

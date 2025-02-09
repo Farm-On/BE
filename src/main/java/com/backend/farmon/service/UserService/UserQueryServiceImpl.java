@@ -14,7 +14,6 @@ import com.backend.farmon.repository.ExpertReposiotry.ExpertRepository;
 import com.backend.farmon.repository.UserRepository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -37,11 +36,8 @@ public class UserQueryServiceImpl implements UserQueryService {
     @Override
     public ExchangeResponse exchangeRole(Long userId, Role role, String existingToken) {
         // 역할 전환 시 현재 역할과 중복되지 않은지 검사
-        String currentRole = userAuthorizationUtill.getCurrentUserRole();
-        if(currentRole.equals(role.toString()))
-            throw new AuthenticationCredentialsNotFoundException(
-                    "전환하려는 역할과 현재 로그인한 역할이 일치합니다. 현재 역할: " + currentRole
-            );
+        if(userAuthorizationUtill.isCurrentUserRoleMatching(role.toString()))
+            throw new UserHandler(ErrorStatus.EXCHANGE_ROLE_SAME);
 
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserHandler(ErrorStatus.USER_NOT_FOUND));

@@ -2,27 +2,41 @@ package com.backend.farmon.domain;
 
 import com.backend.farmon.domain.commons.BaseEntity;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.ColumnDefault;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
-@Table(name="Comment_Table")
+@Table(name="comment")
 @Entity
 @Setter
 @Getter
-public class Comment extends BaseEntity {
+@Builder
+@AllArgsConstructor
+public class Comment extends  BaseEntity {
     // 수정까지 가능
 
-
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name="comment_id")
     private Long id;
     //id로 통일
 
+    @NotNull
     private String commentContent;
+
+    @NotNull
+    private  String authorName;
+
+
+    private String expertCategory;
 
     @ManyToOne(fetch=FetchType.LAZY)
     @JoinColumn(name="PARENT_ID")
@@ -34,7 +48,7 @@ public class Comment extends BaseEntity {
 
     //삭제기능은 구현 안함
 
-    //일단 사용자 : 댓글 1:ㅜ
+    //일단 사용자 : 댓글 1:N
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="user_id")
     private User user;
@@ -42,9 +56,29 @@ public class Comment extends BaseEntity {
 
     //부모댓글과 대댓글
     @OneToMany(mappedBy="parent",fetch=FetchType.LAZY,
-    cascade = {CascadeType.ALL},orphanRemoval = true)
+            cascade = {CascadeType.ALL},orphanRemoval = true)
     private List<Comment> children=new ArrayList<>();
 
 
+    public Comment(String content) {
+        this.commentContent = content;
+    }
 
+    @ColumnDefault("FALSE")
+    @Column(nullable = false)
+    private Boolean isDeleted;
+
+
+    @Column(name = "time")
+    private String time; //댓글 작성 시간
+
+
+    @PrePersist
+    protected void Createtime() {
+        time = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy.MM.dd HH:mm:ss"));
+    }
+
+    public Comment() {
+
+    }
 }

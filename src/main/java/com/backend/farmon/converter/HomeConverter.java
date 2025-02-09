@@ -54,4 +54,34 @@ public class HomeConverter {
                 )
                 .build();
     }
+
+    public static HomeResponse.AutoCompleteSearchPostDTO toAutoCompleteSearchPostDTO(){
+        return HomeResponse.AutoCompleteSearchPostDTO.builder()
+                .isSearchSave(true)
+                .build();
+    }
+
+    public static HomeResponse.SearchDeleteDTO toSearchDeleteDTO(){
+        return HomeResponse.SearchDeleteDTO.builder()
+                .isSearchDelete(true)
+                .build();
+    }
+
+    public static HomeResponse.AutoCompleteSearchDTO toAutoCompleteSearchDTO(List<String> searchList){
+        return HomeResponse.AutoCompleteSearchDTO.builder()
+                .searchList(searchList)
+                .build();
+    }
+
+    public static HomeResponse.RecommendSearchListDTO toRecommendSearchListDTO(List<String> recommendSearchList){
+        return HomeResponse.RecommendSearchListDTO.builder()
+                .recommendSearchList(recommendSearchList)
+                .build();
+    }
+
+    public static HomeResponse.RecentSearchListDTO toRecentSearchListDTO(List<String> recentSearchList){
+        return HomeResponse.RecentSearchListDTO.builder()
+                .recentSearchList(recentSearchList)
+                .build();
+    }
 }

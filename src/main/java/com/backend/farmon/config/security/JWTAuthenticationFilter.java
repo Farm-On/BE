@@ -1,5 +1,7 @@
 package com.backend.farmon.config.security;
 
+import com.backend.farmon.apiPayload.code.status.ErrorStatus;
+import com.backend.farmon.apiPayload.exception.handler.AuthorizationHandler;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -51,6 +53,9 @@ public class JWTAuthenticationFilter extends OncePerRequestFilter {
             }
         } catch (Exception e) {
             logger.error("Invalid JWT token: " + e.getMessage());
+
+            // 토큰이 없을 경우 에러 던짐
+            throw new AuthorizationHandler(ErrorStatus._UNAUTHORIZED);
         }
         filterChain.doFilter(request, response);
     }

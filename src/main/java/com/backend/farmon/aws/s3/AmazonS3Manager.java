@@ -1,6 +1,7 @@
 package com.backend.farmon.aws.s3;
 
 import com.amazonaws.services.s3.AmazonS3;
+import com.amazonaws.services.s3.model.DeleteObjectRequest;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.backend.farmon.config.AmazonConfig;
@@ -36,4 +37,7 @@ public class AmazonS3Manager{
         return amazonS3.getUrl(amazonConfig.getBucket(), keyName).toString();
     }
 
+    public void deleteFile(String s3Key) {
+        amazonS3.deleteObject(new DeleteObjectRequest(amazonConfig.getBucket(), s3Key));
+    }
 }

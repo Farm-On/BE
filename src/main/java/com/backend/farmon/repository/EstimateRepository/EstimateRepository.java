@@ -1,6 +1,7 @@
 package com.backend.farmon.repository.EstimateRepository;
 
 import com.backend.farmon.domain.Estimate;
+import com.backend.farmon.domain.Expert;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -19,6 +20,12 @@ public interface EstimateRepository extends JpaRepository<Estimate, Long>, Estim
             "WHERE e.crop.id = :cropId AND e.status = 0 " +
             "ORDER BY e.createdAt DESC")
     Page<Estimate> findByCropIdAndStatus(@Param("cropId") Long cropId, Pageable pageable);
+
+    // 1-1) 특정 cropName 에게 매핑된 견적서 목록 - 상태가 0인것만
+    @Query("SELECT e FROM Estimate e " +
+            "WHERE e.crop.name = :cropName AND e.status = 0 " +
+            "ORDER BY e.createdAt DESC")
+    Page<Estimate> findByCropNameAndStatus(@Param("cropName") String cropName, Pageable pageable);
 
     // 2) 특정 cropCategory 에게 매핑된 견적서 목록 - 상태가 0인것만
     @Query("SELECT e FROM Estimate e " +
@@ -54,8 +61,10 @@ public interface EstimateRepository extends JpaRepository<Estimate, Long>, Estim
     Page<Estimate> findCompletedEstimatesByUserId(@Param("userId") Long userId, Pageable pageable);
 
     // 7) estimate  user_id와 일치하는 estimates 목록 중 최신순 5개 목록을 전달
-    @Query("SELECT e FROM Estimate e WHERE e.user.id = :userId " +
-            "ORDER BY e.createdAt DESC")
-    List<Estimate> findTop5ByUserIdOrderByCreatedAtDesc(@Param("userId") Long userId);
-
+//    @Query("SELECT e FROM Estimate e WHERE e.user.id = :userId " +
+//            "ORDER BY e.createdAt DESC")
+//    List<Estimate> findTop5ByUserIdOrderByCreatedAtDesc(@Param("userId") Long userId);
+    List<Estimate> findTop5ByUserIdOrderByCreatedAtDesc(Long userId);
+    // 특정 전문가에 대한 모든 Estimate 수를 반환하는 메서드
+    long countByExpert(Expert expert);
 }
