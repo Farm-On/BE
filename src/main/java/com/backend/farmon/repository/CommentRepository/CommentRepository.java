@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface CommentRepository extends JpaRepository<Comment, Long> {
     // 게시글과 연관된 댓글 개수 조회
@@ -17,5 +18,12 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
 
     @Query("SELECT COUNT(c) FROM Comment c WHERE c.parent.id = :parentId")
     int countByParentId(@Param("parentId") Long parentId);
+
+    @Query("SELECT COALESCE(MAX(c.groupOrder), 0) FROM Comment c WHERE c.groupId = :groupId")
+    Optional<Integer> findMaxGroupOrderByGroupId(@Param("groupId") Long groupId);
+
+
+    boolean existsByParentId(Long parentId);
+
 
 }
