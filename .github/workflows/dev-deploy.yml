@@ -81,6 +81,11 @@ jobs:
             # Pull Latest Docker Image
             sudo docker pull "${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_REPO }}:latest"
             
+            # .env 파일을 EC2 서버의 루트 디렉터리에 생성
+            echo "REDIS_PASSWORD=${{ secrets.REDIS_PASSWORD }}" > /home/ubuntu/.env
+            echo "DOCKER_USERNAME=${{ secrets.DOCKER_USERNAME }}" >> /home/ubuntu/.env
+            echo "DOCKER_REPO=${{ secrets.DOCKER_REPO }}" >> /home/ubuntu/.env
+            
             # Start Containers with Docker Compose
             if [ -f /home/ubuntu/docker-compose.yml ]; then
               docker-compose up -d
