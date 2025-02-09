@@ -1,22 +1,23 @@
 package com.backend.farmon.service.CommentService;
 
+import com.backend.farmon.apiPayload.code.status.ErrorStatus;
+import com.backend.farmon.apiPayload.exception.GeneralException;
+import com.backend.farmon.controller.UserController;
 import com.backend.farmon.domain.Comment;
 import com.backend.farmon.domain.Post;
 import com.backend.farmon.domain.User;
 import com.backend.farmon.dto.Comment.CommentRequestDTO;
 import com.backend.farmon.dto.Comment.CommentResponseDTO;
+import com.backend.farmon.dto.post.PostType;
+import com.backend.farmon.repository.BoardRepository.BoardRepository;
 import com.backend.farmon.repository.CommentRepository.CommentRepository;
+import com.backend.farmon.repository.CommentRepository.CommentRepositoryImpl;
 import com.backend.farmon.repository.PostRepository.PostRepository;
 import com.backend.farmon.repository.UserRepository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
-
-import static com.backend.farmon.converter.CommentConverter.toChildCommentEntity;
-import static com.backend.farmon.converter.CommentConverter.toParentSaveEntity;
 
 
 @Slf4j
@@ -26,129 +27,113 @@ public class CommentServiceImpl implements CommentService {
 
     private final CommentRepository commentRepository;
     private final PostRepository postRepository;
+    private final UserController userController;
     private final UserRepository userRepository;
+    private final BoardRepository boardRepository;
 
-
-
-    @Override
+    /**
+     * 댓글 저장 (최상위 댓글 / 대댓글)
+     */
     @Transactional
-    public void saveParentComment(Long postId, CommentRequestDTO.CommentSaveParentRequestDto dto) {
-        Post post = postRepository.findById(postId)
-                .orElseThrow(() -> new RuntimeException("게시글이 확인되지 않습니다."));
-
-        User user = userRepository.findById(dto.getUserId())
-                .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
-
-        Comment comment = commentRepository.save(toParentSaveEntity(dto, user, post));
-    }
-
     @Override
-    @Transactional
-    public void saveChildComment(Long postId, Long parentId, CommentRequestDTO.CommentSaveChildRequestDto dto) {
-        Post post = postRepository.findById(postId)
-                .orElseThrow(() -> new RuntimeException("게시글이 확인되지 않습니다."));
+    public CommentResponseDTO saveComment(Long postId, Long parentId, CommentRequestDTO.CommentSaveRequestDto dto) {
 
+        // 게시글 조회
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new IllegalArgumentException("해당 게시글이 존재하지 않습니다."));
+
+        if( post.getBoard().getPostType()== PostType.QNA){
+            throw new GeneralException(ErrorStatus.BOARD_TYPE_NOT_COMMENTED);
+        }
+        // 사용자 조회
         User user = userRepository.findById(dto.getUserId())
-                .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
+                .orElseThrow(() -> new IllegalArgumentException("사용자의 아이디가 없습니다."));
 
-        Comment parentComment = commentRepository.findById(parentId)
-                .orElseThrow(() -> new RuntimeException("부모 댓글을 찾을 수 없습니다."));
+        // 부모 댓글 처리 (parentId가 null이면 최상위 댓글로 간주)
+        Comment parent = null;
+        int depth = 0;
+        Long groupId = null;
+        int groupOrder = 0;
 
-        Comment childComment = toChildCommentEntity(dto, user, post, parentComment);
+        if (parentId != null) { // 대댓글 처리
+            parent = commentRepository.findById(parentId)
+                    .orElseThrow(() -> new IllegalArgumentException("부모 댓글이 존재하지 않습니다."));
+            depth = parent.getDepth() + 1; // 부모 댓글의 깊이 + 1
+            groupId = parent.getGroupId(); // 부모 댓글의 그룹 ID 사용
+            groupOrder = commentRepository.countByParentId(parent.getId()); // 자식 수를 기준으로 순서 설정
 
-        commentRepository.save(childComment);
-    }
+            // 삭제된 부모 댓글에는 대댓글 작성 불가
+            if (parent.getIsDeleted()) {
+                throw new IllegalArgumentException("삭제된 댓글에는 대댓글을 작성할 수 없습니다.");
+            }
+        }
 
-//    // 댓글 삭제시 댓글 삭제 상태로 전환
-//    @Override
-//    @Transactional
-//    public CommentResponseDTO.CommentDeleteDTO deleteComment(Long postId, Long parentId) {
-//        Post post = postRepository.findById(postId)
-//                .orElseThrow(() -> new RuntimeException("게시글이 확인되지 않습니다."));
-//
-//        Comment parentComment = commentRepository.findById(parentId)
-//                .orElseThrow(() -> new RuntimeException("부모 댓글이 확인되지 않습니다."));
-//
-//        // 부모 댓글을 삭제된 상태로 설정 (isDeleted 값을 true로 설정)
-//        parentComment.setIsDeleted(true);
-//        commentRepository.save(parentComment);  // 업데이트된 댓글을 저장
-//
-//        return CommentResponseDTO.CommentDeleteDTO.builder()
-//                .isDeleteSuccess(true)
-//                .build();
-//    }
-//
-//    // 대댓글 삭제
-//    @Override
-//    @Transactional
-//    public CommentResponseDTO.CommentDeleteDTO deleteChildComment(Long postId, Long parentId, Long childId) {
-//        // 게시글 조회
-//        Post post = postRepository.findById(postId)
-//                .orElseThrow(() -> new RuntimeException("게시글이 확인되지 않습니다."));
-//
-//        // 부모 댓글 조회
-//        Comment parentComment = commentRepository.findById(parentId)
-//                .orElseThrow(() -> new RuntimeException("부모 댓글이 확인되지 않습니다."));
-//
-//        // 대댓글 조회
-//        Comment childComment = commentRepository.findById(childId)
-//                .orElseThrow(() -> new RuntimeException("대댓글이 확인되지 않습니다."));
-//
-//        // 부모 댓글이 대댓글을 가지고 있는지 확인
-//        if (parentComment.getChildren().contains(childComment)) {
-//            // 대댓글을 삭제된 상태로 설정 (isDeleted 값을 true로 설정)
-//            childComment.setIsDeleted(true);
-//            commentRepository.save(childComment);  // 대댓글 업데이트
-//
-//            // 대댓글 삭제 후 Post의 댓글 리스트에서 제거 (Post의 상태 갱신)
-//            post.getComments().remove(childComment); // 부모 댓글이 달린 대댓글을 포스트의 댓글 리스트에서 제거
-//
-//            // Post를 업데이트하여 댓글 상태 갱신
-//            postRepository.save(post);
-//        } else {
-//            throw new RuntimeException("대댓글이 부모 댓글에 포함되지 않습니다.");
-//        }
-//
-//        // 대댓글 삭제가 성공적으로 처리되었음을 반환
-//        return CommentResponseDTO.CommentDeleteDTO.builder()
-//                .isDeleteSuccess(true)
-//                .build();
-//    }
-
-    // 부모 댓글과 대댓글 모두 조회
-    @Override
-    @Transactional(readOnly = true)
-    public CommentResponseDTO.CommentResponseDto getAllCommentsByPost(Long postId) {
-        Post post = postRepository.findById(postId)
-                .orElseThrow(() -> new RuntimeException("게시글이 확인되지 않습니다."));
-
-        // 부모 댓글 조회
-        List<Comment> parentComments = commentRepository.findParentCommentsByPostId(postId);
-
-        List<CommentResponseDTO.CommentParentResponseDto> parentCommentDtos = parentComments.stream()
-                .map(parent -> {
-                    List<CommentResponseDTO.CommentChildResponseDto> childCommentDtos = parent.getChildren().stream()
-                            .map(child -> CommentResponseDTO.CommentChildResponseDto.builder()
-                                    .commentId(child.getId())
-                                    .commentContent(child.getCommentContent())
-                                    .userId(child.getUser().getId())
-                                    .parentId(parent.getId())
-                                    .build())
-                            .toList();
-
-                    return CommentResponseDTO.CommentParentResponseDto.builder()
-                            .commentId(parent.getId())
-                            .commentContent(parent.getCommentContent())
-                            .userId(parent.getUser().getId())
-                            .expertCategory(String.valueOf(parent.getUser().getExpert().getCrop()))
-                            .childComments(childCommentDtos)
-                            .build();
-                })
-                .toList();
-
-        return CommentResponseDTO.CommentResponseDto.builder()
-                .parentComments(parentCommentDtos)
-                .hasNext(false) // 페이징 적용 시 수정 필요
+        // 댓글 생성
+        Comment comment = Comment.builder()
+                .content(dto.getCommentContent())
+                .authorName(user.getUserName())  // User 엔티티에서 이름 추출
+                .user(user)
+                .post(post)
+                .parent(parent)
+                .depth(depth)
+                .groupId(groupId) // 최상위 댓글은 null, 대댓글은 부모의 groupId 사용
+                .groupOrder(groupOrder)
+                .isDeleted(false)
                 .build();
+
+        log.info("댓글 생성 시작");
+        Comment savedComment = commentRepository.save(comment);
+        log.info("댓글 저장 완료: {}", savedComment);
+
+        // 최상위 댓글인 경우 자기 자신의 ID를 groupId로 설정하고 저장
+        if (savedComment.getParent() == null) {
+            savedComment.setGroupId(savedComment.getId());
+            commentRepository.save(savedComment); // groupId 업데이트를 반영하기 위해 다시 저장
+            log.info("최상위 댓글 groupId 설정 완료: {}", savedComment.getGroupId());
+        }
+
+        return new CommentResponseDTO(savedComment);
+    }
+
+
+
+    /**
+     * 댓글 수정 (내용만 수정 가능)
+     */
+    @Transactional
+    @Override
+    public CommentResponseDTO updateComment(Long commentId, CommentRequestDTO.CommentUpdateRequestDto dto) {
+        Comment comment = commentRepository.findById(commentId)
+                .orElseThrow(() -> new IllegalStateException("삭제된 댓글은 수정할 수 없습니다."));
+
+        if (!comment.getIsDeleted()) {
+            comment.setContent(dto.getCommentContent());
+        } else {
+            throw new IllegalStateException("삭제된 댓글은 수정할 수 없습니다.");
+        }
+
+        // CommentResponseDTO로 변환하여 반환
+        return new CommentResponseDTO(comment);
+    }
+
+
+    /**
+     * 댓글 삭제 (부모 댓글은 isDeleted = true 처리)
+     * 대댓글은 직접 삭제
+     */
+    @Transactional
+    @Override
+    public void deleteComment(Long commentId) {
+        Comment comment = commentRepository.findById(commentId)
+                .orElseThrow(() -> new IllegalArgumentException("해당 댓글이 존재하지 않습니다."));
+
+        if (comment.getParent() == null) {
+            // 부모 댓글 삭제 시, 자식 댓글이 있으면 논리 삭제 처리
+            comment.setIsDeleted(true);
+            // comment.getChildren().forEach(child -> child.setIsDeleted(true));
+        } else {
+            // 대댓글(답글)은 직접 삭제
+            commentRepository.delete(comment);
+        }
     }
 }
