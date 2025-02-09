@@ -358,15 +358,14 @@ public class PostController {
     })
     @Parameters({
             @Parameter(name = "boardId", description = "게시판 번호", required = true),
-            @Parameter(name = "postId", description = "게시글 작성한 사람 Id", required = true)
+            @Parameter(name = "postId", description = "게시글 번호", required = true)
     })
     @GetMapping("popular/list/{postId}/detail")
-    public ApiResponse  getPopularPostById( Long boardId,@PathVariable  Long postId) {
+    public ApiResponse<PostResponseDTO> getPopularPostById( Long boardId,@PathVariable  Long postId) {
         String resultCode;
 
         PostResponseDTO postDetail = postQueryServiceImpl.getBoardIdAndPostById(boardId,postId);
-        resultCode=SuccessStatus._OK.getCode();
-        return ApiResponse.onSuccess(resultCode);
+        return ApiResponse.onSuccess(postDetail);
     }
 
     @Operation(
@@ -381,14 +380,12 @@ public class PostController {
     })
     @Parameters({
             @Parameter(name = "boardId", description = "게시판 번호", required = true),
-            @Parameter(name = "postId", description = "게시글 작성한 사람 Id", required = true)
+            @Parameter(name = "postId", description = "게시글 번호", required = true)
     })
     @GetMapping("all/list/{postId}/detail")
-    public ApiResponse  getAllPostById( Long boardId,@PathVariable Long postId) {
-        String resultCode;
+    public ApiResponse<PostResponseDTO>   getAllPostById( Long boardId,@PathVariable Long postId) {
         PostResponseDTO postDetail = postQueryServiceImpl.getBoardIdAndPostById(boardId,postId);
-        resultCode=SuccessStatus._OK.getCode();
-        return ApiResponse.onSuccess(resultCode);
+        return ApiResponse.onSuccess(postDetail);
 
     }
 
@@ -407,11 +404,9 @@ public class PostController {
             @Parameter(name = "postId", description = "게시글 작성한 사람 Id", required = true)
     })
     @GetMapping("free/list/{postId}/detail")
-    public ApiResponse  getFreePostById( Long boardId,@PathVariable Long postId) {
-        String resultCode;
+    public ApiResponse<PostResponseDTO>   getFreePostById( Long boardId,@PathVariable Long postId) {
         PostResponseDTO postDetail = postQueryServiceImpl.getBoardIdAndPostById(boardId,postId);
-        resultCode=SuccessStatus._OK.getCode();
-        return ApiResponse.onSuccess(resultCode);
+        return ApiResponse.onSuccess(postDetail);
     }
 
 
@@ -430,10 +425,8 @@ public class PostController {
             @Parameter(name = "postId", description = "게시글 작성한 사람 Id", required = true)
     })
     @GetMapping("qna/list/{postId}/detail")
-    public ApiResponse  getQnaPostById(Long boardId,@PathVariable  Long postId) {
-        String resultCode;
+    public ApiResponse<PostWithAnswersResponseDTO>   getQnaPostById(Long boardId,@PathVariable  Long postId) {
         PostWithAnswersResponseDTO postDetail = postQueryServiceImpl.getBoardIdAndQnAPostById(boardId,postId);
-        resultCode=SuccessStatus._OK.getCode();
         return ApiResponse.onSuccess(postDetail);
 
     }
@@ -455,11 +448,9 @@ public class PostController {
             @Parameter(name = "postId", description = "게시글 작성한 사람 Id", required = true)
     })
     @GetMapping("expertCol/list/{postId}/detail")
-    public ApiResponse getExpertColumnPostById( Long boardId,@PathVariable Long postId) {
-        String resultCode;
+    public ApiResponse<PostResponseDTO>  getExpertColumnPostById( Long boardId,@PathVariable Long postId) {
         PostResponseDTO postDetail = postQueryServiceImpl.getBoardIdAndPostById(boardId,postId);
-        resultCode=SuccessStatus._OK.getCode();
-        return ApiResponse.onSuccess(resultCode);
+        return ApiResponse.onSuccess(postDetail);
     }
 
 }
