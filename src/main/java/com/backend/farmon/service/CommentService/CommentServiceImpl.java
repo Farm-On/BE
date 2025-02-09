@@ -42,9 +42,10 @@ public class CommentServiceImpl implements CommentService {
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 게시글이 존재하지 않습니다."));
 
-        if( post.getBoard().getPostType()== PostType.QNA){
+        if (post.getBoard().getPostType() == PostType.QNA) {
             throw new GeneralException(ErrorStatus.BOARD_TYPE_NOT_COMMENTED);
         }
+
         // 사용자 조회
         User user = userRepository.findById(dto.getUserId())
                 .orElseThrow(() -> new IllegalArgumentException("사용자의 아이디가 없습니다."));
@@ -60,12 +61,21 @@ public class CommentServiceImpl implements CommentService {
                     .orElseThrow(() -> new IllegalArgumentException("부모 댓글이 존재하지 않습니다."));
             depth = parent.getDepth() + 1; // 부모 댓글의 깊이 + 1
             groupId = parent.getGroupId(); // 부모 댓글의 그룹 ID 사용
-            groupOrder = commentRepository.countByParentId(parent.getId()); // 자식 수를 기준으로 순서 설정
 
             // 삭제된 부모 댓글에는 대댓글 작성 불가
             if (parent.getIsDeleted()) {
                 throw new IllegalArgumentException("삭제된 댓글에는 대댓글을 작성할 수 없습니다.");
             }
+
+            // 부모 댓글에 이미 대댓글이 있는지 확인
+            boolean hasChildComment = commentRepository.existsByParentId(parent.getId());
+            if (hasChildComment) {
+                throw new IllegalArgumentException("부모 댓글에 이미 대댓글이 존재합니다. 대댓글은 하나만 작성할 수 있습니다.");
+            }
+
+            // 그룹 내에서 가장 큰 groupOrder 값을 가져와 +1
+            groupOrder = commentRepository.findMaxGroupOrderByGroupId(groupId)
+                    .orElse(0) + 1; // 값이 없으면 기본값 0으로 시작
         }
 
         // 댓글 생성
