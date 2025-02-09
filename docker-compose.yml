@@ -17,7 +17,7 @@ services:
 
   backend:
     container_name: spring-app
-    image: ${DOCKER_USER}/${DOCKER_REPO}:latest
+    image: ${DOCKER_USERNAME}/${DOCKER_REPO}:latest
     env_file:
       - .env  # 환경변수를 .env 파일에서 읽어옴
     # 접근 포트 설정(컨테이너 외부:컨테이너 내부)
