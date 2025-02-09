@@ -2,6 +2,7 @@ package com.backend.farmon.dto.post;
 
 import com.backend.farmon.domain.Post;
 import com.backend.farmon.dto.Answer.AnswerResponseDTO;
+import com.backend.farmon.dto.Comment.CommentResponseDTO;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 import org.jetbrains.annotations.NotNull;
@@ -46,6 +47,17 @@ public class PostResponseDTO {
         @Schema(description = "답변 리스트", example = "[{...}, {...}]")
         private List<AnswerResponseDTO> answers; // 답변 리스트
 
+
+        private List<CommentResponseDTO> comments; // 댓글 리스트
+
+        public PostResponseDTO(Post post, List<String> imgUrls, String timeAgo, List<CommentResponseDTO> comments) {
+                this.postId = post.getId();
+                this.postTitle = post.getPostTitle();
+                this.postContent = post.getPostContent();
+                this.createdAt=timeAgo;
+                this.imageUrls = imgUrls;
+                this.comments = comments;
+        }
         /**
          * 기본 생성자: answers 필드를 빈 리스트로 초기화
          */
