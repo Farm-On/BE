@@ -1,84 +1,69 @@
 package com.backend.farmon.domain;
 
+import com.backend.farmon.domain.Post;
+import com.backend.farmon.domain.User;
 import com.backend.farmon.domain.commons.BaseEntity;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
-import org.hibernate.annotations.ColumnDefault;
+import lombok.*;
 
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
-@Table(name="comment")
+@Table(name = "comment")
 @Entity
-@Setter
 @Getter
 @Builder
 @AllArgsConstructor
-public class Comment extends  BaseEntity {
-    // 수정까지 가능
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+public class Comment extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name="comment_id")
+    @Column(name = "comment_id")
     private Long id;
-    //id로 통일
+
+    @Setter
+    @NotNull
+    @Column(name = "comment_content", nullable = false)
+    private String content;
 
     @NotNull
-    private String commentContent;
+    @Column(nullable = false)
+    private String authorName;
 
-    @NotNull
-    private  String authorName;
-
-
-    private String expertCategory;
-
-    @ManyToOne(fetch=FetchType.LAZY)
-    @JoinColumn(name="PARENT_ID")
+    @ManyToOne(fetch = FetchType.LAZY,optional = true)
+    @JoinColumn(name = "parent_id")
     private Comment parent;
+
+    @OneToMany(mappedBy = "parent", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Comment> children = new ArrayList<>();
+
+    @Setter
+    @Column(name = "group_id", nullable = true)
+    private Long groupId;
+
+    @Column(name = "group_order", nullable = true)
+    private Integer groupOrder;
+
+    @Column(nullable = false)
+    private Integer depth;
+
+
+    @Setter
+    @Column(nullable = false)
+    private Boolean isDeleted;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "post_id")
     private Post post;
 
-    //삭제기능은 구현 안함
-
-    //일단 사용자 : 댓글 1:N
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name="user_id")
+    @JoinColumn(name = "user_id")
     private User user;
 
 
-    //부모댓글과 대댓글
-    @OneToMany(mappedBy="parent",fetch=FetchType.LAZY,
-            cascade = {CascadeType.ALL},orphanRemoval = true)
-    private List<Comment> children=new ArrayList<>();
 
 
-    public Comment(String content) {
-        this.commentContent = content;
-    }
-
-    @ColumnDefault("FALSE")
-    @Column(nullable = false)
-    private Boolean isDeleted;
-
-
-    @Column(name = "time")
-    private String time; //댓글 작성 시간
-
-
-    @PrePersist
-    protected void Createtime() {
-        time = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy.MM.dd HH:mm:ss"));
-    }
-
-    public Comment() {
-
-    }
 }

@@ -81,7 +81,8 @@ public enum ErrorStatus implements BaseErrorCode {
     SEARCH_NOT_EMPTY(HttpStatus.BAD_REQUEST, "SEARCH_4001", "검색어가 비어 있습니다."),
 
     //게시판
-    BOARD_TYPE_NOT_FOUND(HttpStatus.BAD_REQUEST, "MESSAGE_TYPE4001", "지원되지 게시판 타입입니다."),
+    BOARD_TYPE_NOT_FOUND(HttpStatus.BAD_REQUEST, "BOARD_TYPE4001", "지원되지 게시판 타입입니다."),
+    BOARD_TYPE_NOT_COMMENTED(HttpStatus.BAD_REQUEST, "BOARD_TYPE4002", "게시판에 댓글을 달 수 없습니다."),
 
     // QNA게시판 조회 에러
     QNA_NOT_FOUND(HttpStatus.BAD_REQUEST, "QNA_TYPE4001", "QNA게시판이 아닙니다."),
