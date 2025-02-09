@@ -11,6 +11,7 @@ import com.backend.farmon.dto.estimate.EstimateResponseDTO;
 import com.backend.farmon.repository.ChatRoomReposiotry.ChatRoomRepository;
 import com.backend.farmon.repository.EstimateRepository.EstimateRepository;
 import com.backend.farmon.repository.ExpertReposiotry.ExpertRepository;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -62,7 +63,8 @@ public class EstimateQueryServiceImpl implements EstimateQueryService {
     @Override
     public EstimateResponseDTO.ListDTO getEstimateListByExpertCropId(Long expertId, int page) {
         // 1) 전문가
-        Long cropId =  expertRepository.findById(expertId).get().getCrop().getId();
+        Long cropId =  expertRepository.findById(expertId).orElseThrow(() -> new EntityNotFoundException("해당 ID와 일치하는 전문가를 찾을 수 없습니다."))
+                .getCrop().getId();
 
         if(cropId == null){
             return EstimateResponseDTO.ListDTO.builder().build();
