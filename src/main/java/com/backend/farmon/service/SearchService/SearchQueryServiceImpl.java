@@ -32,6 +32,7 @@ public class SearchQueryServiceImpl implements SearchQueryService{
     @Override
     public HomeResponse.RecentSearchListDTO findRecentSearchLogs(Long userId) {
         List<String> recentSearchList = recentSearchLogRedisTemplate.opsForList().range(recentSearchKey+userId, 0, 9);
+
         return HomeConverter.toRecentSearchListDTO(recentSearchList);
     }
 
