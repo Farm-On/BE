@@ -1,5 +1,6 @@
 package com.backend.farmon.service.SearchService;
 
+import com.backend.farmon.converter.HomeConverter;
 import com.backend.farmon.dto.home.HomeResponse;
 import com.backend.farmon.repository.CropRepository.CropRepository;
 import lombok.RequiredArgsConstructor;
@@ -30,21 +31,13 @@ public class SearchQueryServiceImpl implements SearchQueryService{
     // 사용자 최근 검색어 리스트 조회
     @Override
     public HomeResponse.RecentSearchListDTO findRecentSearchLogs(Long userId) {
-        return HomeResponse.RecentSearchListDTO.builder()
-                .recentSearchList( recentSearchLogRedisTemplate.opsForList().range(recentSearchKey+userId, 0, 9))
-                .build();
-    }
-
-    // 추천 검색어 스케줄링
-    @Override
-    public HomeResponse.RecommendSearchListDTO getRecommendSearchNameRank(){
-        return HomeResponse.RecommendSearchListDTO.builder()
-                .recommendSearchList(recommendSearchNameRankList())
-                .build();
+        List<String> recentSearchList = recentSearchLogRedisTemplate.opsForList().range(recentSearchKey+userId, 0, 9);
+        return HomeConverter.toRecentSearchListDTO(recentSearchList);
     }
 
     // 추천 검색어 리스트 조회
-     private List<String> recommendSearchNameRankList(){
+    @Override
+     public List<String> findRecommendSearchNameList(){
         log.info("추천 검색어 리스트 조회");
 
         ZSetOperations<String, String> zSetOperations = recommendSearchLogRedisTemplate.opsForZSet();
@@ -59,18 +52,18 @@ public class SearchQueryServiceImpl implements SearchQueryService{
                     .collect(Collectors.toList());
         }
 
-        return Collections.emptyList();
+        return new ArrayList<>(List.of("쌀", "보리"));
     }
 
     // 자동 완성 검색어 조회
     @Override
-    public List<String> autoSearchNameList(String keyword) {
+    public List<String> findAutoSearchNameList(String keyword) {
         Long index = findFromSortedSet(keyword);  // 사용자가 입력한 검색어를 바탕으로 Redis에서 조회한 결과 매칭되는 index
         log.info("index: {}", index);
 
         if (index == null || index == 0) {
             // 만약 사용자 검색어 바탕으로 자동 완성 검색어를 만들 수 없으면 추천 검색어 리스트 반환
-            return recommendSearchNameRankList();
+            return findRecommendSearchNameList();
         }
 
         Set<String> allValuesAfterIndexFromSortedSet = findAllValuesAfterIndexFromSortedSet(index);   // 사용자 검색어 이후로 정렬된 Redis 데이터들 가져오기
