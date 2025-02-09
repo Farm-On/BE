@@ -40,4 +40,17 @@ public class ExpertProfileRequest {
         @Schema(description = "도서 지방 제외 여부")
         Boolean isExcludeIsland;
     }
+
+    @Builder
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class UpdateProfileDTO { // 내 프로필 변경 요청 DTO
+        @Schema(description = "닉네임", example = "해충해방")
+        String nickName;
+        @Schema(description = "닉네임만 보여주기 여부", example = "true")
+        Boolean isNickNameOnly;
+        @Schema(description = "한 줄 소개", example = "현장에서 쌓은 경험을 바탕으로, 실전 노하우를 전해드립니다.")
+        String expertDescription;
+    }
 }

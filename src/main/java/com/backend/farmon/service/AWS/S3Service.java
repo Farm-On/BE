@@ -123,7 +123,6 @@ public class S3Service {
         amazonS3.deleteObject(bucket, img.getStoredFileName());
     }
 
-
     // 전문가 프로필 이미지
     @Transactional
     public String putProfImage(Long expertId, MultipartFile multipartFile) throws IOException {
@@ -148,7 +147,10 @@ public class S3Service {
 
         // 이전에 저장된 프로필 사진이 있으면 삭제
         if (expert.getProfileImageUrl() != null){
-            deleteProfImage(expertId);
+            String profileUrl = expert.getProfileImageUrl();
+            String s3key = profileUrl.substring(profileUrl.indexOf("Profile/"));
+            deleteImg(s3key);
+            expert.setProfileImageUrl(null);
         }
 
         // 원본 파일명을 서버에 저장된 파일명으로 변경하여 storedFileName에 저장하기 위함 (중복 비허용)
@@ -163,24 +165,6 @@ public class S3Service {
 
         expert.setProfileImageUrl(getFullPath(storedFileName));
         return getFullPath(storedFileName);
-    }
-//
-//    // 프로필 이미지의 S3 전체 주소 조회
-//    @Transactional(readOnly = true)
-//    public String getProfImage(Long userNo){
-//        User user = userRepository.findById(userNo).orElseThrow(() -> new RuntimeException("유저를 찾을 수 없습니다"));
-//        if (user.getUserProfImg() == null){
-//            return null;
-//        }
-//        return getFullPath(user.getUserProfImg());
-//    }
-
-    // 프로필 이미지 삭제
-    @Transactional
-    public void deleteProfImage(Long expertId)  {
-        Expert expert = expertRepository.findById(expertId).orElseThrow(() -> new ExpertHandler(ErrorStatus.EXPERT_NOT_FOUND));
-        amazonS3.deleteObject(bucket, expert.getProfileImageUrl());
-        expert.setProfileImageUrl(null);
     }
 
     // 채팅용 이미지 업로드
@@ -213,5 +197,38 @@ public class S3Service {
         amazonS3.putObject(bucket, storedFileName, multipartFile.getInputStream(), metadata);
 
         return getFullPath(storedFileName);
+    }
+
+    // 포트폴리오 이미지 저장
+    @Transactional
+    public String putPortfolioImg(MultipartFile multipartFile) {
+        if (multipartFile.isEmpty()) {return null;}
+
+        List<String> allowedExtensions = Arrays.asList("jpg", "jpeg", "png", "gif", "webp");
+        String originalFileName = multipartFile.getOriginalFilename();
+        String fileExtension = extractExt(originalFileName).toLowerCase();
+
+        if (!allowedExtensions.contains(fileExtension)) {
+            throw new IllegalArgumentException("지원하지 않는 파일 형식입니다. 이미지 파일(jpg, jpeg, png, gif, webp)만 업로드 가능합니다.");
+        }
+
+        String storedFileName = "Portfolio/" + UUID.randomUUID() + "." + extractExt(originalFileName);
+
+        ObjectMetadata metadata = new ObjectMetadata();
+        metadata.setContentLength(multipartFile.getSize());
+        metadata.setContentType(multipartFile.getContentType());
+        try {
+            amazonS3.putObject(bucket, storedFileName, multipartFile.getInputStream(), metadata);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return getFullPath(storedFileName);
+    }
+
+    // 이미지 삭제
+    @Transactional
+    public void deleteImg(String imgUrl)  {
+        amazonS3.deleteObject(bucket, imgUrl);
     }
 }

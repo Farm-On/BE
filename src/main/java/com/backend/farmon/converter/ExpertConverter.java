@@ -130,6 +130,16 @@ public class ExpertConverter {
                 .build();
     }
 
+    // 전문가 내 프로필 수정 응답 DTO 생성
+    public static ExpertProfileResponse.UpdateProfileResultDTO updateProfileDTO(Expert request) {
+        return ExpertProfileResponse.UpdateProfileResultDTO.builder()
+                .expertId(request.getId())
+                .nickName(request.getNickName())
+                .isNickNameOnly(request.getIsNickNameOnly())
+                .expertDescription(request.getExpertDescription())
+                .build();
+    }
+
     // 전문가 프로필 리스트 조회
     public static ExpertListResponse.ExpertProfileListDTO expertProfileListDTO(Page<Expert> expertList) {
         List<ExpertListResponse.ExpertProfileViewDTO> expertProfileViewDTOList = expertList.stream()
@@ -150,7 +160,9 @@ public class ExpertConverter {
         return ExpertListResponse.ExpertProfileViewDTO.builder()
                 .expertId(expert.getId())
                 .profileImg(expert.getProfileImageUrl())
-                .name(expert.getUser().getUserName())
+                .name(expert.getIsNickNameOnly() ? null : expert.getUser().getUserName())
+                .nickName(expert.getNickName())
+                .isNickNameOnly(expert.getIsNickNameOnly())
                 .rate(expert.getRating())
                 .career(expert.getCareerYears())
                 .expertDescription(expert.getExpertDescription())
@@ -175,8 +187,9 @@ public class ExpertConverter {
 
         return ExpertProfileResponse.ExpertProfileDTO.builder()
                 .profileImg(expert.getProfileImageUrl())
-                .name(expert.getUser().getUserName())
-                 // .nickName(expert.getNickName)  닉네임 항목 추가시 수정
+                .name(expert.getIsNickNameOnly() ? null : expert.getUser().getUserName())
+                .nickName(expert.getNickName())
+                .isNickNameOnly(expert.getIsNickNameOnly())
                 .expertDescription(expert.getExpertDescription())
                 .rate(expert.getRating())
                 // .reviewCount() 리뷰 추가시 수정
@@ -221,6 +234,17 @@ public class ExpertConverter {
                 .detailContent2(expertCareer.getDetailContent2())
                 .detailContent3(expertCareer.getDetailContent3())
                 .detailContent4(expertCareer.getDetailContent4())
+                .build();
+    }
+
+    // 전문가 포트폴리오 GET 응답 DTO 생성
+    public static PortfolioResponse.PostPortfolioResultDTO toPortfolioGetResultDTO(Portfolio portfolio) {
+        return PortfolioResponse.PostPortfolioResultDTO.builder()
+                .portfolioId(portfolio.getId())
+                .title(portfolio.getTitle())
+                .text(portfolio.getText())
+                .thumbnailImg(portfolio.getThumbnailImg())
+                .createdAt(LocalDateTime.now())
                 .build();
     }
 }

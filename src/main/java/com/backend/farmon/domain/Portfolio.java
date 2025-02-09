@@ -28,7 +28,8 @@ public class Portfolio extends BaseEntity {
     @Column(nullable = false)
     private String thumbnailImg;
 
-    @Column(nullable = false)
+    @Lob
+    @Column(columnDefinition = "TEXT", nullable = false)
     private String text;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -36,5 +37,14 @@ public class Portfolio extends BaseEntity {
     private Expert expert;
 
     @OneToMany(mappedBy = "portfolio", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
     private List<PortfolioImg> portfolioImgList = new ArrayList<>();
+
+    public void setExpert(Expert expert) {
+        if (this.expert != null) {
+            expert.getPortfolioList().remove(this);
+        }
+        this.expert = expert;
+        expert.getPortfolioList().add(this);
+    }
 }
