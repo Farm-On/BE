@@ -24,17 +24,6 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      ## Gradle 캐시 설정 (Gradle 빌드 속도 향상)
-      - name: Cache Gradle dependencies
-        uses: actions/cache@v3
-        with:
-          path: |
-            ~/.gradle/caches
-            ~/.gradle/wrapper
-          key: gradle-${{ runner.os }}-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
-          restore-keys: |
-            gradle-${{ runner.os }}-
-
       ## 환경별 YML 파일 생성 - dev
       - name: Make application-dev.yml
         run: |
@@ -60,20 +49,11 @@ jobs:
       - name: Build Gradle
         run: ./gradlew clean build
 
-      ## Docker 캐시 설정 (Docker 빌드 속도 향상)
-      - name: Cache Docker layers
-        uses: actions/cache@v3
-        with:
-          path: /tmp/.buildx-cache
-          key: docker-${{ runner.os }}-${{ github.sha }}
-          restore-keys: |
-            docker-${{ runner.os }}-
-
-      ## Docker 빌드 & 푸시 (빌드 캐시 적용)
-      - name: Docker build & push to Docker Hub
+      # dockerfile을 통해 이미지를 빌드하고, 이를 docker repo로 push
+      - name: Docker build & push to docker repo
         run: |
           docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
-          docker build --cache-from=type=local,src=/tmp/.buildx-cache --cache-to=type=local,dest=/tmp/.buildx-cache -f Dockerfile -t ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_REPO }} .
+          docker build -f Dockerfile -t ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_REPO }} .
           docker push ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_REPO }}:latest
 
   deploy:
