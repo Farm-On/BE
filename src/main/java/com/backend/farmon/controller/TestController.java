@@ -1,11 +1,11 @@
 package com.backend.farmon.controller;
 
+import com.backend.farmon.converter.HomeConverter;
 import com.backend.farmon.dto.home.HomeResponse;
 import com.backend.farmon.service.SearchService.SearchCommandService;
 import com.backend.farmon.service.SearchService.SearchQueryService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -65,13 +65,13 @@ public class TestController {
         // Redis에 데이터 저장
         searchCommandService.saveRecommendSearchLog(userId, value);
 
-        return searchQueryService.getRecommendSearchNameRank();
+        return HomeConverter.toRecommendSearchListDTO(searchQueryService.findRecommendSearchNameList());
     }
 
     @DeleteMapping("/test-redis/delete/recommend")
     public  HomeResponse.RecommendSearchListDTO testDeleteRecommendRedis(@RequestParam Long userId, @RequestParam String value) {
         searchCommandService.deleteRecommendSearchLog(userId, value);
 
-        return searchQueryService.getRecommendSearchNameRank();
+        return HomeConverter.toRecommendSearchListDTO(searchQueryService.findRecommendSearchNameList());
     }
 }

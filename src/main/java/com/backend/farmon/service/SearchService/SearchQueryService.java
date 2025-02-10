@@ -8,9 +8,9 @@ public interface SearchQueryService {
     // 사용자 최근 검색어 리스트 조회
     HomeResponse.RecentSearchListDTO findRecentSearchLogs(Long userId);
 
-    // 추천 검색어 스케줄링
-    HomeResponse.RecommendSearchListDTO getRecommendSearchNameRank();
+    // 추천 검색어 리스트 조회
+    List<String> findRecommendSearchNameList();
 
     // 자동 완성 검색어 조회
-    List<String> autoSearchNameList(String keyword);
+    List<String> findAutoSearchNameList(String keyword);
 }

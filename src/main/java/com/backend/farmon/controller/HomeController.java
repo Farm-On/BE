@@ -17,7 +17,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -95,7 +94,7 @@ public class HomeController {
     @GetMapping("/search")
     public ApiResponse<HomeResponse.AutoCompleteSearchDTO> getHomeAutoCompleteSearchNameList (@RequestParam(name = "userId") @EqualsUserId Long userId,
                                                                                               @RequestParam(name = "name") String searchName){
-        List<String> searchList = searchQueryService.autoSearchNameList(searchName);
+        List<String> searchList = searchQueryService.findAutoSearchNameList(searchName);
         return ApiResponse.onSuccess(HomeConverter.toAutoCompleteSearchDTO(searchList));
     }
 
@@ -194,15 +193,15 @@ public class HomeController {
     }
 
     // 추천 검색어 스케줄링
-    // 매월 1일 오전 1시에 스케줄링된 작업, 추천 검색어 리스트 불러오기 실행
-    @Scheduled(cron = "0 0 1 1 * *", zone = "Asia/Seoul")
+    // 매주 월요일 오전 1시에 스케줄링된 작업, 추천 검색어 리스트 불러오기 실행
+    @Scheduled(cron = "0 0 1 * * 1", zone = "Asia/Seoul")
     @Async("customAsyncExecutor")
     public void recommendSearchListSchedule() {
         try {
             log.info("추천 검색어 스케줄링 실행");
-            HomeResponse.RecommendSearchListDTO response = searchQueryService.getRecommendSearchNameRank();
+            List<String> recommendSearchNameList = searchQueryService.findRecommendSearchNameList();
 
-            recommendSearchListFuture = CompletableFuture.completedFuture(ResponseEntity.ok().body(response));
+            recommendSearchListFuture = CompletableFuture.completedFuture(ResponseEntity.ok().body(HomeConverter.toRecommendSearchListDTO(recommendSearchNameList)));
         } catch (Exception e) {
             log.warn("추천 검색어 스케줄링 실패: " + e.getMessage());
             recommendSearchListFuture = null;
@@ -238,10 +237,10 @@ public class HomeController {
         }
 
         // 스케줄링된 작업이 없거나 실패했을 경우 새로운 추천 검색어 조회 실행
-        HomeResponse.RecommendSearchListDTO response = searchQueryService.getRecommendSearchNameRank();
+        List<String> recommendSearchNameList = searchQueryService.findRecommendSearchNameList();
         log.info("스케줄링된 작업이 없어 추천 검색어 리스트 조회 후 반환");
 
-        return ApiResponse.onSuccess(response);
+        return ApiResponse.onSuccess(HomeConverter.toRecommendSearchListDTO(recommendSearchNameList));
     }
 
 }
