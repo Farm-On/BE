@@ -24,7 +24,7 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      # 환경별 yml 파일 생성
+      # 환경별 yml 파일 생성 - dev
       - name: Make application-dev.yml
         run: |
           if [ ! -d "src/main/resources" ]; then
@@ -33,7 +33,7 @@ jobs:
           echo "${{ secrets.APPLICATION_DEV_YML }}" > src/main/resources/application-dev.yml
         shell: bash
 
-      ## 환경별 `.env` 파일 생성 (Redis 비밀번호 포함)
+      ## 환경별 .env 파일 생성
       - name: Create .env file
         run: |
           echo "REDIS_PASSWORD=${{ secrets.REDIS_PASSWORD }}" > .env
@@ -55,6 +55,16 @@ jobs:
           docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
           docker build -f Dockerfile -t ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_REPO }} .
           docker push ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_REPO }}:latest
+
+      # docker-compose 파일을 EC2 인스턴스에 복사
+      - name: copy docker-compose to EC2 server
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.HOST }}
+          username: ubuntu
+          key: ${{ secrets.KEY }}
+          source: docker-compose.yml
+          target: /home/ubuntu/
 
   deploy:
     needs: build  # build 작업이 완료된 후 실행
