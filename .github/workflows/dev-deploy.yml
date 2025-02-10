@@ -24,7 +24,7 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      ## 환경별 YML 파일 생성
+      ## 환경별 YML 파일 생성 - dev
       - name: Make application-dev.yml
         run: |
           if [ ! -d "src/main/resources" ]; then
@@ -67,8 +67,11 @@ jobs:
           host: ${{ secrets.HOST }}
           username: ubuntu
           key: ${{ secrets.KEY }}
-          source: "docker-compose.yml"
+          source: "./docker-compose.yml"
           target: "/home/ubuntu/"
+          rm: true
+          strip_components: 0
+          tar_exec: ""
 
       ## EC2에서 배포 스크립트 실행
       - name: Deploy to server
