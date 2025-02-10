@@ -33,7 +33,7 @@ services:
     image: nginx:latest
     ports:
       - "80:80"   # HTTP 요청 처리
-      - "443:443" # HTTPS 요청 처리    networks:
+      - "443:443" # HTTPS 요청 처리
     networks:
       - app-network
     volumes:
