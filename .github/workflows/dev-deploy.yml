@@ -60,10 +60,6 @@ jobs:
       - name: Build Gradle
         run: ./gradlew clean build
 
-      # Gradle 빌드 후 의존성 그래프 제출 (dependency-submission)
-      - name: Generate and submit dependency graph
-        uses: gradle/actions/dependency-submission@v3.1.0
-
       # dockerfile을 통해 이미지를 빌드하고, 이를 docker repo로 push
       - name: Docker build & push to docker repo
         run: |
