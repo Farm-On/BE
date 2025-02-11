@@ -120,7 +120,7 @@ public class UserController {
         return ApiResponse.onSuccess(response);
     }
 
-    @PostMapping("/api/user/find-username")
+    @PostMapping("/api/user/find-email")
     @Operation(summary = "아이디(이메일) 찾기 API")
     @ApiResponses({
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200", description = "OK, 성공")

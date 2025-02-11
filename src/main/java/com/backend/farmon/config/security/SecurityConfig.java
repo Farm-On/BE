@@ -41,7 +41,7 @@ public class SecurityConfig { // 애플리케이션의 보안 정책을 정의
 //                        .requestMatchers("/").authenticated()
 
                         // 공용 접근 허용 (누구나 접근 가능)
-                        .requestMatchers("/api/login","/api/generate","/api/verify","/api/user/join", "/api/user/find-username", "/api/user/reset-password",
+                        .requestMatchers("/api/login","/api/generate","/api/verify","/api/user/join", "/api/user/find-email", "/api/user/reset-password",
                                 "/api/home/community", "/api/home/popular",
                                 "/api/expert/list", "/api/expert/{expert-id}",
                                 "/api/posts/popular/list/**", "/api/posts/all/list/**", "/api/posts/free/list/**","/api/posts/qna/list/**",
