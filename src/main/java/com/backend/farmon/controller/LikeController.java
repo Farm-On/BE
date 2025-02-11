@@ -30,7 +30,6 @@ public class LikeController {
     })
     @PostMapping
     public ApiResponse<LikeResponseDTO> addLike(
-            @PathVariable("boardId") Long boardId,
             @RequestBody LikeRequestDTO likeRequestDTO) throws IllegalAccessException {
 
         Long userId = likeRequestDTO.getUserId();
@@ -58,7 +57,6 @@ public class LikeController {
     })
     @DeleteMapping
     public ApiResponse<Integer> removeLike(
-            @PathVariable("boardId")  Long boardId,
             @RequestBody LikeRequestDTO likeRequestDTO) throws IllegalAccessException {
 
         Long userId = likeRequestDTO.getUserId();

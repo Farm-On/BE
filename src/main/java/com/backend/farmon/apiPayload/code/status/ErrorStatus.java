@@ -57,7 +57,7 @@ public enum ErrorStatus implements BaseErrorCode {
 
     //좋아요
     Like_TYPE_NOT_SAVED(HttpStatus.BAD_REQUEST, "LIKE_TYPE4001", "좋아요가 눌리지 않았습니다."),
-
+    LIKE_NOT_SAME_SAVED(HttpStatus.BAD_REQUEST, "LIKE_TYPE4001", "자기가 작성한 게시글에 좋아요를 누를 수 없습니다."),
     // 사용자 인증 정보
     AUTHORIZATION_NOT_EQUALS(HttpStatus.FORBIDDEN, "AUTHORIZATION4031", "인증된 사용자 정보와 요청된 리소스의 사용자 정보가 다릅니다. (userId 불일치)"),
 
