@@ -9,6 +9,7 @@ import com.backend.farmon.config.security.UserAuthorizationUtil;
 import com.backend.farmon.converter.ExpertConverter;
 import com.backend.farmon.converter.SignupConverter;
 import com.backend.farmon.converter.UserConverter;
+import com.backend.farmon.domain.Expert;
 import com.backend.farmon.domain.User;
 import com.backend.farmon.domain.enums.Role;
 import com.backend.farmon.dto.user.ExchangeResponse;
@@ -117,5 +118,43 @@ public class UserController {
         ExchangeResponse response = userQueryService.exchangeRole(userId, role, token);
 
         return ApiResponse.onSuccess(response);
+    }
+
+    @PostMapping("/api/user/find-email")
+    @Operation(summary = "아이디(이메일) 찾기 API")
+    @ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200", description = "OK, 성공")
+    })
+    @Parameters({
+            @Parameter(name = "phoneNum", description = "아이디를 찾으려는 유저의 휴대폰 번호", required = true)
+    })
+    public ApiResponse<String> findEmail(
+            @RequestParam(name="phoneNum") String phoneNum
+    ) {
+        User user = userRepository.findByPhoneNum(phoneNum)
+                .orElseThrow(() -> new UserHandler(ErrorStatus.USER_NOT_FOUND));
+
+        return ApiResponse.onSuccess(user.getEmail());
+    }
+
+    @PatchMapping("/api/user/reset-password")
+    @Operation(summary = "비밀번호 재설정 API")
+    @ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200", description = "OK, 성공")
+    })
+    @Parameters({
+            @Parameter(name = "email", description = "비밀번호를 찾으려는 유저의 이메일(아이디)", required = true),
+            @Parameter(name = "newPassword", description = "재설정할 새로운 비밀번호", required = true)
+    })
+    public ApiResponse<String> resetPassword(
+            @RequestParam(name="email") String email,
+            @RequestParam(name="newPassword")  String newPassword
+    ) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new UserHandler(ErrorStatus.USER_NOT_FOUND));
+
+        user.encodePassword(passwordEncoder.encode(newPassword));
+        userRepository.save(user);
+        return ApiResponse.onSuccess("비밀번호 변경이 완료되었습니다.");
     }
 }
