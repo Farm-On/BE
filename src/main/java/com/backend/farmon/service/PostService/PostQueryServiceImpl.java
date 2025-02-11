@@ -157,7 +157,7 @@ public class PostQueryServiceImpl implements PostQueryService {
                 .orElseThrow(() -> new GeneralException(ErrorStatus.BOARD_TYPE_NOT_FOUND));
 
         // 게시글 존재 여부 확인
-        Post post = postRepository.findById(postId)
+        Post post = postRepository.findByIdWithComments(postId)
                 .orElseThrow(() -> new GeneralException(ErrorStatus.POST_NOT_FOUND));
 
         // 이미지 URL 생성
@@ -171,6 +171,7 @@ public class PostQueryServiceImpl implements PostQueryService {
 
         // 댓글 데이터 조회 및 변환
         List<CommentResponseDTO> comments = post.getComments().stream()
+                .filter(comment -> comment.getParent() == null)
                 .map(CommentResponseDTO::new)
                 .collect(Collectors.toList());
 

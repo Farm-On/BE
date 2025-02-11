@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface PostRepository extends JpaRepository<Post, Long>, PostRepositoryCustom {
 
@@ -23,6 +24,8 @@ public interface PostRepository extends JpaRepository<Post, Long>, PostRepositor
     int getLikeCount(@Param("postId") Long postId);
 
 
-
+    // PostRepository에 메서드 추가
+    @Query("SELECT p FROM Post p LEFT JOIN FETCH p.comments WHERE p.id = :postId")
+    Optional<Post> findByIdWithComments(@Param("postId") Long postId);
 
 }
