@@ -476,8 +476,21 @@ public class EstimateRestController {
     @GetMapping("/{estimateId}/offers")
     public ApiResponse<EstimateResponseDTO.OfferListDTO> getEstimateOffers(
             @PathVariable Long estimateId,
-            @RequestParam(name = "page", defaultValue = "1", required = false) Integer page
+            @RequestParam(name = "page", defaultValue = "1", required = false) Integer page,
+            HttpServletRequest request
     ){
+
+        // 요청에서 JWT 토큰 추출
+        String token =jwtUtil.extractTokenFromRequest(request);
+
+//        // 토큰에서 사용자 정보 추출
+        String role = jwtUtil.extractRole(token);
+
+        if (!"FARMER".equals(role)) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "농업인일때만 해당 API 를 요청해주세요");
+        }
+//        // 로그 출력
+//        log.info("Authenticated User ID: {}, Role: {}", userId, role);
         EstimateResponseDTO.OfferListDTO response = estimateQueryService.getEstimateOffers(estimateId, page);
 
         return ApiResponse.onSuccess(response);
