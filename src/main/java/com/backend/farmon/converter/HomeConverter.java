@@ -72,4 +72,16 @@ public class HomeConverter {
                 .searchList(searchList)
                 .build();
     }
+
+    public static HomeResponse.RecommendSearchListDTO toRecommendSearchListDTO(List<String> recommendSearchList){
+        return HomeResponse.RecommendSearchListDTO.builder()
+                .recommendSearchList(recommendSearchList)
+                .build();
+    }
+
+    public static HomeResponse.RecentSearchListDTO toRecentSearchListDTO(List<String> recentSearchList){
+        return HomeResponse.RecentSearchListDTO.builder()
+                .recentSearchList(recentSearchList)
+                .build();
+    }
 }

@@ -175,19 +175,22 @@ public class ExpertCommandServiceImpl implements ExpertCommandService {
         newPortfolio.setExpert(expert);
 
         // 4. 포트폴리오 이미지 처리 (이미지 파일 리스트)
-        List<PortfolioImg> portfolioImgs = new ArrayList<>();
-        for (MultipartFile img : ImgList) {
-            String s3ImageUrl = s3Service.putPortfolioImg(img);
-            PortfolioImg portfolioImg = PortfolioImg.builder() // 포트폴리오 이미지 엔티티 생성
-                    .imageUrl(s3ImageUrl)
-                    .build();
-            portfolioImg.setPortfolio(newPortfolio); // 포트폴리오 엔티티와 양방매핑
-            portfolioImgs.add(portfolioImg);
+        if(ImgList != null) {
+            List<PortfolioImg> portfolioImgs = new ArrayList<>();
+            for (MultipartFile img : ImgList) {
+                String s3ImageUrl = s3Service.putPortfolioImg(img);
+                PortfolioImg portfolioImg = PortfolioImg.builder() // 포트폴리오 이미지 엔티티 생성
+                        .imageUrl(s3ImageUrl)
+                        .build();
+                portfolioImg.setPortfolio(newPortfolio); // 포트폴리오 엔티티와 양방매핑
+                portfolioImgs.add(portfolioImg);
+            }
+            // 5. 본문 이미지 URL 수정
+            String updatedText = updateTextWithImageUrls(postPortfolioDTO.getText(), portfolioImgs);
+            newPortfolio.setText(updatedText); // 수정된 본문 텍스트 저장
+        }else{ // 4. 본문 이미지 URL 없는 경우
+            newPortfolio.setText(postPortfolioDTO.getText());
         }
-
-        // 5. 본문 이미지 URL 수정
-        String updatedText = updateTextWithImageUrls(postPortfolioDTO.getText(), portfolioImgs);
-        newPortfolio.setText(updatedText); // 수정된 본문 텍스트 저장
 
         // 6. 포트폴리오와 이미지들을 DB에 저장
         Portfolio savedPortfolio = portfolioRepository.save(newPortfolio);

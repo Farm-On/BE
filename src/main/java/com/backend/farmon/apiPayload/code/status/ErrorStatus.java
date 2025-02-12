@@ -57,7 +57,7 @@ public enum ErrorStatus implements BaseErrorCode {
 
     //좋아요
     Like_TYPE_NOT_SAVED(HttpStatus.BAD_REQUEST, "LIKE_TYPE4001", "좋아요가 눌리지 않았습니다."),
-
+    LIKE_NOT_SAME_SAVED(HttpStatus.BAD_REQUEST, "LIKE_TYPE4001", "자기가 작성한 게시글에 좋아요를 누를 수 없습니다."),
     // 사용자 인증 정보
     AUTHORIZATION_NOT_EQUALS(HttpStatus.FORBIDDEN, "AUTHORIZATION4031", "인증된 사용자 정보와 요청된 리소스의 사용자 정보가 다릅니다. (userId 불일치)"),
 
@@ -81,7 +81,8 @@ public enum ErrorStatus implements BaseErrorCode {
     SEARCH_NOT_EMPTY(HttpStatus.BAD_REQUEST, "SEARCH_4001", "검색어가 비어 있습니다."),
 
     //게시판
-    BOARD_TYPE_NOT_FOUND(HttpStatus.BAD_REQUEST, "MESSAGE_TYPE4001", "지원되지 게시판 타입입니다."),
+    BOARD_TYPE_NOT_FOUND(HttpStatus.BAD_REQUEST, "BOARD_TYPE4001", "지원되지 게시판 타입입니다."),
+    BOARD_TYPE_NOT_COMMENTED(HttpStatus.BAD_REQUEST, "BOARD_TYPE4002", "게시판에 댓글을 달 수 없습니다."),
 
     // QNA게시판 조회 에러
     QNA_NOT_FOUND(HttpStatus.BAD_REQUEST, "QNA_TYPE4001", "QNA게시판이 아닙니다."),

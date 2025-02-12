@@ -7,6 +7,7 @@ import com.backend.farmon.converter.PostConverter;
 import com.backend.farmon.domain.*;
 import com.backend.farmon.domain.commons.TimeDifferenceUtil;
 import com.backend.farmon.dto.Answer.AnswerResponseDTO;
+import com.backend.farmon.dto.Comment.CommentResponseDTO;
 import com.backend.farmon.dto.home.HomeResponse;
 import com.backend.farmon.dto.post.PostPagingResponseDTO;
 import com.backend.farmon.dto.post.PostResponseDTO;
@@ -126,7 +127,7 @@ public class PostQueryServiceImpl implements PostQueryService {
         Pageable pageable = PageRequest.of(page - 1, size, sort);
 
         Page<Post> posts = (crops == null || crops.isEmpty())
-                ? postRepository.findPopularPosts(boardId, pageable)
+                ? postRepository.findAllByBoardId(boardId, pageable)
                 : postRepository.findPostsByBoardIdAndCrops(boardId, crops, pageable);
 
         return posts.map(post -> new PostPagingResponseDTO(post, s3Service.getFullPath(post.getPostImgs())));
@@ -142,7 +143,7 @@ public class PostQueryServiceImpl implements PostQueryService {
         Pageable pageable = PageRequest.of(page - 1, size, sort);
 
         Page<Post> posts = (crops == null || crops.isEmpty())
-                ? postRepository.findPopularPosts(boardId, pageable)
+                ? postRepository.findAllByBoardId(boardId, pageable)
                 : postRepository.findPostsByBoardIdAndCrops(boardId, crops, pageable);
 
         return posts.map(post -> new PostPagingResponseDTO(post, s3Service.getFullPath(post.getPostImgs())));
@@ -150,13 +151,17 @@ public class PostQueryServiceImpl implements PostQueryService {
 
     ////모든  글 상세 조회(QnA 빼고)
     @Transactional(readOnly = true)
-    public PostResponseDTO getBoardIdAndPostById(Long boardId,Long postId) {
-        Board board=boardRepository.findById(boardId)
+    public PostResponseDTO getBoardIdAndPostById(Long boardId, Long postId) {
+        // 게시판 존재 여부 확인
+        Board board = boardRepository.findById(boardId)
                 .orElseThrow(() -> new GeneralException(ErrorStatus.BOARD_TYPE_NOT_FOUND));
-        Post post = postRepository.findById(postId)
+
+        // 게시글 존재 여부 확인
+        Post post = postRepository.findByIdWithComments(postId)
                 .orElseThrow(() -> new GeneralException(ErrorStatus.POST_NOT_FOUND));
 
-        List<PostImg>imgs=post.getPostImgs();
+        // 이미지 URL 생성
+        List<PostImg> imgs = post.getPostImgs();
         List<String> imgUrls = imgs.stream()
                 .map(img -> s3Service.getFullPath(img.getStoredFileName())) // S3 URL 생성
                 .collect(Collectors.toList());
@@ -164,7 +169,14 @@ public class PostQueryServiceImpl implements PostQueryService {
         // 작성 시간 차이 계산
         String timeAgo = TimeDifferenceUtil.calculateTimeDifference(post.getCreatedAt());
 
-        return new PostResponseDTO(post, imgUrls, timeAgo);
+        // 댓글 데이터 조회 및 변환
+        List<CommentResponseDTO> comments = post.getComments().stream()
+                .filter(comment -> comment.getParent() == null)
+                .map(CommentResponseDTO::new)
+                .collect(Collectors.toList());
+
+        // PostResponseDTO 반환 (댓글 포함)
+        return new PostResponseDTO(post, imgUrls, timeAgo, comments);
     }
 
     // Qna 게시판용 상세 조회
