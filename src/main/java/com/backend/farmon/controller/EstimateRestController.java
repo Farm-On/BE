@@ -86,7 +86,7 @@ public class EstimateRestController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON401", description = "사용자 토큰이 잘못되었습니다.", content = @Content(schema = @Schema(implementation = ApiResponse.class)))
     })
     @Parameters({
-            @Parameter(name = "estimateId", description = "조회하려는 견적서의 id(pk)", example = "100", required = true)
+            @Parameter(name = "estimateId", description = "조회하려는 견적서의 id(pk)", example = "1", required = true)
     })
     @GetMapping("/{estimateId}")
     public ApiResponse<EstimateResponseDTO.DetailDTO> getEstimateDetail(
@@ -131,7 +131,7 @@ public class EstimateRestController {
 
     })
     @Parameters({
-            @Parameter(name = "estimatedId", description = "수정할 견적서의 ID(pk)", example = "100", required = true)
+            @Parameter(name = "estimatedId", description = "수정할 견적서의 ID(pk)", example = "1", required = true)
     })
     @PutMapping("/{estimateId}")
     public ApiResponse<EstimateResponseDTO.UpdateDTO> updateEstimate(
@@ -155,7 +155,7 @@ public class EstimateRestController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON400", description = "잘못된 요청입니다.", content = @Content(schema = @Schema(implementation = ApiResponse.class)))
     })
     @Parameters({
-            @Parameter(name = "estimateId", description = "삭제할 견적서의 ID(pk)", example = "100", required = true)
+            @Parameter(name = "estimateId", description = "삭제할 견적서의 ID(pk)", example = "1", required = true)
     })
     @DeleteMapping("/{estimateId}")
     public ApiResponse<EstimateResponseDTO.DeleteDTO> deleteEstimate(
@@ -184,7 +184,7 @@ public class EstimateRestController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON400", description = "잘못된 요청입니다.", content = @Content(schema = @Schema(implementation = ApiResponse.class)))
     })
     @Parameters({
-            @Parameter(name = "expertId", description = "전문가 ID", example = "10", required = true),
+            @Parameter(name = "expertId", description = "전문가 ID", example = "1", required = true),
             @Parameter(name = "page", description = "페이지 번호(1부터 시작)", example = "1", required = true)
     })
     @GetMapping("/expert/{expertId}/by-crop")
@@ -274,8 +274,8 @@ public class EstimateRestController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON400", description = "잘못된 요청입니다.", content = @Content(schema = @Schema(implementation = ApiResponse.class)))
     })
     @Parameters({
-            @Parameter(name = "expertId", description = "전문가 ID", required = true),
-            @Parameter(name = "page", description = "페이지 번호", required = true)
+            @Parameter(name = "expertId", description = "전문가 ID", example = "1", required = true),
+            @Parameter(name = "page", description = "페이지 번호", example = "1", required = true)
     })
     @GetMapping("/expert/{expertId}/all")
     public ApiResponse<EstimateResponseDTO.ListDTO> getInProgressEstimatesForExpert(
@@ -304,8 +304,8 @@ public class EstimateRestController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON400", description = "잘못된 요청입니다.", content = @Content(schema = @Schema(implementation = ApiResponse.class)))
     })
     @Parameters({
-            @Parameter(name = "expertId", description = "전문가 ID", required = true),
-            @Parameter(name = "page", description = "페이지 번호", required = true)
+            @Parameter(name = "expertId", description = "전문가 ID", example = "1", required = true),
+            @Parameter(name = "page", description = "페이지 번호", example = "1",  required = true)
     })
     @GetMapping("/expert/{expertId}/is-complete")
     public ApiResponse<EstimateResponseDTO.ListDTO> getIsCompleteEstimatesForExpert(
@@ -334,8 +334,8 @@ public class EstimateRestController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON400", description = "잘못된 요청입니다.", content = @Content(schema = @Schema(implementation = ApiResponse.class)))
     })
     @Parameters({
-            @Parameter(name = "userId", description = "농업인 ID", required = true),
-            @Parameter(name = "page", description = "페이지 번호", required = true)
+            @Parameter(name = "userId", description = "농업인 ID", example = "1", required = true),
+            @Parameter(name = "page", description = "페이지 번호", example = "1", required = true)
     })
     @GetMapping("/user/{userId}/all")
     public ApiResponse<EstimateResponseDTO.ListDTO> getInProgressEstimatesForUser(
@@ -364,8 +364,8 @@ public class EstimateRestController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON400", description = "잘못된 요청입니다.", content = @Content(schema = @Schema(implementation = ApiResponse.class)))
     })
     @Parameters({
-            @Parameter(name = "userId", description = "농업인 ID", required = true),
-            @Parameter(name = "page", description = "페이지 번호", required = true)
+            @Parameter(name = "userId", description = "농업인 ID", example = "1", required = true),
+            @Parameter(name = "page", description = "페이지 번호", example = "1", required = true)
     })
     @GetMapping("/user/{userId}/is-complete")
     public ApiResponse<EstimateResponseDTO.ListDTO> getIsCompleteEstimatesForUser(
@@ -393,7 +393,7 @@ public class EstimateRestController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON400", description = "잘못된 요청입니다.", content = @Content(schema = @Schema(implementation = ApiResponse.class)))
     })
     @Parameters({
-            @Parameter(name = "userId", description = "농업인 ID", required = true)
+            @Parameter(name = "userId", description = "농업인 ID", example = "1", required = true)
     })
     @GetMapping("/user/{userId}/recent5")
     public ApiResponse<EstimateResponseDTO.ListDTO> getTop5EstimatesForFarmer(
@@ -424,14 +424,14 @@ public class EstimateRestController {
 
     )
     @Parameters({
-            @Parameter(name = "expertId", description = "추천탭에서 필터링시 전문가 ID 필요", required = false),
-            @Parameter(name = "cropCategory", description = "작물카테고리 탭에서 필터링시 작물카테고리 필요 ", required = false),
-            @Parameter(name = "cropName", description = "세부작물 탭에서 필터링시 세부 작물 이름 필요"),
-            @Parameter(name = "estimateCategory", description = "견적 카테고리", required = false),
-            @Parameter(name = "budget", description = "예산 범위(예:50만원 ~ 100만원)", required = false),
-            @Parameter(name = "areaName", description = "지역 이름(예: 서울)", required = false),
-            @Parameter(name = "areaNameDetail", description = "지역 세부 이름(예: 강남구)", required = false),
-            @Parameter(name = "page", description = "페이지 번호", required = true)
+            @Parameter(name = "expertId", description = "추천탭에서 필터링시 전문가 ID 필요", example = "1", required = false),
+            @Parameter(name = "cropCategory", description = "작물카테고리 탭에서 필터r링시 작물카테고리 필요", example = "곡물", required = false),
+            @Parameter(name = "cropName", description = "세부작물 탭에서 필터링시 세부 작물 이름 필요", example = "쌀", required = false),
+            @Parameter(name = "estimateCategory", description = "견적 카테고리", example = "토양 및 환경관리", required = false),
+            @Parameter(name = "budget", description = "예산 범위", example = "500만원 ~ 1,000만원", required = false),
+            @Parameter(name = "areaName", description = "지역 이름(예: 서울)", example = "서울", required = false),
+            @Parameter(name = "areaNameDetail", description = "지역 세부 이름(예: 강남구)", example = "강남구", required = false),
+            @Parameter(name = "page", description = "페이지 번호", example = "1", required = true)
     })
     @GetMapping("/expert/filter")
     public ApiResponse<EstimateResponseDTO.FilteredListDTO> filterEstimates(
@@ -470,14 +470,27 @@ public class EstimateRestController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200", description = "OK, 성공")
     )
     @Parameters({
-            @Parameter(name = "estimateId", description = "견적서 ID", required = true),
-            @Parameter(name = "page", description = "페이지 번호", required = true)
+            @Parameter(name = "estimateId", description = "견적서 ID", example = "1", required = true),
+            @Parameter(name = "page", description = "페이지 번호", example = "1", required = true)
     })
     @GetMapping("/{estimateId}/offers")
     public ApiResponse<EstimateResponseDTO.OfferListDTO> getEstimateOffers(
             @PathVariable Long estimateId,
-            @RequestParam(name = "page", defaultValue = "1", required = false) Integer page
+            @RequestParam(name = "page", defaultValue = "1", required = false) Integer page,
+            HttpServletRequest request
     ){
+
+        // 요청에서 JWT 토큰 추출
+        String token =jwtUtil.extractTokenFromRequest(request);
+
+//        // 토큰에서 사용자 정보 추출
+        String role = jwtUtil.extractRole(token);
+
+        if (!"FARMER".equals(role)) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "농업인일때만 해당 API 를 요청해주세요");
+        }
+//        // 로그 출력
+//        log.info("Authenticated User ID: {}, Role: {}", userId, role);
         EstimateResponseDTO.OfferListDTO response = estimateQueryService.getEstimateOffers(estimateId, page);
 
         return ApiResponse.onSuccess(response);
@@ -493,7 +506,7 @@ public class EstimateRestController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200", description = "OK, 성공")
     )
     @Parameters({
-            @Parameter(name = "page", description = "페이지 번호", required = true)
+            @Parameter(name = "page", description = "페이지 번호", example = "1", required = true)
     })
     @GetMapping("/expert-cards")
     public ApiResponse<EstimateResponseDTO.ExpertCardListDTO> getExpertProfileCards(
