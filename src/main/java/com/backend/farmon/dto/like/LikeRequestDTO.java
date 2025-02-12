@@ -14,10 +14,10 @@ import lombok.NoArgsConstructor;
 @Schema(description = "좋아요 요청 DTO")
 public class LikeRequestDTO {
 
-    @Schema(description = "사용자Id", example = "xxx")
+    @Schema(description = "사용자Id", example = "1")
     private Long userId;  // 사용자 ID
 
-    @Schema(description = "좋아요를 누를 대상의 ID (게시글 또는 댓글 ID)", example = "123")
+    @Schema(description = "좋아요를 누를 대상의 ID (게시글 또는 댓글 ID)", example = "3")
     private Long postId;
 
     @Schema(description = "작성 시간", example = "2025-01-01T12:00:00")

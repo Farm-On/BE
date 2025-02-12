@@ -31,6 +31,10 @@ public class LikeServiceImpl {
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new GeneralException(ErrorStatus.POST_NOT_FOUND));
 
+        if(user==post.getUser()){
+            throw new GeneralException(ErrorStatus.Like_TYPE_NOT_SAVED);
+        }
+
         if (likeCountRepository.findByUserIdAndPostId(userId, postId) !=null) {
             throw new IllegalAccessException("이미 좋아요를 눌렀습니다!");
         }
