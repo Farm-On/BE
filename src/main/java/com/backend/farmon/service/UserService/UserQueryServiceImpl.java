@@ -39,9 +39,6 @@ public class UserQueryServiceImpl implements UserQueryService {
         if(userAuthorizationUtill.isCurrentUserRoleMatching(role.toString()))
             throw new UserHandler(ErrorStatus.EXCHANGE_ROLE_SAME);
 
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new UserHandler(ErrorStatus.USER_NOT_FOUND));
-
         // 농업인 -> 전문가 전환 시 전문가로 등록되어 있는 지 확인
         Expert expert = (role.equals(Role.EXPERT))
                 ? expertRepository.findExpertByUserId(userId)

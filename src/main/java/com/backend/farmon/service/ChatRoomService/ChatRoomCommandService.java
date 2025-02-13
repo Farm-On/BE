@@ -13,7 +13,7 @@ public interface ChatRoomCommandService {
     ChatResponse.ChatRoomDeleteDTO removeChatRoom(Long userId, Long chatRoomId);
 
     // 채팅방 컨설팅 완료
-    void exchangeChatRoomUserComplete(Long userId, Long chatRoomId, ChatRequest.ChatMessageDTO dto);
+    void exchangeChatRoomUserComplete(Long userId, ChatRoom chatRoom, ChatRequest.ChatMessageDTO dto);
 
     // 사용자 여부에 따른 채팅 입장 시간 변경
     void changeChatRoomEnterTime(Long userId, ChatRoom chatRoom);

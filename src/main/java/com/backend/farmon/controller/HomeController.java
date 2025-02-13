@@ -8,6 +8,7 @@ import com.backend.farmon.service.PostService.PostQueryService;
 import com.backend.farmon.service.SearchService.SearchCommandService;
 import com.backend.farmon.service.SearchService.SearchQueryService;
 import com.backend.farmon.validaton.annotation.EqualsUserId;
+import com.backend.farmon.validaton.annotation.ExistUser;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
@@ -92,7 +93,7 @@ public class HomeController {
             @Parameter(name = "name", description = "검색어", example = "곡"),
     })
     @GetMapping("/search")
-    public ApiResponse<HomeResponse.AutoCompleteSearchDTO> getHomeAutoCompleteSearchNameList (@RequestParam(name = "userId") @EqualsUserId Long userId,
+    public ApiResponse<HomeResponse.AutoCompleteSearchDTO> getHomeAutoCompleteSearchNameList (@RequestParam(name = "userId") @EqualsUserId @ExistUser Long userId,
                                                                                               @RequestParam(name = "name") String searchName){
         List<String> searchList = searchQueryService.findAutoSearchNameList(searchName);
         return ApiResponse.onSuccess(HomeConverter.toAutoCompleteSearchDTO(searchList));
@@ -117,7 +118,7 @@ public class HomeController {
             @Parameter(name = "name", description = "저장할 작물 이름", example = "채소작물"),
     })
     @PostMapping("/search")
-    public ApiResponse<HomeResponse.AutoCompleteSearchPostDTO> postHomeAutoCompleteSearchNameList (@RequestParam(name = "userId") @EqualsUserId Long userId,
+    public ApiResponse<HomeResponse.AutoCompleteSearchPostDTO> postHomeAutoCompleteSearchNameList (@RequestParam(name = "userId") @EqualsUserId @ExistUser Long userId,
                                                                                                @RequestParam(name = "name") String searchName){
         searchCommandService.saveRecentSearchLog(userId, searchName);
         log.info("자동 완성 검색어 저장 - userId: {}, 검색어: {}", userId, searchName);
@@ -140,7 +141,7 @@ public class HomeController {
             @Parameter(name = "userId", description = "로그인한 유저의 아이디(pk)", example = "1")
     })
     @GetMapping("/search/recent")
-    public ApiResponse<HomeResponse.RecentSearchListDTO> getRecentSearchNameList (@RequestParam(name = "userId") @EqualsUserId Long userId){
+    public ApiResponse<HomeResponse.RecentSearchListDTO> getRecentSearchNameList (@RequestParam(name = "userId") @EqualsUserId @ExistUser Long userId){
         HomeResponse.RecentSearchListDTO response = searchQueryService.findRecentSearchLogs(userId);
         log.info("최근 검색어 조회 완료 - userId: {}", userId);
 
@@ -164,7 +165,7 @@ public class HomeController {
             @Parameter(name = "name", description = "삭제 할 검색어 이름", example = "채소작물")
     })
     @DeleteMapping("/search/recent")
-    public ApiResponse<HomeResponse.SearchDeleteDTO> deleteSearchName(@RequestParam(name = "userId") @EqualsUserId Long userId,
+    public ApiResponse<HomeResponse.SearchDeleteDTO> deleteSearchName(@RequestParam(name = "userId") @EqualsUserId @ExistUser Long userId,
                                                                       @RequestParam(name = "name") String searchName){
         searchCommandService.deleteRecentSearchLog(userId, searchName);
 
@@ -186,7 +187,7 @@ public class HomeController {
             @Parameter(name = "userId", description = "로그인한 유저의 아이디(pk)", example = "1")
     })
     @DeleteMapping("/search/recent/all")
-    public ApiResponse<HomeResponse.SearchDeleteDTO> deleteAllSearchName(@RequestParam(name = "userId") @EqualsUserId Long userId) {
+    public ApiResponse<HomeResponse.SearchDeleteDTO> deleteAllSearchName(@RequestParam(name = "userId") @EqualsUserId @ExistUser Long userId) {
         searchCommandService.deleteAllRecentSearchLog(userId);
 
         return ApiResponse.onSuccess(HomeConverter.toSearchDeleteDTO());
@@ -222,7 +223,7 @@ public class HomeController {
             @Parameter(name = "userId", description = "로그인한 유저의 아이디(pk)", example = "1")
     })
     @GetMapping("/search/recommend")
-    public ApiResponse<HomeResponse.RecommendSearchListDTO> getRecommendSearchNameList(@RequestParam(name = "userId") @EqualsUserId Long userId) {
+    public ApiResponse<HomeResponse.RecommendSearchListDTO> getRecommendSearchNameList(@RequestParam(name = "userId") @EqualsUserId @ExistUser Long userId) {
         try {
             // 완료된 스케줄링된 작업이 있는 경우
             if (recommendSearchListFuture != null && recommendSearchListFuture.isDone()) {

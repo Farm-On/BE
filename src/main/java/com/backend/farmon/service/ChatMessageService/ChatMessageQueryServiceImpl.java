@@ -37,12 +37,6 @@ public class ChatMessageQueryServiceImpl implements ChatMessageQueryService{
     @Transactional
     @Override
     public ChatResponse.ChatMessageListDTO findChatMessageList(Long userId, Long chatRoomId, Integer pageNumber) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(()-> new UserHandler(ErrorStatus.USER_NOT_FOUND));
-
-        ChatRoom chatRoom = chatRoomRepository.findById(chatRoomId)
-                .orElseThrow(()-> new ChatRoomHandler(ErrorStatus.CHATROOM_NOT_FOUND));
-
         // 안 읽은 메시지들을 읽음 처리
         chatMessageRepository.updateMessagesToReadByChatRoomId(chatRoomId, userId);
         log.info("안 읽은 메시지들 읽음 처리 완료 - chatRoomId: {}", chatRoomId);

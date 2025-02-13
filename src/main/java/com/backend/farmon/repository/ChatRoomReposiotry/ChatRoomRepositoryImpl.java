@@ -5,6 +5,7 @@ import com.backend.farmon.domain.enums.ChatMessageType;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.QueryResults;
 import com.querydsl.jpa.JPAExpressions;
+import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -126,18 +127,44 @@ public class ChatRoomRepositoryImpl implements ChatRoomRepositoryCustom {
                 .fetchFirst() != null; // 존재 여부 확인
     }
 
-    // 채팅방에서 농업인 또는 전문가로 참여한 사용자인지 여부
+    // 사용자가 로그인한 역할(role)로 채팅방에 속해 있는지 확인
     @Override
-    public Boolean isFarmerOrExpertInChatRoom(Long userId, Long chatRoomId) {
-        return queryFactory
+    public String checkUserRoleInChatRoom(Long userId, Long chatRoomId, String role) {
+        boolean isUserInChatRoom = queryFactory
                 .selectOne()
                 .from(chatRoom)
                 .leftJoin(chatRoom.farmer, farmer)
                 .leftJoin(chatRoom.expert, expert)
-                .where(
-                        chatRoom.id.eq(chatRoomId)
-                                .and(farmer.id.eq(userId).or(expert.user.id.eq(userId)))
-                )
+                .where(chatRoom.id.eq(chatRoomId)
+                        .and(farmer.id.eq(userId).or(expert.user.id.eq(userId))))
                 .fetchFirst() != null;
+
+        if (!isUserInChatRoom) {
+            return "NOT_IN_CHATROOM"; // 채팅방과 연관이 없는 경우
+        }
+
+        if ("FARMER".equalsIgnoreCase(role)) {
+            boolean isFarmer = queryFactory
+                    .selectOne()
+                    .from(chatRoom)
+                    .join(chatRoom.farmer, farmer)
+                    .where(chatRoom.id.eq(chatRoomId).and(farmer.id.eq(userId)))
+                    .fetchFirst() != null;
+
+            return isFarmer ? "MATCHES_ROLE" : "WRONG_ROLE"; // 역할이 일치하는지 확인
+        }
+
+        if ("EXPERT".equalsIgnoreCase(role)) {
+            boolean isExpert = queryFactory
+                    .selectOne()
+                    .from(chatRoom)
+                    .join(chatRoom.expert, expert)
+                    .where(chatRoom.id.eq(chatRoomId).and(expert.user.id.eq(userId)))
+                    .fetchFirst() != null;
+
+            return isExpert ? "MATCHES_ROLE" : "WRONG_ROLE"; // 역할이 일치하는지 확인
+        }
+
+        return "INVALID_ROLE"; // 올바르지 않은 역할 입력 시
     }
 }

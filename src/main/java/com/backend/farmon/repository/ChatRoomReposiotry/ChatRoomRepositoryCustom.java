@@ -14,6 +14,6 @@ public interface ChatRoomRepositoryCustom {
     // 채팅방에서 농업인 여부
     Boolean isFarmerInChatRoom(Long userId, Long chatRoomId);
 
-    // 채팅방에서 농업인 또는 전문가로 참여한 사용자인지 여부
-    Boolean isFarmerOrExpertInChatRoom(Long userId, Long chatRoomId);
+    // 사용자가 로그인한 역할(role)로 채팅방에 속해 있는지와 해당 채팅방에 접근할 권한이 있는 사용자인지 검증
+    String checkUserRoleInChatRoom(Long userId, Long chatRoomId, String role);
 }

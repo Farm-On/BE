@@ -15,6 +15,7 @@ import com.backend.farmon.repository.ChatRoomReposiotry.ChatRoomRepository;
 import com.backend.farmon.repository.EstimateRepository.EstimateRepository;
 import com.backend.farmon.repository.ExpertReposiotry.ExpertRepository;
 import com.backend.farmon.repository.UserRepository.UserRepository;
+import com.backend.farmon.service.ValidationService.ValidationService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -31,8 +32,8 @@ public class ChatRoomCommandServiceImpl implements ChatRoomCommandService{
     private final ChatMessageRepository chatMessageRepository;
     private final ExpertRepository expertRepository;
     private final UserRepository userRepository;
-    private final EstimateRepository estimateRepository;
     private final UserAuthorizationUtil userAuthorizationUtil;
+    private final ValidationService validationService;
 
     // 채팅방 생성
     @Transactional
@@ -47,8 +48,7 @@ public class ChatRoomCommandServiceImpl implements ChatRoomCommandService{
                 .orElseThrow(()-> new ExpertHandler(ErrorStatus.EXPERT_NOT_FOUND));
 
         // 채팅 신청한 견적
-        Estimate estimate = estimateRepository.findById(estimateId)
-                .orElseThrow(()-> new EstimateHandler(ErrorStatus.ESTIMATE_NOT_FOUND));
+        Estimate estimate = validationService.validateEstimate(estimateId);
 
         // 견적을 신청한 농업인
         User farmer = userRepository.findById(estimate.getUser().getId())
@@ -70,11 +70,7 @@ public class ChatRoomCommandServiceImpl implements ChatRoomCommandService{
     @Transactional
     @Override
     public ChatResponse.ChatRoomDeleteDTO removeChatRoom(Long userId, Long chatRoomId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(()-> new UserHandler(ErrorStatus.USER_NOT_FOUND));
-
-        ChatRoom chatRoom = chatRoomRepository.findById(chatRoomId)
-                .orElseThrow(()-> new ChatRoomHandler(ErrorStatus.CHATROOM_NOT_FOUND));
+        ChatRoom chatRoom = validationService.validateChatRoom(chatRoomId);
 
         chatMessageRepository.deleteByChatRoomId(chatRoomId); // 채팅 메시지 삭제
         chatRoomRepository.delete(chatRoom); // 채팅방 삭제
@@ -86,12 +82,8 @@ public class ChatRoomCommandServiceImpl implements ChatRoomCommandService{
     // 채팅방 컨설팅 완료
     @Transactional
     @Override
-    public void exchangeChatRoomUserComplete(Long userId, Long chatRoomId, ChatRequest.ChatMessageDTO dto) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(()-> new UserHandler(ErrorStatus.USER_NOT_FOUND));
-
-        ChatRoom chatRoom = chatRoomRepository.findById(chatRoomId)
-                .orElseThrow(()-> new ChatRoomHandler(ErrorStatus.CHATROOM_NOT_FOUND));
+    public void exchangeChatRoomUserComplete(Long userId, ChatRoom chatRoom, ChatRequest.ChatMessageDTO dto) {
+        Long chatRoomId = chatRoom.getId();
 
         // 채팅방에서의 전문가 여부
         boolean isExpert = !chatRoomRepository.isFarmerInChatRoom(userId, chatRoomId);

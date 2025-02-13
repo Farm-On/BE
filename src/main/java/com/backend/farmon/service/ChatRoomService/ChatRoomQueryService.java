@@ -9,7 +9,7 @@ public interface ChatRoomQueryService {
     // 사용자 역할 & 검색어 별 채팅방 목록 조회
     ChatResponse.ChatRoomListDTO findChatRoomByRoleAndSearch(Long userId, Integer read, String searchName, Integer pageNumber);
 
-    // 채팅방 정보 조회 & 안 읽음 메시지 읽음 처리
+    // 채팅방 정보 조회
     ChatResponse.ChatRoomDataDTO findChatRoomDataAndChangeUnreadMessage(Long userId, Long chatRoomId);
 
     // 채팅방의 견적 조회
@@ -17,7 +17,4 @@ public interface ChatRoomQueryService {
 
     // 채팅용 이미지 업로드
     ChatResponse.ChatImageDTO uploadChatImage(Long userId, Long chatRoomId, MultipartFile imageFile) throws IOException;
-
-    // 채팅방에서 농업인 또는 전문가로 참여한 사용자인지 여부
-    void validateAuthInChatRoom(Long userId, Long chatRoomId);
 }

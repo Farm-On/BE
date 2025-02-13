@@ -15,6 +15,7 @@ import com.backend.farmon.repository.ChatRoomReposiotry.ChatRoomRepository;
 import com.backend.farmon.repository.EstimateRepository.EstimateRepository;
 import com.backend.farmon.repository.UserRepository.UserRepository;
 import com.backend.farmon.service.AWS.S3Service;
+import com.backend.farmon.service.ValidationService.ValidationService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -26,7 +27,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
 @Slf4j
@@ -36,10 +36,10 @@ import java.util.List;
 public class ChatRoomQueryServiceImpl implements ChatRoomQueryService {
     private final ChatRoomRepository chatRoomRepository;
     private final ChatMessageRepository chatMessageRepository;
-    private final UserRepository userRepository;
     private final EstimateRepository estimateRepository;
     private final UserAuthorizationUtil userAuthorizationUtil;
     private final S3Service s3Service;
+    private final ValidationService validationService;
 
     private static final Integer PAGE_SIZE=10;
 
@@ -51,9 +51,6 @@ public class ChatRoomQueryServiceImpl implements ChatRoomQueryService {
     // 로그인한 사용자의 역할 & 검색어와 일치하는 채팅방 목록 조회
     @Override
     public ChatResponse.ChatRoomListDTO findChatRoomByRoleAndSearch(Long userId, Integer read, String searchName, Integer pageNumber) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new UserHandler(ErrorStatus.USER_NOT_FOUND));
-
         // 현재 로그인한 사용자의 역할
         String role = userAuthorizationUtil.getCurrentUserRole();
 
@@ -102,11 +99,7 @@ public class ChatRoomQueryServiceImpl implements ChatRoomQueryService {
     @Transactional
     @Override
     public ChatResponse.ChatRoomDataDTO findChatRoomDataAndChangeUnreadMessage(Long userId, Long chatRoomId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new UserHandler(ErrorStatus.USER_NOT_FOUND));
-
-        ChatRoom chatRoom = chatRoomRepository.findById(chatRoomId)
-                .orElseThrow(() -> new ChatRoomHandler(ErrorStatus.CHATROOM_NOT_FOUND));
+        ChatRoom chatRoom = validationService.validateChatRoom(chatRoomId);
 
         boolean isExpert = !chatRoomRepository.isFarmerInChatRoom(userId, chatRoomId);
         log.info("채팅방 정보 조회 완료 - userId: {}, chatRoomId: {}, 전문가 여부: {}", userId, chatRoomId, isExpert);
@@ -117,11 +110,7 @@ public class ChatRoomQueryServiceImpl implements ChatRoomQueryService {
     // 채팅방의 견적 조회
     @Override
     public ChatResponse.ChatRoomEstimateDTO findChatRoomEstimate(Long userId, Long chatRoomId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new UserHandler(ErrorStatus.USER_NOT_FOUND));
-
-        ChatRoom chatRoom = chatRoomRepository.findById(chatRoomId)
-                .orElseThrow(() -> new ChatRoomHandler(ErrorStatus.CHATROOM_NOT_FOUND));
+        ChatRoom chatRoom = validationService.validateChatRoom(chatRoomId);
 
         // 견적 이미지와 함께 견적 조회
         Estimate estimate = estimateRepository.findEstimateWithImages(chatRoom.getEstimate().getId())
@@ -135,24 +124,10 @@ public class ChatRoomQueryServiceImpl implements ChatRoomQueryService {
     // 채팅용 이미지 업로드
     @Override
     public ChatResponse.ChatImageDTO uploadChatImage(Long userId, Long chatRoomId, MultipartFile imageFile) throws IOException {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new UserHandler(ErrorStatus.USER_NOT_FOUND));
-
-        ChatRoom chatRoom = chatRoomRepository.findById(chatRoomId)
-                .orElseThrow(() -> new ChatRoomHandler(ErrorStatus.CHATROOM_NOT_FOUND));
-
         // 채팅용 이미지 업로드
         String imageURL = s3Service.putChatImage(userId, chatRoomId, imageFile);
         log.info("채팅용 이미지 업로드 성공, 이미지 URL: {}", imageURL);
 
         return ChatConverter.toChatImageDTO(imageURL);
-    }
-
-    // 채팅방에서 농업인 또는 전문가로 참여한 사용자인지 여부
-    @Override
-    public void validateAuthInChatRoom(Long userId, Long chatRoomId) {
-        Boolean isValid = chatRoomRepository.isFarmerOrExpertInChatRoom(userId, chatRoomId);
-        if(!isValid) // 채팅방에 속하지 않는 사용자이면 접근 권한 없음
-            throw new ChatRoomHandler(ErrorStatus.NOT_CHATROOM_USER);
     }
 }

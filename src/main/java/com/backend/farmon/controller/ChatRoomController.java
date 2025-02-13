@@ -7,6 +7,8 @@ import com.backend.farmon.service.ChatRoomService.ChatRoomCommandService;
 import com.backend.farmon.service.ChatRoomService.ChatRoomQueryService;
 import com.backend.farmon.validaton.annotation.CheckPage;
 import com.backend.farmon.validaton.annotation.EqualsUserId;
+import com.backend.farmon.validaton.annotation.ExistChatRoom;
+import com.backend.farmon.validaton.annotation.ExistUser;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
@@ -47,6 +49,7 @@ public class ChatRoomController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200",description = "OK, 성공"),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "USER4001", description = "아이디와 일치하는 사용자가 없습니다.", content = @Content(schema = @Schema(implementation = ApiResponse.class))),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "AUTHORIZATION_4031", description = "인증된 사용자 정보와 요청된 리소스의 사용자 정보가 다릅니다. (userId 불일치)", content = @Content(schema = @Schema(implementation = ApiResponse.class))),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "AUTHORIZATION_4033", description = "로그인한 역할과 채팅방에서의 역할이 일치하지 않습니다.", content = @Content(schema = @Schema(implementation = ApiResponse.class))),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "PAGE4001", description = "페이지 번호는 1 이상이어야 합니다.", content = @Content(schema = @Schema(implementation = ApiResponse.class))),
     })
     @Parameters({
@@ -56,7 +59,7 @@ public class ChatRoomController {
             @Parameter(name = "searchName", description = "검색어", example = "병해중전문가"),
     })
     @GetMapping("/rooms/all")
-    public ApiResponse<ChatResponse.ChatRoomListDTO> getChatRoomPage (@RequestParam(name = "userId") @EqualsUserId Long userId,
+    public ApiResponse<ChatResponse.ChatRoomListDTO> getChatRoomPage (@RequestParam(name = "userId") @EqualsUserId @ExistUser Long userId,
                                                                       @RequestParam(name = "read") Integer read,
                                                                       @CheckPage Integer page,
                                                                       @RequestParam(name = "searchName", required = false) String searchName){
@@ -106,13 +109,14 @@ public class ChatRoomController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "CHATROOM4001", description = "채팅방 아이디와 일치하는 채팅방이 없습니다.", content = @Content(schema = @Schema(implementation = ApiResponse.class))),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "AUTHORIZATION_4031", description = "인증된 사용자 정보와 요청된 리소스의 사용자 정보가 다릅니다. (userId 불일치)", content = @Content(schema = @Schema(implementation = ApiResponse.class))),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "AUTHORIZATION_4032", description = "해당 채팅방에 농업인 또는 전문가로 속하지 않는 사용자 입니다.", content = @Content(schema = @Schema(implementation = ApiResponse.class))),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "AUTHORIZATION_4033", description = "로그인한 역할과 채팅방에서의 역할이 일치하지 않습니다.", content = @Content(schema = @Schema(implementation = ApiResponse.class))),
     })
     @Parameters({
             @Parameter(name = "userId", description = "로그인한 유저의 아이디(pk)", example = "1", required = true),
             @Parameter(name = "chatRoomId", description = "조회하려는 채팅방의 아이디", example = "1", required = true),
     })
     @GetMapping("/room")
-    public ApiResponse<ChatResponse.ChatRoomDataDTO> getChatRoomData (@RequestParam(name = "userId") @EqualsUserId  Long userId,
+    public ApiResponse<ChatResponse.ChatRoomDataDTO> getChatRoomData (@RequestParam(name = "userId") @EqualsUserId @ExistUser Long userId,
                                                                           @RequestParam(name = "chatRoomId") Long chatRoomId) {
         ChatResponse.ChatRoomDataDTO response = chatRoomQueryService.findChatRoomDataAndChangeUnreadMessage(userId, chatRoomId);
 
@@ -131,6 +135,7 @@ public class ChatRoomController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "CHATROOM4001", description = "채팅방 아이디와 일치하는 채팅방이 없습니다.", content = @Content(schema = @Schema(implementation = ApiResponse.class))),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "AUTHORIZATION_4031", description = "인증된 사용자 정보와 요청된 리소스의 사용자 정보가 다릅니다. (userId 불일치)", content = @Content(schema = @Schema(implementation = ApiResponse.class))),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "AUTHORIZATION_4032", description = "해당 채팅방에 농업인 또는 전문가로 속하지 않는 사용자 입니다.", content = @Content(schema = @Schema(implementation = ApiResponse.class))),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "AUTHORIZATION_4033", description = "로그인한 역할과 채팅방에서의 역할이 일치하지 않습니다.", content = @Content(schema = @Schema(implementation = ApiResponse.class))),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "PAGE4001", description = "페이지 번호는 1 이상이어야 합니다.", content = @Content(schema = @Schema(implementation = ApiResponse.class))),
     })
     @Parameters({
@@ -139,8 +144,8 @@ public class ChatRoomController {
             @Parameter(name = "page", description = "페이지 번호, 1부터 시작입니다.", example = "1", required = true)
     })
     @GetMapping("/room/message")
-    public ApiResponse<ChatResponse.ChatMessageListDTO> getChatMessageList (@RequestParam(name = "userId") @EqualsUserId Long userId,
-                                                                            @RequestParam(name = "chatRoomId") Long chatRoomId,
+    public ApiResponse<ChatResponse.ChatMessageListDTO> getChatMessageList (@RequestParam(name = "userId") @EqualsUserId @ExistUser Long userId,
+                                                                            @RequestParam(name = "chatRoomId") @ExistChatRoom Long chatRoomId,
                                                                             @CheckPage Integer page) {
         ChatResponse.ChatMessageListDTO response = chatMessageQueryService.findChatMessageList(userId, chatRoomId, page);
 
@@ -159,6 +164,7 @@ public class ChatRoomController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "USER4001", description = "아이디와 일치하는 사용자가 없습니다.", content = @Content(schema = @Schema(implementation = ApiResponse.class))),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "AUTHORIZATION_4031", description = "인증된 사용자 정보와 요청된 리소스의 사용자 정보가 다릅니다. (userId 불일치)", content = @Content(schema = @Schema(implementation = ApiResponse.class))),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "AUTHORIZATION_4032", description = "해당 채팅방에 농업인 또는 전문가로 속하지 않는 사용자 입니다.", content = @Content(schema = @Schema(implementation = ApiResponse.class))),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "AUTHORIZATION_4033", description = "로그인한 역할과 채팅방에서의 역할이 일치하지 않습니다.", content = @Content(schema = @Schema(implementation = ApiResponse.class))),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "CHATROOM4001", description = "채팅방 아이디와 일치하는 채팅방이 없습니다.", content = @Content(schema = @Schema(implementation = ApiResponse.class))),
     })
     @Parameters({
@@ -166,7 +172,7 @@ public class ChatRoomController {
             @Parameter(name = "chatRoomId", description = "삭제하려는 채팅방의 아이디", example = "1", required = true),
     })
     @DeleteMapping("/room")
-    public ApiResponse<ChatResponse.ChatRoomDeleteDTO> deleteChatRoom (@RequestParam(name = "userId") @EqualsUserId Long userId,
+    public ApiResponse<ChatResponse.ChatRoomDeleteDTO> deleteChatRoom (@RequestParam(name = "userId") @EqualsUserId @ExistUser Long userId,
                                                                          @RequestParam(name = "chatRoomId") Long chatRoomId) {
         ChatResponse.ChatRoomDeleteDTO response = chatRoomCommandService.removeChatRoom(userId, chatRoomId);
 
@@ -186,13 +192,14 @@ public class ChatRoomController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "CHATROOM4001", description = "채팅방 아이디와 일치하는 채팅방이 없습니다.", content = @Content(schema = @Schema(implementation = ApiResponse.class))),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "AUTHORIZATION_4031", description = "인증된 사용자 정보와 요청된 리소스의 사용자 정보가 다릅니다. (userId 불일치)", content = @Content(schema = @Schema(implementation = ApiResponse.class))),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "AUTHORIZATION_4032", description = "해당 채팅방에 농업인 또는 전문가로 속하지 않는 사용자 입니다.", content = @Content(schema = @Schema(implementation = ApiResponse.class))),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "AUTHORIZATION_4033", description = "로그인한 역할과 채팅방에서의 역할이 일치하지 않습니다.", content = @Content(schema = @Schema(implementation = ApiResponse.class))),
     })
     @Parameters({
             @Parameter(name = "userId", description = "로그인한 유저의 아이디(pk)", example = "1", required = true),
             @Parameter(name = "chatRoomId", description = "채팅방의 아이디", example = "1", required = true)
     })
     @GetMapping("/room/estimate")
-    public ApiResponse<ChatResponse.ChatRoomEstimateDTO> getChatRoomEstimate (@RequestParam(name = "userId") @EqualsUserId  Long userId,
+    public ApiResponse<ChatResponse.ChatRoomEstimateDTO> getChatRoomEstimate (@RequestParam(name = "userId") @EqualsUserId @ExistChatRoom Long userId,
                                                                               @RequestParam(name = "chatRoomId") Long chatRoomId) {
         ChatResponse.ChatRoomEstimateDTO response = chatRoomQueryService.findChatRoomEstimate(userId, chatRoomId);
 
@@ -213,6 +220,7 @@ public class ChatRoomController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "CHATROOM4001", description = "채팅방 아이디와 일치하는 채팅방이 없습니다.", content = @Content(schema = @Schema(implementation = ApiResponse.class))),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "AUTHORIZATION_4031", description = "인증된 사용자 정보와 요청된 리소스의 사용자 정보가 다릅니다. (userId 불일치)", content = @Content(schema = @Schema(implementation = ApiResponse.class))),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "AUTHORIZATION_4032", description = "해당 채팅방에 농업인 또는 전문가로 속하지 않는 사용자 입니다.", content = @Content(schema = @Schema(implementation = ApiResponse.class))),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "AUTHORIZATION_4033", description = "로그인한 역할과 채팅방에서의 역할이 일치하지 않습니다.", content = @Content(schema = @Schema(implementation = ApiResponse.class))),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "ERROR_UPLOAD_CHAT_IMG", description = "채팅용 이미지 업로드에 실패하였습니다. 관리자에게 문의 바랍니다.", content = @Content(schema = @Schema(implementation = ApiResponse.class))),
     })
     @Parameters({
@@ -222,8 +230,8 @@ public class ChatRoomController {
     })
     @PostMapping(value = "/image", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
     public ApiResponse<ChatResponse.ChatImageDTO> postChatImage (@Parameter(content = @Content(mediaType = MediaType.MULTIPART_FORM_DATA_VALUE))
-                                                                     @RequestParam(name = "userId") @EqualsUserId Long userId,
-                                                                 @RequestParam(name = "chatRoomId") Long chatRoomId,
+                                                                     @RequestParam(name = "userId") @EqualsUserId @ExistUser Long userId,
+                                                                 @RequestParam(name = "chatRoomId") @ExistChatRoom Long chatRoomId,
                                                                  @RequestPart("chatImage") MultipartFile imageFile) {
         try{
             ChatResponse.ChatImageDTO response = chatRoomQueryService.uploadChatImage(userId, chatRoomId, imageFile);
