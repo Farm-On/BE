@@ -23,8 +23,6 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class ChatMessageQueryServiceImpl implements ChatMessageQueryService{
     private final ChatMessageRepository chatMessageRepository;
-    private final ChatRoomRepository chatRoomRepository;
-    private final UserRepository userRepository;
 
     private static final Integer PAGE_SIZE=12;
 
