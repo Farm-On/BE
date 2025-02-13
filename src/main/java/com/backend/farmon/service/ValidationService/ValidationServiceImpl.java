@@ -55,11 +55,11 @@ public class ValidationServiceImpl implements ValidationService {
         String result = chatRoomRepository.checkUserRoleInChatRoom(userId, chatRoomId, role);
         switch (result){
             case "NOT_IN_CHATROOM":
-                log.warn("해당 채팅방에 농업인 또는 전문가로 속하지 않는 사용자 - userId: {}, chatRoomId: {}, role: {}", userId, chatRoomId, role);
+                log.error("해당 채팅방에 농업인 또는 전문가로 속하지 않는 사용자 - userId: {}, chatRoomId: {}, role: {}", userId, chatRoomId, role);
                 throw new ChatRoomHandler(ErrorStatus.NOT_CHATROOM_USER);
 
             case "WRONG_ROLE":
-                log.warn("로그인한 사용자의 역할과 채팅방에서의 역할 불일치 - userId: {}, chatRoomId: {}, role: {}", userId, chatRoomId, role);
+                log.error("로그인한 사용자의 역할과 채팅방에서의 역할 불일치 - userId: {}, chatRoomId: {}, role: {}", userId, chatRoomId, role);
                 throw new ChatRoomHandler(ErrorStatus.NOT_EQUALS_CHATROOM_ROLE);
         }
     }

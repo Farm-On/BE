@@ -27,6 +27,7 @@ public class ChatAuthorizationAspect {
     @Around(value = "aspectChatRoom() && args(userId, chatRoomId, ..)", argNames = "joinPoint,userId,chatRoomId")
     public Object validateAuthInChatRoom(ProceedingJoinPoint joinPoint, Long userId, Long chatRoomId) throws Throwable {
         validationService.validateAuthInChatRoom(userId, chatRoomId, userAuthorizationUtil.getCurrentUserRole());
+        log.info("AOP를 이용한 채팅방 접근 권한 검증 완료");
 
         return joinPoint.proceed();
     }
