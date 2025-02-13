@@ -1,7 +1,7 @@
 # 🌱 UMC 7th FarmON BackEnd
 
 ## 🌾 Introduce
-**농업의 연결 고리** **FarmON**은 UMC 7기에서 진행된 농업의 혁신을 이끄는 디지털 솔루션으로, <br>
+**농업의 연결 고리** **FarmON**은 UMC 7기에서 진행된 프로젝트 및 농업의 혁신을 이끄는 디지털 솔루션으로, <br>
 **디지털 커뮤니티**를 통해 소규모 영세농업의 **공동농업을 활성화**하고, 플랫폼을 활용하여 **전국의 농업 전문가를 연결**하며, **농업 데이터**를 기반으로 **체계적인 농업 농업 서비스**를 제공합니다.
 
 &nbsp;
@@ -21,6 +21,7 @@
   <img src="https://img.shields.io/badge/AWS-232F3E?style=for-the-badge&logo=amazonaws&logoColor=white">
   <img src="https://img.shields.io/badge/github-181717?style=for-the-badge&logo=github&logoColor=white">
   <img src="https://img.shields.io/badge/GitHub_Actions-2088FF?style=for-the-badge&logo=githubactions&logoColor=white">
+  <img src="https://img.shields.io/badge/Swagger-85EA2D?style=for-the-badge&logo=swagger&logoColor=white">
 </p>
 
 &nbsp;
