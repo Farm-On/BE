@@ -2,8 +2,6 @@ package com.backend.farmon.service.SearchService;
 
 import com.backend.farmon.apiPayload.code.status.ErrorStatus;
 import com.backend.farmon.apiPayload.exception.handler.SearchHandler;
-import com.backend.farmon.apiPayload.exception.handler.UserHandler;
-import com.backend.farmon.domain.User;
 import com.backend.farmon.repository.CropRepository.CropRepository;
 import com.backend.farmon.repository.UserRepository.UserRepository;
 import jakarta.annotation.PostConstruct;
@@ -11,7 +9,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Set;

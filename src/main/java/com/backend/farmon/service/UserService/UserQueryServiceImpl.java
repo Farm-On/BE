@@ -7,7 +7,6 @@ import com.backend.farmon.config.security.JWTUtil;
 import com.backend.farmon.config.security.UserAuthorizationUtil;
 import com.backend.farmon.converter.UserConverter;
 import com.backend.farmon.domain.Expert;
-import com.backend.farmon.domain.User;
 import com.backend.farmon.domain.enums.Role;
 import com.backend.farmon.dto.user.ExchangeResponse;
 import com.backend.farmon.repository.ExpertReposiotry.ExpertRepository;

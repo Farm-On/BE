@@ -2,14 +2,11 @@ package com.backend.farmon.validaton.validator;
 
 import com.backend.farmon.apiPayload.code.status.ErrorStatus;
 import com.backend.farmon.apiPayload.exception.handler.AuthorizationHandler;
-import com.backend.farmon.config.security.JWTUtil;
 import com.backend.farmon.config.security.UserAuthorizationUtil;
 import com.backend.farmon.validaton.annotation.EqualsUserId;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 import lombok.RequiredArgsConstructor;
-import org.springframework.core.Ordered;
-import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 

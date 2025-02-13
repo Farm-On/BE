@@ -1,10 +1,7 @@
 package com.backend.farmon.service.ChatRoomService;
 
 import com.backend.farmon.apiPayload.code.status.ErrorStatus;
-import com.backend.farmon.apiPayload.exception.handler.ChatRoomHandler;
 import com.backend.farmon.apiPayload.exception.handler.EstimateHandler;
-import com.backend.farmon.apiPayload.exception.handler.UserHandler;
-import com.backend.farmon.config.chat.WebSocketSessionManager;
 import com.backend.farmon.config.security.UserAuthorizationUtil;
 import com.backend.farmon.converter.ChatConverter;
 import com.backend.farmon.domain.*;
@@ -13,7 +10,6 @@ import com.backend.farmon.dto.chat.ChatResponse;
 import com.backend.farmon.repository.ChatMessageRepository.ChatMessageRepository;
 import com.backend.farmon.repository.ChatRoomReposiotry.ChatRoomRepository;
 import com.backend.farmon.repository.EstimateRepository.EstimateRepository;
-import com.backend.farmon.repository.UserRepository.UserRepository;
 import com.backend.farmon.service.AWS.S3Service;
 import com.backend.farmon.service.ValidationService.ValidationService;
 import lombok.RequiredArgsConstructor;
