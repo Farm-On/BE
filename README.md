@@ -12,6 +12,7 @@
   <img src="https://img.shields.io/badge/MySQL-4479A1?style=for-the-badge&logo=mysql&logoColor=white">
   <img src="https://img.shields.io/badge/STOMP-6E4C13?style=for-the-badge&logo=apachekafka&logoColor=white">
   <img src="https://img.shields.io/badge/Redis-DC382D?style=for-the-badge&logo=redis&logoColor=white">
+  <img src="https://img.shields.io/badge/JWT-000000?style=for-the-badge&logo=jsonwebtokens&logoColor=white">
 </p>
 
 <p>
@@ -61,6 +62,7 @@
 
 &nbsp;
 ## 👩‍💻👨‍💻 Backend Developer
+
 <table>
     <tr height="200px">
         <td align="center" width="200px">
@@ -69,7 +71,6 @@
             </a>
             <br />
             <a href="https://github.com/LEEYOENN">데이/이연</a>
-            <br />
         </td>
         <td align="center" width="200px">
             <a href="https://github.com/hyunji0348">
@@ -77,7 +78,6 @@
             </a>
             <br />
             <a href="https://github.com/hyunji0348">로컬/김현지</a>
-            <br />
         </td>
         <td align="center" width="200px">
             <a href="https://github.com/mmije0ng">
@@ -85,7 +85,6 @@
             </a>
             <br />
             <a href="https://github.com/mmije0ng">엠제이/박미정</a>
-            <br />
         </td>
         <td align="center" width="200px">
             <a href="https://github.com/Hanjun2022">
@@ -93,8 +92,13 @@
             </a>
             <br />
             <a href="https://github.com/Hanjun2022">준/전한준</a>
-            <br />
         </td>
+    </tr>
+    <tr>
+      <td align="center">견적 관련 기능 구현</td>
+      <td align="center">유저&전문가 관련 기능 구현<br>로그인&회원가입<br>JWT 기반 인증&인가</td>
+      <td align="center">채팅 및 검색 관련 기능 구현<br>CI/CD 구축</td>
+      <td align="center">커뮤니티 관련 기능 구현</td>
     </tr>
 </table>
 
