@@ -147,4 +147,12 @@ public class ChatRoomQueryServiceImpl implements ChatRoomQueryService {
 
         return ChatConverter.toChatImageDTO(imageURL);
     }
+
+    // 채팅방에서 농업인 또는 전문가로 참여한 사용자인지 여부
+    @Override
+    public void validateAuthInChatRoom(Long userId, Long chatRoomId) {
+        Boolean isValid = chatRoomRepository.isFarmerOrExpertInChatRoom(userId, chatRoomId);
+        if(!isValid) // 채팅방에 속하지 않는 사용자이면 접근 권한 없음
+            throw new ChatRoomHandler(ErrorStatus.NOT_CHATROOM_USER);
+    }
 }

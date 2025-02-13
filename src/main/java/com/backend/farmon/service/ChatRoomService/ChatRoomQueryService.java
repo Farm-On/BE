@@ -17,4 +17,7 @@ public interface ChatRoomQueryService {
 
     // 채팅용 이미지 업로드
     ChatResponse.ChatImageDTO uploadChatImage(Long userId, Long chatRoomId, MultipartFile imageFile) throws IOException;
+
+    // 채팅방에서 농업인 또는 전문가로 참여한 사용자인지 여부
+    void validateAuthInChatRoom(Long userId, Long chatRoomId);
 }

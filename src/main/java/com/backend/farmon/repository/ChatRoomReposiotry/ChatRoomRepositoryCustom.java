@@ -13,4 +13,7 @@ public interface ChatRoomRepositoryCustom {
 
     // 채팅방에서 농업인 여부
     Boolean isFarmerInChatRoom(Long userId, Long chatRoomId);
+
+    // 채팅방에서 농업인 또는 전문가로 참여한 사용자인지 여부
+    Boolean isFarmerOrExpertInChatRoom(Long userId, Long chatRoomId);
 }

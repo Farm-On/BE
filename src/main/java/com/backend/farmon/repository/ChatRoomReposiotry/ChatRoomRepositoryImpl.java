@@ -19,6 +19,7 @@ public class ChatRoomRepositoryImpl implements ChatRoomRepositoryCustom {
     QChatRoom chatRoom = QChatRoom.chatRoom;
     QChatMessage chatMessage = QChatMessage.chatMessage;
     QUser farmer = QUser.user;
+    QExpert expert = QExpert.expert;
 
     @Override
     public Page<ChatRoom> findChatRoomsByUserIdAndRoleAndSearch(Long userId, String role, String searchName, Pageable pageable) {
@@ -114,14 +115,29 @@ public class ChatRoomRepositoryImpl implements ChatRoomRepositoryCustom {
     // 채팅방에서 농업인 여부
     @Override
     public Boolean isFarmerInChatRoom(Long userId, Long chatRoomId) {
-        long count = queryFactory
-                .select(chatRoom.id)
+        return queryFactory
+                .selectOne()
                 .from(chatRoom)
                 .join(chatRoom.farmer, farmer)
-                .where(chatRoom.id.eq(chatRoomId)
-                        .and(farmer.id.eq(userId)))
-                .fetchCount();
+                .where(
+                        chatRoom.id.eq(chatRoomId),
+                        farmer.id.eq(userId)
+                )
+                .fetchFirst() != null; // 존재 여부 확인
+    }
 
-        return count > 0; // 데이터가 존재하면 true, 없으면 false
+    // 채팅방에서 농업인 또는 전문가로 참여한 사용자인지 여부
+    @Override
+    public Boolean isFarmerOrExpertInChatRoom(Long userId, Long chatRoomId) {
+        return queryFactory
+                .selectOne()
+                .from(chatRoom)
+                .leftJoin(chatRoom.farmer, farmer)
+                .leftJoin(chatRoom.expert, expert)
+                .where(
+                        chatRoom.id.eq(chatRoomId)
+                                .and(farmer.id.eq(userId).or(expert.user.id.eq(userId)))
+                )
+                .fetchFirst() != null;
     }
 }
