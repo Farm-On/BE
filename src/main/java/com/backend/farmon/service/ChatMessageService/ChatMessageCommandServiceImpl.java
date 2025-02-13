@@ -16,15 +16,11 @@ import com.backend.farmon.repository.ChatMessageRepository.ChatMessageRepository
 import com.backend.farmon.repository.ChatRoomReposiotry.ChatRoomRepository;
 import com.backend.farmon.repository.UserRepository.UserRepository;
 import com.backend.farmon.service.ChatRoomService.ChatRoomCommandService;
+import com.backend.farmon.service.ValidationService.ValidationService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.io.*;
-import java.time.LocalDateTime;
-import java.util.Base64;
-import java.util.UUID;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -33,23 +29,17 @@ import java.util.UUID;
 public class ChatMessageCommandServiceImpl implements ChatMessageCommandService {
 
     private final ChatRoomCommandService chatRoomCommandService;
-    private final UserRepository userRepository;
-    private final ChatRoomRepository chatRoomRepository;
     private final ChatMessageRepository chatMessageRepository;
-    private final AmazonS3Manager amazonS3Manager;
-    private final UuidRepository uuidRepository;
+    private final ValidationService validationService;
 
     // 메시지 저장
     @Transactional
     @Override
     public void saveChatMessage(Long chatRoomId, ChatRequest.ChatMessageDTO dto){
         Long userId = dto.getSenderId();
+        Boolean isExistUser = validationService.existsUserById(userId);
 
-        User user = userRepository.findById(userId)
-                .orElseThrow(()-> new UserHandler(ErrorStatus.USER_NOT_FOUND));
-
-        ChatRoom chatRoom = chatRoomRepository.findById(chatRoomId)
-                .orElseThrow(()-> new ChatRoomHandler(ErrorStatus.CHATROOM_NOT_FOUND));
+        ChatRoom chatRoom = validationService.validateChatRoom(chatRoomId);
 
         switch (dto.getMessageType()){
             case "ENTER": // 입장 - 접속시간 변경
@@ -64,7 +54,7 @@ public class ChatMessageCommandServiceImpl implements ChatMessageCommandService 
                 break;
             case "COMPLETE": // 컨설팅 완료
                 log.info("채팅방 컨설팅 완료 COMPLETE - chatRoomId: {}", chatRoomId);
-                chatRoomCommandService.exchangeChatRoomUserComplete(userId, chatRoomId, dto);
+                chatRoomCommandService.exchangeChatRoomUserComplete(userId, chatRoom, dto);
                 break;
             case "EXIT": // 퇴장 - 접속시간 변경
                 log.info("채팅방 퇴장 EXIT - chatRoomId: {}", chatRoomId);

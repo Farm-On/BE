@@ -19,6 +19,7 @@ import com.backend.farmon.dto.user.SignupRequest;
 import com.backend.farmon.repository.UserRepository.UserRepository;
 import com.backend.farmon.service.UserService.UserQueryService;
 import com.backend.farmon.validaton.annotation.EqualsUserId;
+import com.backend.farmon.validaton.annotation.ExistUser;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
@@ -110,7 +111,7 @@ public class UserController {
             @Parameter(name = "userId", description = "로그인한 유저의 아이디(pk)", example = "1"),
             @Parameter(name = "role", description = "전환하고자 하는 사용자 유형(ADMIN 제외), 전문가 전환 시 EXPERT, 농업인 전환 시 FARMER", example = "EXPERT")
     })
-    public ApiResponse<ExchangeResponse> getExchangeRole(@RequestParam(name="userId") @EqualsUserId Long userId,
+    public ApiResponse<ExchangeResponse> getExchangeRole(@RequestParam(name="userId") @EqualsUserId @ExistUser Long userId,
                                                          @RequestParam(name="role", defaultValue = "EXPERT") Role role,
                                                          HttpServletRequest request) {
         // JWTUtil을 통해 토큰 추출

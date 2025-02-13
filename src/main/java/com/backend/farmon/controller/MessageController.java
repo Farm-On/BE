@@ -2,14 +2,17 @@ package com.backend.farmon.controller;
 
 import com.backend.farmon.dto.chat.ChatRequest;
 import com.backend.farmon.service.ChatMessageService.ChatMessageCommandService;
+import com.backend.farmon.validaton.annotation.ExistChatRoom;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
+import org.springframework.validation.annotation.Validated;
 
 @Slf4j
+@Validated
 @Controller
 @RequiredArgsConstructor
 public class MessageController {
@@ -19,12 +22,13 @@ public class MessageController {
     // 채팅 메시지 보내기
     // /send/chat/message/{chatRoomId}
     @MessageMapping(value="/chat/message/{chatRoomId}")
-    public void sendChatMessage (@DestinationVariable("chatRoomId") Long chatRoomId,
+    public void sendChatMessage (@DestinationVariable("chatRoomId") @ExistChatRoom Long chatRoomId,
                                  ChatRequest.ChatMessageDTO dto) {
         log.info("전송할 메시지 내용: {}", dto);
 
         // 메시지 저장 로직
         chatMessageCommandService.saveChatMessage(chatRoomId, dto);
+        log.info(dto.toString());
 
         // 구독자들에게 메시지 전달
         // /receive/chat/message/{chatRoomId}

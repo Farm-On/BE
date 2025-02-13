@@ -2,8 +2,6 @@ package com.backend.farmon.service.SearchService;
 
 import com.backend.farmon.apiPayload.code.status.ErrorStatus;
 import com.backend.farmon.apiPayload.exception.handler.SearchHandler;
-import com.backend.farmon.apiPayload.exception.handler.UserHandler;
-import com.backend.farmon.domain.User;
 import com.backend.farmon.repository.CropRepository.CropRepository;
 import com.backend.farmon.repository.UserRepository.UserRepository;
 import jakarta.annotation.PostConstruct;
@@ -11,7 +9,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Set;
@@ -49,9 +46,6 @@ public class SearchCommandServiceImpl implements SearchCommandService {
     // 사용자 최근 검색어 저장
     @Override
     public void saveRecentSearchLog(Long userId, String searchName) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new UserHandler(ErrorStatus.USER_NOT_FOUND));
-
         if(searchName == null || searchName.isEmpty())
             throw new SearchHandler(ErrorStatus.SEARCH_NOT_EMPTY);
 
@@ -88,9 +82,6 @@ public class SearchCommandServiceImpl implements SearchCommandService {
 
     @Override
     public void deleteRecentSearchLog(Long userId, String searchName) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new UserHandler(ErrorStatus.USER_NOT_FOUND));
-
         String key = recentSearchKey + userId;
 
         Long count = recentSearchLogRedisTemplate.opsForList().remove(key, 1, searchName);
@@ -100,9 +91,6 @@ public class SearchCommandServiceImpl implements SearchCommandService {
     // 사용자 최근 검색어 전체 삭제
     @Override
     public void deleteAllRecentSearchLog(Long userId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new UserHandler(ErrorStatus.USER_NOT_FOUND));
-
         Set<String> keys = recentSearchLogRedisTemplate.keys(recentSearchKey + userId);
 
         if (keys != null && !keys.isEmpty()) {
@@ -115,9 +103,6 @@ public class SearchCommandServiceImpl implements SearchCommandService {
     // 추천 검색어 저장
     @Override
     public void saveRecommendSearchLog(Long userId, String cropName) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new UserHandler(ErrorStatus.USER_NOT_FOUND));
-
         if(cropName == null || cropName.isEmpty())
             throw new SearchHandler(ErrorStatus.SEARCH_NOT_EMPTY);
 
@@ -133,9 +118,6 @@ public class SearchCommandServiceImpl implements SearchCommandService {
     // 특정 추천 검색어 삭제
     @Override
     public void deleteRecommendSearchLog(Long userId, String cropName) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new UserHandler(ErrorStatus.USER_NOT_FOUND));
-
         Long count = recommendSearchLogRedisTemplate.opsForZSet().remove(RECOMMEND_SEARCH_KEY, 1, cropName);
         log.info("삭제된 추천 검색어: {}, 검색 횟수: {}", cropName, count);
     }
