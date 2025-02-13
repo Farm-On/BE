@@ -95,10 +95,10 @@
         </td>
     </tr>
     <tr>
-      <td align="center">견적서 등록, 작물 카테고리&위치 등 필터링 기반 견적 찾기 등<br>견적 관련 기능 구현</td>
-      <td align="center">유저&전문가 관련 기능 구현<br>로그인&회원가입<br>JWT 기반 인증&인가</td>
-      <td align="center">실시간 채팅 및<br>검색 관련 기능 구현<br>CI/CD 구축</td>
-      <td align="center">커뮤니티 관련 기능 구현<br> s3 설정</td>
+      <td align="center">견적 관련 기능 구현<br>(견적서 등록, 작물 카테고리&위치 등 필터링 기반 견적 찾기 등)</td>
+      <td align="center">유저&전문가 관련 기능 구현(전문가 등록, 포트폴리오 등록 등)<br>로그인&회원가입<br>JWT 기반 인증&인가 설정</td>
+      <td align="center">실시간 채팅 및<br>작물 카테고리 기반 검색 관련 기능 구현<br>CI/CD 구축 및 Docker 기반 배포 환경 구성</td>
+      <td align="center">커뮤니티 관련 기능 구현(게시글, 댓글, 좋아요 등)<br>s3 설정</td>
     </tr>
 </table>
 
