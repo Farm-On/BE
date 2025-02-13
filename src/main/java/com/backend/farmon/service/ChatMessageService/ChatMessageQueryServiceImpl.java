@@ -45,11 +45,11 @@ public class ChatMessageQueryServiceImpl implements ChatMessageQueryService{
 
         // 안 읽은 메시지들을 읽음 처리
         chatMessageRepository.updateMessagesToReadByChatRoomId(chatRoomId, userId);
-        log.info("안 읽은 메시지들 읽음 처리 완료 - 채팅방 아아디: {}", chatRoomId);
+        log.info("안 읽은 메시지들 읽음 처리 완료 - chatRoomId: {}", chatRoomId);
 
-        // 모든 채팅 메시지 내역 조회 (EXIT, COMPLETE 제외)
-        Slice<ChatMessage> chatMessageList = chatMessageRepository.findNonExitCompleteMessagesByChatRoomId(chatRoomId, pageRequest(pageNumber));
-        log.info("모든 채팅 메시지 내역 조회 완료 - 채팅방 아아디: {}", chatRoomId);
+        // 채팅 메시지 내역 조회 (EXIT, COMPLETE 제외)
+        Slice<ChatMessage> chatMessageList = chatMessageRepository.findTextImageMessagesByChatRoomId(chatRoomId, pageRequest(pageNumber));
+        log.info("채팅 메시지 내역 조회 완료 - chatRoomId: {}", chatRoomId);
 
         return ChatConverter.toChatMessageListDTO(chatMessageList, userId);
     }

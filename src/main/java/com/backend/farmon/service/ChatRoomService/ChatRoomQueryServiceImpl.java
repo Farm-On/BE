@@ -48,9 +48,9 @@ public class ChatRoomQueryServiceImpl implements ChatRoomQueryService {
         return PageRequest.of(pageNumber, PAGE_SIZE, Sort.by("createdAt").descending());
     }
 
-    // 검색어와 일치하는 채팅방 목록 조회
+    // 로그인한 사용자의 역할 & 검색어와 일치하는 채팅방 목록 조회
     @Override
-    public ChatResponse.ChatRoomListDTO findChatRoomBySearch(Long userId, Integer read, String searchName, Integer pageNumber) {
+    public ChatResponse.ChatRoomListDTO findChatRoomByRoleAndSearch(Long userId, Integer read, String searchName, Integer pageNumber) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserHandler(ErrorStatus.USER_NOT_FOUND));
 
@@ -73,7 +73,7 @@ public class ChatRoomQueryServiceImpl implements ChatRoomQueryService {
         // 채팅 대화방 세부 정보 목록 생성
         List<ChatResponse.ChatRoomDetailDTO> chatRoomInfoList = chatRoomPage.stream().map(chatRoom -> {
             // 전문가 여부
-            boolean isExpert = chatRoom.getExpert().getUser().getId().equals(userId);
+            boolean isExpert = !chatRoomRepository.isFarmerInChatRoom(userId, chatRoom.getId());
             log.info("채팅방에서 전문가 여부: {}", isExpert);
 
             // 안 읽은 채팅 메시지 개수 조회
@@ -108,10 +108,8 @@ public class ChatRoomQueryServiceImpl implements ChatRoomQueryService {
         ChatRoom chatRoom = chatRoomRepository.findById(chatRoomId)
                 .orElseThrow(() -> new ChatRoomHandler(ErrorStatus.CHATROOM_NOT_FOUND));
 
-        // 채팅방 입장 시 접속 시간 수정
-        boolean isExpert = chatRoom.getExpert().getUser().getId().equals(userId);
-//        chatRoomCommandService.changeChatRoomEnterTime(userId, chatRoomId, isExpert);
-//        log.info("채팅방 입장 접속 시간 변경 - userId: {}, chatRoomId: {}, 전문가 여부: {}", userId, chatRoomId, isExpert);
+        boolean isExpert = !chatRoomRepository.isFarmerInChatRoom(userId, chatRoomId);
+        log.info("채팅방 정보 조회 완료 - userId: {}, chatRoomId: {}, 전문가 여부: {}", userId, chatRoomId, isExpert);
 
         return ChatConverter.toChatRoomDataDTO(chatRoom, isExpert);
     }

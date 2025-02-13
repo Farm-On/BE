@@ -6,8 +6,8 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 
 public interface ChatRoomQueryService {
-    // 검색어 별 채팅방 목록 조회
-    ChatResponse.ChatRoomListDTO findChatRoomBySearch(Long userId, Integer read, String searchName, Integer pageNumber);
+    // 사용자 역할 & 검색어 별 채팅방 목록 조회
+    ChatResponse.ChatRoomListDTO findChatRoomByRoleAndSearch(Long userId, Integer read, String searchName, Integer pageNumber);
 
     // 채팅방 정보 조회 & 안 읽음 메시지 읽음 처리
     ChatResponse.ChatRoomDataDTO findChatRoomDataAndChangeUnreadMessage(Long userId, Long chatRoomId);

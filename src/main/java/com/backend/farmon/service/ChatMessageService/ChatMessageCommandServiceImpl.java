@@ -21,11 +21,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.io.*;
-import java.time.LocalDateTime;
-import java.util.Base64;
-import java.util.UUID;
-
 @Slf4j
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -36,8 +31,6 @@ public class ChatMessageCommandServiceImpl implements ChatMessageCommandService 
     private final UserRepository userRepository;
     private final ChatRoomRepository chatRoomRepository;
     private final ChatMessageRepository chatMessageRepository;
-    private final AmazonS3Manager amazonS3Manager;
-    private final UuidRepository uuidRepository;
 
     // 메시지 저장
     @Transactional

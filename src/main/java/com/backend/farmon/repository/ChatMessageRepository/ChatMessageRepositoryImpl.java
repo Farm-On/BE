@@ -18,9 +18,9 @@ public class ChatMessageRepositoryImpl implements ChatMessageRepositoryCustom {
     private final JPAQueryFactory queryFactory;
     QChatMessage chatMessage = QChatMessage.chatMessage;
 
-    // 채팅방 아이디와 일치하는 퇴장, 거래 완료가 아닌 채팅 메시지 무한스크롤 조회
+    // 채팅방 아이디와 일치하는 텍스트, 이미지 타입 채팅 메시지 무한스크롤 조회
     @Override
-    public Slice<ChatMessage> findNonExitCompleteMessagesByChatRoomId(Long chatRoomId, Pageable pageable) {
+    public Slice<ChatMessage> findTextImageMessagesByChatRoomId(Long chatRoomId, Pageable pageable) {
         // 요청된 페이지 크기보다 1개 더 가져오기
         List<ChatMessage> content = queryFactory.selectFrom(chatMessage)
                 .where(
@@ -41,7 +41,7 @@ public class ChatMessageRepositoryImpl implements ChatMessageRepositoryCustom {
         return new SliceImpl<>(content, pageable, hasNext);
     }
 
-    // 채팅방 아이디와 일치하는 채팅 메시지 중, 상대방이 보낸 메시지 중 TEXT, IMAGE 메시지를 읽음 처리
+    // 채팅방 아이디와 일치하는 채팅 메시지 중, 상대방이 보낸 메시지를 읽음 처리
     @Transactional
     @Override
     public void updateMessagesToReadByChatRoomId(Long chatRoomId, Long userId) {
@@ -50,8 +50,7 @@ public class ChatMessageRepositoryImpl implements ChatMessageRepositoryCustom {
                 .where(
                         chatMessage.chatRoom.id.eq(chatRoomId),
                         chatMessage.senderId.notIn(userId),
-                        chatMessage.isRead.isFalse(),
-                        chatMessage.type.in(ChatMessageType.TEXT, ChatMessageType.IMAGE)
+                        chatMessage.isRead.isFalse()
                 )
                 .execute();
     }

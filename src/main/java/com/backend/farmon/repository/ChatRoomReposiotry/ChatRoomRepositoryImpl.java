@@ -1,11 +1,10 @@
 package com.backend.farmon.repository.ChatRoomReposiotry;
 
-import com.backend.farmon.domain.ChatRoom;
-import com.backend.farmon.domain.QChatMessage;
-import com.backend.farmon.domain.QChatRoom;
+import com.backend.farmon.domain.*;
 import com.backend.farmon.domain.enums.ChatMessageType;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.QueryResults;
+import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -19,6 +18,7 @@ public class ChatRoomRepositoryImpl implements ChatRoomRepositoryCustom {
     private final JPAQueryFactory queryFactory;
     QChatRoom chatRoom = QChatRoom.chatRoom;
     QChatMessage chatMessage = QChatMessage.chatMessage;
+    QUser farmer = QUser.user;
 
     @Override
     public Page<ChatRoom> findChatRoomsByUserIdAndRoleAndSearch(Long userId, String role, String searchName, Pageable pageable) {
@@ -109,5 +109,19 @@ public class ChatRoomRepositoryImpl implements ChatRoomRepositoryCustom {
 
         // Page 객체 반환
         return new PageImpl<>(results.getResults(), pageable, results.getTotal());
+    }
+
+    // 채팅방에서 농업인 여부
+    @Override
+    public Boolean isFarmerInChatRoom(Long userId, Long chatRoomId) {
+        long count = queryFactory
+                .select(chatRoom.id)
+                .from(chatRoom)
+                .join(chatRoom.farmer, farmer)
+                .where(chatRoom.id.eq(chatRoomId)
+                        .and(farmer.id.eq(userId)))
+                .fetchCount();
+
+        return count > 0; // 데이터가 존재하면 true, 없으면 false
     }
 }

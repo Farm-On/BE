@@ -25,6 +25,7 @@ public class MessageController {
 
         // 메시지 저장 로직
         chatMessageCommandService.saveChatMessage(chatRoomId, dto);
+        log.info(dto.toString());
 
         // 구독자들에게 메시지 전달
         // /receive/chat/message/{chatRoomId}

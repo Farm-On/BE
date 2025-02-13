@@ -36,8 +36,9 @@ public class ChatRoomController {
 
     // 전체 채팅 목록 조회
     @Operation(
-            summary = "사용자의 전체 채팅 목록 조회 API",
-            description = "사용자의 전체 채팅 목록을 조회하는 API이며, 페이징을 포함합니다. " +
+            summary = "사용자 역할 & 검색어에 따른 전체 채팅 목록 조회 API",
+            description = "사용자 역할과 검색어에 따른 전체 채팅 목록을 조회하는 API이며, 페이징을 포함합니다. " +
+                    "로그인 한 사용자의 역할이 농업인일 경우 농업인으로 대화한 채팅 목록을, 전문가일 경우 전문가로 대화한 채팅 목록을 반환합니다. " +
                     "채팅 상대 이름 혹은 작물 이름으로 검색하는 경우에는 검색어를 쿼리 스트링에 입력해 주세요. " +
                     "검색어를 입력하지 않은 경우에는 전체 채팅 목록을 조회합니다. " +
                     "유저 아이디, 읽음 여부 필터, 검색어, 페이지 번호를 쿼리 스트링으로 입력해주세요."
@@ -60,7 +61,7 @@ public class ChatRoomController {
                                                                       @CheckPage Integer page,
                                                                       @RequestParam(name = "searchName", required = false) String searchName){
 
-        ChatResponse.ChatRoomListDTO response = chatRoomQueryService.findChatRoomBySearch(userId, read, searchName, page);
+        ChatResponse.ChatRoomListDTO response = chatRoomQueryService.findChatRoomByRoleAndSearch(userId, read, searchName, page);
 
         return ApiResponse.onSuccess(response);
     }

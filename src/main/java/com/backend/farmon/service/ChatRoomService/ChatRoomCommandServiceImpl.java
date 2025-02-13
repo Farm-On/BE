@@ -61,7 +61,7 @@ public class ChatRoomCommandServiceImpl implements ChatRoomCommandService{
 
         chatRoomRepository.save(chatRoom);
 
-        log.info("채팅방 생성 완료 - 채팅방 아아디: {}, 생성한 전문가 expertId: {}", chatRoom.getId(), expert.getId());
+        log.info("채팅방 생성 완료 - chatRoomId: {}, 생성한 전문가 expertId: {}", chatRoom.getId(), expert.getId());
 
         return ChatConverter.toChatRoomCreateDTO(chatRoom, farmer);
     }
@@ -78,7 +78,7 @@ public class ChatRoomCommandServiceImpl implements ChatRoomCommandService{
 
         chatMessageRepository.deleteByChatRoomId(chatRoomId); // 채팅 메시지 삭제
         chatRoomRepository.delete(chatRoom); // 채팅방 삭제
-        log.info("채팅방 삭제 완료 - 채팅방 아아디: {}", chatRoomId);
+        log.info("채팅방 삭제 완료 - chatRoomId: {}", chatRoomId);
 
         return ChatConverter.toChatRoomDeleteDTO();
     }
@@ -94,7 +94,7 @@ public class ChatRoomCommandServiceImpl implements ChatRoomCommandService{
                 .orElseThrow(()-> new ChatRoomHandler(ErrorStatus.CHATROOM_NOT_FOUND));
 
         // 채팅방에서의 전문가 여부
-        boolean isExpert = chatRoom.getExpert().getUser().getId().equals(userId);
+        boolean isExpert = !chatRoomRepository.isFarmerInChatRoom(userId, chatRoomId);
 
         boolean isOtherComplete = false;
         // 컨설팅 완료 여부 변경 및 상대 거래 완료 여부 조회
@@ -116,21 +116,24 @@ public class ChatRoomCommandServiceImpl implements ChatRoomCommandService{
             dto.setIsEstimateComplete(true);
         }
 
-        log.info("채팅방 컨설팅 완료 - 유저 아이디: {}, 채팅방 아아디: {}", userId, chatRoomId);
+        log.info("채팅방 컨설팅 완료 - 역할: {}, userId: {}, chatRoomId: {}",
+                isExpert ? "전문가" : "농업인", userId, chatRoomId);
     }
 
     // 사용자 여부에 따른 채팅 입장 시간 변경
     @Transactional
     @Override
     public void changeChatRoomEnterTime(Long userId, ChatRoom chatRoom) {
+        Long chatRoomId = chatRoom.getId();
+
         // 전문가라면 전문가 접속 시간 뱐걍
-        if(chatRoom.getExpert().getUser().getId().equals(userId)){
+        if(!chatRoomRepository.isFarmerInChatRoom(userId, chatRoomId)){
             chatRoom.setExpertLastEnter(LocalDateTime.now());
-            log.info("전문가 접속 시간 변경 - 채팅방 아이디: {}", chatRoom.getId());
+            log.info("전문가 접속 시간 변경 - 채팅방 아이디: {}", chatRoomId);
         }
         else{
             chatRoom.setFarmerLastEnter(LocalDateTime.now());
-            log.info("농업인 접속 시간 변경 - 채팅방 아이디: {}", chatRoom.getId());
+            log.info("농업인 접속 시간 변경 - 채팅방 아이디: {}", chatRoomId);
         }
     }
 }
