@@ -95,10 +95,10 @@
         </td>
     </tr>
     <tr>
-      <td align="center">견적서 등록, 필터링 기반 견적 조회 등 견적 관련 기능 구현</td>
+      <td align="center">견적서 등록, 작물 카테고리&위치 등 필터링 기반 견적 찾기 등 견적 관련 기능 구현</td>
       <td align="center">유저&전문가 관련 기능 구현<br>로그인&회원가입<br>JWT 기반 인증&인가</td>
       <td align="center">채팅 및 검색 관련 기능 구현<br>CI/CD 구축</td>
-      <td align="center">커뮤니티 관련 기능 구현<br> s3 이미지 업로드 구현</td>
+      <td align="center">커뮤니티 관련 기능 구현<br> s3 설정</td>
     </tr>
 </table>
 
