@@ -102,9 +102,12 @@
     </tr>
 </table>
 
+&nbsp;
+## 🗂 ERD
+<img width="972" alt="Image" src="https://github.com/user-attachments/assets/f6805244-44b5-45b1-9e47-c47521d8d53a" />
 
 &nbsp;
-## 🛡️ Backend Architecture
+## 🛠 Backend Architecture
 <p align="center">
   <img width="500" alt="image" src="https://github.com/user-attachments/assets/e02ac54f-30da-4500-b662-8679bb52f42a">
 </p>
