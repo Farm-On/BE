@@ -49,27 +49,30 @@ public class SmsServiceImpl implements SmsService {
         if (userRepository.existsByPhoneNum(phoneNum)) {
             throw new UserHandler(ErrorStatus.PHONENUM_ALREADY_EXIST);  // 전화번호가 이미 존재할 경우 예외 발생
         }
-        // 기존 인증있으면(인증문자 재발급일 경우) 해당 엔티티 삭제
-        smsAuthRepository.findByPhoneNum(phoneNum)
-                .ifPresent(smsAuthRepository::delete);
+
+        // 새 인증 코드 생성
+        String certificationCode = Integer.toString((int)(Math.random() * (999999 - 100000 + 1)) + 100000); // 6자리 인증 코드를 랜덤으로 생성
+
+        // 기존 인증 정보를 업데이트하거나 없으면 새로 생성
+        SmsAuth newSmsAuth = smsAuthRepository.findByPhoneNum(phoneNum)
+                .map(existingAuth -> { // 기존 인증 정보가 있으면 업데이트
+                    existingAuth.setAuthCode(certificationCode);
+                    existingAuth.setExpirationTime(LocalDateTime.now().plusMinutes(3));
+                    return existingAuth;
+                })
+                .orElseGet(() -> SmsAuth.builder() // 기존 데이터가 없으면 새로 생성
+                        .phoneNum(phoneNum)
+                        .authCode(certificationCode)
+                        .expirationTime(LocalDateTime.now().plusMinutes(3))
+                        .build()
+                );
+        smsAuthRepository.save(newSmsAuth);
 
         // 전송할 message객체 생성
         Message message = new Message();
         // 발신번호 및 수신번호는 반드시 01012345678 형태로 입력되어야 합니다.
         message.setFrom(smsSender);
         message.setTo(phoneNum);
-
-        // 새 인증 코드 생성
-        String certificationCode = Integer.toString((int)(Math.random() * (999999 - 100000 + 1)) + 100000); // 6자리 인증 코드를 랜덤으로 생성
-
-        // 문자인증 엔티티 생성
-        SmsAuth newSmsAuth = SmsAuth.builder()
-                .phoneNum(phoneNum)
-                .authCode(certificationCode)
-                .expirationTime(LocalDateTime.now().plusMinutes(3)) // 3분 후 만료
-                .build();
-        smsAuthRepository.save(newSmsAuth);
-
         message.setText("FarmOn 본인확인 인증번호는 " + certificationCode + "입니다.");
 
         // 문자 전송
