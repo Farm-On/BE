@@ -10,16 +10,16 @@ import java.util.List;
 
 public interface PostRepositoryCustom {
     // 커뮤니티 전체 게시글 3개 조회
-    public List<Post> findTop3Posts();
+    List<Post> findTopPosts(Integer limit);
 
     // 커뮤니티 인기 게시글 3개 조회
-    public List<Post> findTop3PostsByLikes();
+    List<Post> findTopPostsByLikes(Integer limit);
 
     // 커뮤니티 카테고리별 게시글 3개 조회
-    public List<Post> findTop3PostsByPostTYpe(PostType postType);
+    List<Post> findTopPostsByPostTYpe(PostType postType, Integer limit);
 
     // 인기 전문가 칼럼 6개 조회
-    public List<Post> findTop6ExpertColumnPostsByPostId(List<Long> popularPostsIdList);
+    List<Post> findTop6ExpertColumnPostsByPostId(List<Long> popularPostsIdList);
 
     Page<Post> findAllByBoardId(Long boardId, Pageable pageable);
 

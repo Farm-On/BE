@@ -94,9 +94,9 @@ jobs:
             # Docker Login
             sudo docker login -u "${{ secrets.DOCKER_USERNAME }}" -p "${{ secrets.DOCKER_PASSWORD }}"
             
-            # Stop and Remove All Running Containers
-            if [ -n "$(sudo docker ps -aq)" ]; then
-              sudo docker rm -f $(sudo docker ps -aq)
+            # Stop and Remove Only the spring-app Container
+            if [ "$(sudo docker ps -aqf "name=spring-app")" ]; then
+            sudo docker rm -f spring-app
             fi
             
             # Pull Latest Docker Image
@@ -107,19 +107,17 @@ jobs:
             echo "DOCKER_USERNAME=${{ secrets.DOCKER_USERNAME }}" >> /home/ubuntu/.env
             echo "DOCKER_REPO=${{ secrets.DOCKER_REPO }}" >> /home/ubuntu/.env
             
-            # Start Containers with Docker Compose
+            # Start Only the spring-app Container
             if [ -f /home/ubuntu/docker-compose.yml ]; then
-              docker-compose up -d
+            docker-compose up -d backend
             else
-              echo "docker-compose.yml not found. Exiting."
-              exit 1
+            echo "docker-compose.yml not found. Exiting."
+            exit 1
             fi
             
-            # Connect All Running Containers to app-network
-            if [ "$(sudo docker ps -q)" ]; then
-              for container_id in $(sudo docker ps -q); do
-                sudo docker network connect app-network $container_id || echo "Container $container_id is already connected to app-network"
-              done
+            # Connect spring-app to app-network if not already connected
+            if [ "$(sudo docker ps -qf "name=spring-app")" ]; then
+            sudo docker network connect app-network spring-app || echo "spring-app is already connected to app-network"
             fi
             
             # Clean Up Unused Docker Images

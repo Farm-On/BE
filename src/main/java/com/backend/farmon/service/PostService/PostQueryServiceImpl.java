@@ -52,6 +52,7 @@ public class PostQueryServiceImpl implements PostQueryService {
     private final BoardRepository boardRepository;
     private final S3Service s3Service;
     private final AnswerRepository answerRepository;
+    private static final Integer POST_LIMIT=3;
 
     // 홈 화면 카테고리에 따른 커뮤니티 게시글 3개씩 조회
     // 인기, 전체, QNA, 전문가 칼럼
@@ -60,7 +61,7 @@ public class PostQueryServiceImpl implements PostQueryService {
 
         // 카테고리별 게시글 조회
         PostFetchStrategy strategy = strategyFactory.getStrategy(category);
-        List<Post> postList = strategy.fetchPosts(category);
+        List<Post> postList = strategy.fetchPosts(category, POST_LIMIT);
         log.info("홈 화면 카테고리별 게시글 조회 성공");
 
         // 각 게시물의 좋아요 개수 조회
