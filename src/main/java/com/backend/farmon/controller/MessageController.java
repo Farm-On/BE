@@ -12,11 +12,13 @@ import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.CrossOrigin;
 
 @Slf4j
 @Validated
 @Controller
 @RequiredArgsConstructor
+@CrossOrigin(origins={"https://jiangxy.github.io/websocket-debug-tool/", "lhttp://ocalhost:5173", "http://localhost:8080", "http://43.201.137.131:8080/"})
 public class MessageController {
     private final ChatMessageCommandService chatMessageCommandService;
     private final static String CHAT_EXCHANGE_NAME = "chat.exchange";
