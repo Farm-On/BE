@@ -6,5 +6,5 @@ import com.backend.farmon.dto.post.PostType;
 import java.util.List;
 
 public interface PostFetchStrategy {
-    List<Post> fetchPosts(PostType postType);
+    List<Post> fetchPosts(PostType postType, Integer limit);
 }

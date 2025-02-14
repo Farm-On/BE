@@ -25,26 +25,26 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
     QCrop crop = QCrop.crop;
     // 커뮤니티 전체 게시글 3개 조회
     @Override
-    public List<Post> findTop3Posts() {
+    public List<Post> findTopPosts(Integer limit) {
         return queryFactory.selectFrom(post)
                 .orderBy(post.createdAt.desc())
-                .limit(3)
+                .limit(limit)
                 .fetch();
     }
 
     // 커뮤니티 인기 게시글 3개 조회
     @Override
-    public List<Post> findTop3PostsByLikes() {
+    public List<Post> findTopPostsByLikes(Integer limit) {
         return queryFactory.selectFrom(post)
                 .leftJoin(post.postlikes, likeCount).fetchJoin()
                 .groupBy(post)
                 .orderBy(likeCount.count().desc(), post.createdAt.desc())
-                .limit(3)
+                .limit(limit)
                 .fetch();
     }
 
     @Override
-    public List<Post> findTop3PostsByPostTYpe(PostType postType) {
+    public List<Post> findTopPostsByPostTYpe(PostType postType, Integer limit) {
         return queryFactory.select(post)
                 .from(post)
                 .join(post.board, board).fetchJoin() // Post와 Board를 조인
@@ -55,7 +55,7 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
                         likeCount.count().desc(), // 좋아요 개수로 정렬
                         post.createdAt.desc() // 최신순 정렬
                 )
-                .limit(3) // 3개 제한
+                .limit(limit) // 3개 제한
                 .fetch();
     }
 

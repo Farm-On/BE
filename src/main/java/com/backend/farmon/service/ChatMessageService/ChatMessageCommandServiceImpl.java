@@ -2,19 +2,12 @@ package com.backend.farmon.service.ChatMessageService;
 
 import com.backend.farmon.apiPayload.code.status.ErrorStatus;
 import com.backend.farmon.apiPayload.exception.handler.ChatMessageHandler;
-import com.backend.farmon.apiPayload.exception.handler.ChatRoomHandler;
-import com.backend.farmon.apiPayload.exception.handler.UserHandler;
-import com.backend.farmon.aws.s3.AmazonS3Manager;
-import com.backend.farmon.aws.s3.UuidRepository;
 import com.backend.farmon.converter.ChatConverter;
 import com.backend.farmon.converter.ConvertTime;
 import com.backend.farmon.domain.ChatMessage;
 import com.backend.farmon.domain.ChatRoom;
-import com.backend.farmon.domain.User;
 import com.backend.farmon.dto.chat.ChatRequest;
 import com.backend.farmon.repository.ChatMessageRepository.ChatMessageRepository;
-import com.backend.farmon.repository.ChatRoomReposiotry.ChatRoomRepository;
-import com.backend.farmon.repository.UserRepository.UserRepository;
 import com.backend.farmon.service.ChatRoomService.ChatRoomCommandService;
 import com.backend.farmon.service.ValidationService.ValidationService;
 import lombok.RequiredArgsConstructor;
@@ -37,8 +30,6 @@ public class ChatMessageCommandServiceImpl implements ChatMessageCommandService 
     @Override
     public void saveChatMessage(Long chatRoomId, ChatRequest.ChatMessageDTO dto){
         Long userId = dto.getSenderId();
-        Boolean isExistUser = validationService.existsUserById(userId);
-
         ChatRoom chatRoom = validationService.validateChatRoom(chatRoomId);
 
         switch (dto.getMessageType()){
@@ -69,6 +60,7 @@ public class ChatMessageCommandServiceImpl implements ChatMessageCommandService 
 
         dto.setSendTime(ConvertTime.convertToAmPmFormat(chatMessage.getCreatedAt())); // 전송 시간 변경
         dto.setIsMine(false); // 내가 보낸 메시지 여부 변경
+        if(!dto.getMessageType().equals("COMPLETE")) dto.setIsEstimateComplete(false);
 
         log.info("채팅 메시지 저장 완료 - chatMessageId: {}, senderId: {}, messageType: {}, chatRoomId: {}",
                 chatMessage.getId(), dto.getSenderId(), dto

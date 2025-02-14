@@ -39,6 +39,8 @@ jobs:
           echo "REDIS_PASSWORD=${{ secrets.REDIS_PASSWORD }}" > .env
           echo "DOCKER_USERNAME=${{ secrets.DOCKER_USERNAME }}" > .env
           echo "DOCKER_REPO=${{ secrets.DOCKER_REPO }}" > .env
+          echo "RABBITMQ_USER=${{ secrets.RABBITMQ_USER }}" > .env
+          echo "RABBITMQ_PASSWORD=${{ secrets.RABBITMQ_PASSWORD }}" > .env
         shell: bash
 
       # gradle caching - 빌드 시간 향상

@@ -18,8 +18,8 @@ public class AllPostFetchStrategy implements PostFetchStrategy {
     private final PostRepository postRepository;
 
     @Override
-    public List<Post> fetchPosts(PostType postType) {
+    public List<Post> fetchPosts(PostType postType, Integer limit) {
         log.info("홈 화면 {} 게시글 조회", postType.name());
-        return postRepository.findTop3Posts();
+        return postRepository.findTopPosts(limit);
     }
 }

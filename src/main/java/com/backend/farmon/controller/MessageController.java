@@ -3,8 +3,11 @@ package com.backend.farmon.controller;
 import com.backend.farmon.dto.chat.ChatRequest;
 import com.backend.farmon.service.ChatMessageService.ChatMessageCommandService;
 import com.backend.farmon.validaton.annotation.ExistChatRoom;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.amqp.rabbit.annotation.RabbitListener;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -16,14 +19,16 @@ import org.springframework.validation.annotation.Validated;
 @Controller
 @RequiredArgsConstructor
 public class MessageController {
-    private final SimpMessagingTemplate simpMessagingTemplate;
     private final ChatMessageCommandService chatMessageCommandService;
+    private final static String CHAT_EXCHANGE_NAME = "chat.exchange";
+
+    private final RabbitTemplate rabbitTemplate;
 
     // 채팅 메시지 보내기
-    // /send/chat/message/{chatRoomId}
-    @MessageMapping(value="/chat/message/{chatRoomId}")
+    // /pub/chat.message.{chatRoomId}
+    @MessageMapping("chat.message.{chatRoomId}")
     public void sendChatMessage (@DestinationVariable("chatRoomId") @ExistChatRoom Long chatRoomId,
-                                 ChatRequest.ChatMessageDTO dto) {
+                                 @Valid ChatRequest.ChatMessageDTO dto) {
         log.info("전송할 메시지 내용: {}", dto);
 
         // 메시지 저장 로직
@@ -31,7 +36,13 @@ public class MessageController {
         log.info(dto.toString());
 
         // 구독자들에게 메시지 전달
-        // /receive/chat/message/{chatRoomId}
-        simpMessagingTemplate.convertAndSend("/receive/chat/message/"+chatRoomId, dto);
+        // /exchange/chat.exchange/room.{chatRoomId}
+        rabbitTemplate.convertAndSend(CHAT_EXCHANGE_NAME, "room." + chatRoomId, dto);
     }
+
+    @RabbitListener(queues = "chat.queue")
+    public void consumeChatMessage(ChatRequest.ChatMessageDTO message) {
+        log.info("큐에서 받은 메시지: {}", message);
+    }
+
 }
