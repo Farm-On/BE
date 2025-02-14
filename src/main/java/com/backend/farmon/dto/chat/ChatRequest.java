@@ -1,5 +1,7 @@
 package com.backend.farmon.dto.chat;
 
+import com.backend.farmon.validaton.annotation.EqualsUserId;
+import com.backend.farmon.validaton.annotation.ExistUser;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 
@@ -14,6 +16,8 @@ public class ChatRequest {
     @Schema(description = "전송 또는 수신할 채팅 메시지 정보")
     public static class ChatMessageDTO {
 
+        @EqualsUserId
+        @ExistUser
         @Schema(description = "보낸 사람 아이디, 현재 로그인한 사용자의 userId와 동일", example = "1")
         Long senderId;
 

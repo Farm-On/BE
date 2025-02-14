@@ -38,10 +38,12 @@ public class FilterChannelInterceptor implements ChannelInterceptor {
     @Override
     @Transactional
     public Message<?> preSend(Message<?> message, MessageChannel channel) {
-        log.info("full message:" + message);
-
         StompHeaderAccessor headerAccessor = StompHeaderAccessor.wrap(message);
         StompCommand command = headerAccessor.getCommand();
+
+        if (!"HEARTBEAT".equals(headerAccessor.getMessageType().name())) {
+            log.info("full message:" + message);
+        }
 
         if (command == null) {
             return message;
