@@ -10,10 +10,9 @@
   <img src="https://img.shields.io/badge/SpringBoot-6DB33F?style=for-the-badge&logo=springboot&logoColor=white"> 
   <img src="https://img.shields.io/badge/Java-007396?style=for-the-badge&logo=openjdk&logoColor=white">
   <img src="https://img.shields.io/badge/MySQL-4479A1?style=for-the-badge&logo=mysql&logoColor=white">
+  <img src="https://img.shields.io/badge/STOMP-6E4C13?style=for-the-badge&logo=apachekafka&logoColor=white">
   <img src="https://img.shields.io/badge/Redis-DC382D?style=for-the-badge&logo=redis&logoColor=white">
   <img src="https://img.shields.io/badge/JWT-000000?style=for-the-badge&logo=jsonwebtokens&logoColor=white">
-  <img src="https://img.shields.io/badge/STOMP-6E4C13?style=for-the-badge&logo=apachekafka&logoColor=white">
-  <img src="https://img.shields.io/badge/RabbitMQ-FF6600?style=for-the-badge&logo=rabbitmq&logoColor=white">
 </p>
 
 <p>
@@ -114,7 +113,7 @@
 &nbsp;
 ## 🛠 Backend Architecture
 <p align="center">
-  <img width="500" alt="image" src="https://github.com/user-attachments/assets/e02ac54f-30da-4500-b662-8679bb52f42a">
+  <img width="500" alt="image" src="https://github.com/user-attachments/assets/c69c2f8d-6a78-4f3b-9010-9a1d8373b2bf">
 </p>
 
 &nbsp;
