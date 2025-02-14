@@ -33,16 +33,6 @@ jobs:
           echo "${{ secrets.APPLICATION_DEV_YML }}" > src/main/resources/application-dev.yml
         shell: bash
 
-      ## 환경별 .env 파일 생성
-      - name: Create .env file
-        run: |
-          echo "REDIS_PASSWORD=${{ secrets.REDIS_PASSWORD }}" > .env
-          echo "DOCKER_USERNAME=${{ secrets.DOCKER_USERNAME }}" > .env
-          echo "DOCKER_REPO=${{ secrets.DOCKER_REPO }}" > .env
-          echo "RABBITMQ_USER=${{ secrets.RABBITMQ_USER }}" > .env
-          echo "RABBITMQ_PASSWORD=${{ secrets.RABBITMQ_PASSWORD }}" > .env
-        shell: bash
-
       # gradle caching - 빌드 시간 향상
       - name: Gradle Caching
         uses: actions/cache@v3
@@ -104,10 +94,11 @@ jobs:
             # Pull Latest Docker Image
             sudo docker pull "${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_REPO }}:latest"
             
-            # .env 파일을 EC2 서버의 루트 디렉터리에 생성
             echo "REDIS_PASSWORD=${{ secrets.REDIS_PASSWORD }}" > /home/ubuntu/.env
             echo "DOCKER_USERNAME=${{ secrets.DOCKER_USERNAME }}" >> /home/ubuntu/.env
             echo "DOCKER_REPO=${{ secrets.DOCKER_REPO }}" >> /home/ubuntu/.env
+            echo "RABBITMQ_USER=${{ secrets.RABBITMQ_USER }}" >> /home/ubuntu/.env
+            echo "RABBITMQ_PASSWORD=${{ secrets.RABBITMQ_PASSWORD }}" >> /home/ubuntu/.env
             
             # Start Containers with Docker Compose
             if [ -f /home/ubuntu/docker-compose.yml ]; then
