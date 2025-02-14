@@ -3,6 +3,7 @@ package com.backend.farmon.controller;
 import com.backend.farmon.dto.chat.ChatRequest;
 import com.backend.farmon.service.ChatMessageService.ChatMessageCommandService;
 import com.backend.farmon.validaton.annotation.ExistChatRoom;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
@@ -27,7 +28,7 @@ public class MessageController {
     // /pub/chat.message.{chatRoomId}
     @MessageMapping("chat.message.{chatRoomId}")
     public void sendChatMessage (@DestinationVariable("chatRoomId") @ExistChatRoom Long chatRoomId,
-                                 ChatRequest.ChatMessageDTO dto) {
+                                 @Valid ChatRequest.ChatMessageDTO dto) {
         log.info("전송할 메시지 내용: {}", dto);
 
         // 메시지 저장 로직
