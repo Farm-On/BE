@@ -69,15 +69,15 @@ jobs:
           docker build -f Dockerfile -t ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_REPO }} .
           docker push ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_REPO }}:latest
 
-  #      # docker-compose 파일을 EC2 인스턴스에 복사
-  #      - name: copy docker-compose to EC2 server
-  #        uses: appleboy/scp-action@v0.1.7
-  #        with:
-  #          host: ${{ secrets.HOST }}
-  #          username: ubuntu
-  #          key: ${{ secrets.KEY }}
-  #          source: docker-compose.yml
-  #          target: /home/ubuntu/
+      # docker-compose 파일을 EC2 인스턴스에 복사
+      - name: copy docker-compose to EC2 server
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.HOST }}
+          username: ubuntu
+          key: ${{ secrets.KEY }}
+          source: docker-compose.yml
+          target: /home/ubuntu/
 
   deploy:
     needs: build  # build 작업이 완료된 후 실행
@@ -96,9 +96,9 @@ jobs:
             # Docker Login
             sudo docker login -u "${{ secrets.DOCKER_USERNAME }}" -p "${{ secrets.DOCKER_PASSWORD }}"
             
-            # Stop and Remove Only the spring-app Container
-            if [ "$(sudo docker ps -aqf "name=spring-app")" ]; then
-            sudo docker rm -f spring-app
+            # Stop and Remove All Running Containers
+            if [ -n "$(sudo docker ps -aq)" ]; then
+              sudo docker rm -f $(sudo docker ps -aq)
             fi
             
             # Pull Latest Docker Image
@@ -109,17 +109,19 @@ jobs:
             echo "DOCKER_USERNAME=${{ secrets.DOCKER_USERNAME }}" >> /home/ubuntu/.env
             echo "DOCKER_REPO=${{ secrets.DOCKER_REPO }}" >> /home/ubuntu/.env
             
-            # Start Only the spring-app Container
+            # Start Containers with Docker Compose
             if [ -f /home/ubuntu/docker-compose.yml ]; then
-            docker-compose up -d backend
+              docker-compose up -d
             else
-            echo "docker-compose.yml not found. Exiting."
-            exit 1
+              echo "docker-compose.yml not found. Exiting."
+              exit 1
             fi
             
-            # Connect spring-app to app-network if not already connected
-            if [ "$(sudo docker ps -qf "name=spring-app")" ]; then
-            sudo docker network connect app-network spring-app || echo "spring-app is already connected to app-network"
+            # Connect All Running Containers to app-network
+            if [ "$(sudo docker ps -q)" ]; then
+              for container_id in $(sudo docker ps -q); do
+                sudo docker network connect app-network $container_id || echo "Container $container_id is already connected to app-network"
+              done
             fi
             
             # Clean Up Unused Docker Images
