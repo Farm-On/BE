@@ -14,6 +14,7 @@ import java.util.List;
 @Table(name = "comment")
 @Entity
 @Getter
+@Setter
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -37,6 +38,10 @@ public class Comment extends BaseEntity {
     @JoinColumn(name = "parent_id")
     private Comment parent;
 
+
+    @Column(name = "original_comment_id")
+    private Long originalCommentId;
+
     @OneToMany(mappedBy = "parent", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Comment> children = new ArrayList<>();
 
@@ -57,6 +62,7 @@ public class Comment extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "post_id")
+    @Setter
     private Post post;
 
     @ManyToOne(fetch = FetchType.LAZY)

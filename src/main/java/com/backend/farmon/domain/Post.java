@@ -28,10 +28,19 @@ public class Post extends BaseEntity {
     @Column(name = "post_id")
     private Long id;
 
+    @Column(name = "original_post_id")
+    private Long originalPostId; // 원본 게시글 ID
+
     private String postTitle;
+
+    private String subTitle;
 
     private String postContent;
 
+
+    // 게시판과 다대다 관계 (중간 테이블 사용)
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<BoardPost> boardPosts = new ArrayList<>();
 //
 //    private PostType postType;
 
@@ -57,6 +66,14 @@ public class Post extends BaseEntity {
         crop.getPostCrops().add(postCrop);
     }
 
+    // 댓글 추가 메서드
+    public void addComment(Comment comment) {
+        if (comments == null) {
+            comments = new ArrayList<>();
+        }
+        this.comments.add(comment);
+        comment.setPost(this);
+    }
 
 //    @ElementCollection
 //    @CollectionTable(name = "post_subcategories", joinColumns = @JoinColumn(name = "post_id"))

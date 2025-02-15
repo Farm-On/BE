@@ -23,7 +23,7 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
     QBoard board = QBoard.board;
     QPostCrop postCrop = QPostCrop.postCrop;
     QCrop crop = QCrop.crop;
-    // 커뮤니티 전체 게시글 3개 조회
+
     @Override
     public List<Post> findTopPosts(Integer limit) {
         return queryFactory.selectFrom(post)
@@ -58,6 +58,7 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
                 .limit(limit) // 3개 제한
                 .fetch();
     }
+
 
     // 인기 전문가 칼럼 6개 조회
     @Override

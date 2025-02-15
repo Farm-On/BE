@@ -13,6 +13,8 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class LikeServiceImpl {
@@ -31,23 +33,38 @@ public class LikeServiceImpl {
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new GeneralException(ErrorStatus.POST_NOT_FOUND));
 
-        if(user==post.getUser()){
-            throw new GeneralException(ErrorStatus.Like_TYPE_NOT_SAVED);
+        // 원본 게시물 찾기 (originalPostId가 null인 게시물)
+        Post originalPost = post.getOriginalPostId() == null ? post
+                : postRepository.findById(post.getOriginalPostId())
+                .orElseThrow(() -> new GeneralException(ErrorStatus.POST_NOT_FOUND));
+
+        // originalPostId가 같은 모든 게시물 가져오기
+        List<Post> relatedPosts = postRepository.findAllByOriginalPostId(originalPost.getId());
+
+        if (user.equals(post.getUser())) {
+            throw new GeneralException(ErrorStatus.LIKE_TYPE_NOT_SAVED);
         }
 
-        if (likeCountRepository.findByUserIdAndPostId(userId, postId) !=null) {
-            throw new IllegalAccessException("이미 좋아요를 눌렀습니다!");
+        // 중복 좋아요 방지 (originalPostId가 같은 모든 게시물 체크)
+        for (Post relatedPost : relatedPosts) {
+            if (likeCountRepository.findByUserIdAndPostId(userId, relatedPost.getId()) != null) {
+                throw new IllegalAccessException("이미 좋아요를 눌렀습니다!");
+            }
         }
 
+        // 원본 게시물 기준으로 좋아요 저장
         LikeCount likeCount = LikeCount.builder()
                 .user(user)
-                .post(post)
+                .post(originalPost) // 원본 게시물로 저장
                 .build();
         likeCountRepository.save(likeCount);
 
-        post.increaseLikes();
-        // 좋아요를 일단 Post엔티티에 구현하여 하나를 더해줌
-        postRepository.save(post);
+        // originalPostId가 같은 모든 게시물의 좋아요 증가
+        for (Post relatedPost : relatedPosts) {
+            relatedPost.increaseLikes();
+        }
+
+        postRepository.saveAll(relatedPosts);
         postRepository.flush();
     }
 
@@ -59,17 +76,39 @@ public class LikeServiceImpl {
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new GeneralException(ErrorStatus.POST_NOT_FOUND));
 
-        LikeCount like = likeCountRepository.findByUserIdAndPostId(userId, postId);
+        // 원본 게시물 찾기
+        Post originalPost = post.getOriginalPostId() == null ? post
+                : postRepository.findById(post.getOriginalPostId())
+                .orElseThrow(() -> new GeneralException(ErrorStatus.POST_NOT_FOUND));
+
+        // 좋아요 찾기 (원본 게시물 기준)
+        LikeCount like = likeCountRepository.findByUserIdAndPostId(userId, originalPost.getId());
+        if (like == null) {
+            throw new IllegalAccessException("좋아요를 누른 적이 없습니다!");
+        }
+
+        // 좋아요 삭제
         likeCountRepository.delete(like);
-        post.decreaseLikes();
-        postRepository.save(post);
+
+        // originalPostId가 같은 모든 게시물 가져오기
+        List<Post> relatedPosts = postRepository.findAllByOriginalPostId(originalPost.getId());
+
+        // originalPostId가 같은 모든 게시물의 좋아요 감소
+        for (Post relatedPost : relatedPosts) {
+            relatedPost.decreaseLikes();
+        }
+
+        postRepository.saveAll(relatedPosts);
         postRepository.flush();
-        // 좋아요를 일단 Post엔티티에 구현하여 하나를 더해줌
     }
+
+
+    // 좋아요 개수 조회
     @Transactional
     public int getLikeCount(Long postId) {
         return postRepository.getLikeCount(postId);
     }
+
 
 
 }

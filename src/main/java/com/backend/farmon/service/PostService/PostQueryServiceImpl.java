@@ -33,11 +33,13 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static com.backend.farmon.dto.post.PostType.QNA;
+
 
 @Slf4j
 @RequiredArgsConstructor
@@ -93,7 +95,7 @@ public class PostQueryServiceImpl implements PostQueryService {
         return HomeConverter.toPopularPostListDTO(expertColumnPostList);
     }
 
-    //전체 게시판 좋아요 순
+   //전체 게시판 좋아요 순
     @Transactional(readOnly = true)
     public Page<PostPagingResponseDTO> findAllPostsByBoardPK(Long boardId, int page, int size, String sortStr, List<String> crops) {
         Sort sort = Sort.by(Sort.Direction.fromString(sortStr), "createdAt");
@@ -150,35 +152,69 @@ public class PostQueryServiceImpl implements PostQueryService {
         return posts.map(post -> new PostPagingResponseDTO(post, s3Service.getFullPath(post.getPostImgs())));
     }
 
-    ////모든  글 상세 조회(QnA 빼고)
+
     @Transactional(readOnly = true)
     public PostResponseDTO getBoardIdAndPostById(Long boardId, Long postId) {
-        // 게시판 존재 여부 확인
+        // 1. 게시판 존재 여부 확인
         Board board = boardRepository.findById(boardId)
                 .orElseThrow(() -> new GeneralException(ErrorStatus.BOARD_TYPE_NOT_FOUND));
 
-        // 게시글 존재 여부 확인
+        // 2. 게시글 존재 여부 확인 (지정된 postId로 조회)
         Post post = postRepository.findByIdWithComments(postId)
                 .orElseThrow(() -> new GeneralException(ErrorStatus.POST_NOT_FOUND));
 
-        // 이미지 URL 생성
+        // 3. 댓글 조회를 위해, originalPostId가 같다면 해당 originalPostId를 기준으로 모든 게시글을 동기화한다.
+        List<Post> postsForComments;
+        if (post.getOriginalPostId() != null) {
+            postsForComments = postRepository.findByOriginalPostIdWithComments(post.getOriginalPostId());
+        } else {
+            postsForComments = Collections.singletonList(post); // 원본 게시글만 포함
+        }
+
+        if (postsForComments.isEmpty()) {
+            throw new GeneralException(ErrorStatus.POST_NOT_FOUND);
+        }
+
+        // 4. 댓글 동기화를 위해 첫 번째 게시글을 기준으로 사용
+        Post postForComments = postsForComments.get(0);
+
+        // 5. 이미지 URL 생성 (S3의 전체 URL을 생성)
         List<PostImg> imgs = post.getPostImgs();
         List<String> imgUrls = imgs.stream()
-                .map(img -> s3Service.getFullPath(img.getStoredFileName())) // S3 URL 생성
+                .map(img -> s3Service.getFullPath(img.getStoredFileName()))
                 .collect(Collectors.toList());
 
-        // 작성 시간 차이 계산
+        // 6. 작성 시간 차이 계산
         String timeAgo = TimeDifferenceUtil.calculateTimeDifference(post.getCreatedAt());
 
-        // 댓글 데이터 조회 및 변환
-        List<CommentResponseDTO> comments = post.getComments().stream()
-                .filter(comment -> comment.getParent() == null)
-                .map(CommentResponseDTO::new)
+        // 7. 댓글 데이터 조회 및 변환
+        // 최상위 댓글(부모가 null인 댓글)만 필터링
+        List<CommentResponseDTO> comments = postForComments.getComments().stream()
+                .filter(comment -> comment.getParent() == null) // 최상위 댓글만 필터링
+                .map(parentComment -> {
+                    // 대댓글 중복 제거 (originalCommentId 기준으로 고유한 대댓글만 포함)
+                    List<CommentResponseDTO> uniqueChildren = parentComment.getChildren().stream()
+                            .collect(Collectors.toMap(
+                                    Comment::getOriginalCommentId, // key: originalCommentId
+                                    CommentResponseDTO::new,       // value: CommentResponseDTO 객체
+                                    (existing, replacement) -> existing // 중복 발생 시 기존 값 유지
+                            ))
+                            .values()
+                            .stream()
+                            .collect(Collectors.toList());
+
+                    // 부모 댓글에 고유한 대댓글 리스트를 설정
+                    CommentResponseDTO parentDto = new CommentResponseDTO(parentComment);
+                    parentDto.setChildren(uniqueChildren);
+                    return parentDto;
+                })
                 .collect(Collectors.toList());
 
-        // PostResponseDTO 반환 (댓글 포함)
+        // 8. PostResponseDTO 반환 (게시글, 이미지 URL, 시간 차, 댓글 포함)
         return new PostResponseDTO(post, imgUrls, timeAgo, comments);
     }
+
+
 
     // Qna 게시판용 상세 조회
     @Transactional(readOnly = true)
@@ -231,6 +267,7 @@ public class PostQueryServiceImpl implements PostQueryService {
                 .answers(answerResponseDTOs)
                 .build();
     }
+
 
 
 }
