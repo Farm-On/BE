@@ -40,11 +40,13 @@ public class Answer extends BaseEntity {
     // 게시물 Id 랑 엮어야 함
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "post_id")
+    @Setter
     @JsonBackReference
     private Post post;
 
     @OneToMany(mappedBy = "answer", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<AnswerImg> answerImgList=new ArrayList<>();
+
 
 
 }
