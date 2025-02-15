@@ -12,7 +12,6 @@ import java.util.List;
 public interface BoardService {
 
 
-
     PostResponseDTO save_FreePost(BoardRequestDto.FreePost postDto, List<MultipartFile> multipartFiles) throws Exception;
 
     // 분야 선택 안 할 시 에러가 일어나게 에러 전문가 칼럼 과 qna 게시판에 추가
