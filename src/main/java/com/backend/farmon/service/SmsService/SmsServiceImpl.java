@@ -44,9 +44,9 @@ public class SmsServiceImpl implements SmsService {
     // 인증 코드 생성
     @Override
     @Transactional
-    public boolean sendSms(String phoneNum) {
-        // 가입한 번호가 이미 존재하는지 검증
-        if (userRepository.existsByPhoneNum(phoneNum)) {
+    public boolean sendSms(String phoneNum, boolean isSignup) {
+        // 회원가입일 경우만 전화번호 중복 체크
+        if (isSignup && userRepository.existsByPhoneNum(phoneNum)) {
             throw new UserHandler(ErrorStatus.PHONENUM_ALREADY_EXIST);  // 전화번호가 이미 존재할 경우 예외 발생
         }
 
