@@ -24,9 +24,10 @@ public class Board extends BaseEntity {
     @Enumerated(value=EnumType.STRING)
     private PostType postType;
 
-    @OneToMany(mappedBy = "board",cascade = CascadeType.ALL)
-    private List<Post> boardPosts=new ArrayList<>();
 
+    // 게시글과 다대다 관계 (중간 테이블 사용)
+    @OneToMany(mappedBy = "board", cascade = CascadeType.ALL)
+    private List<BoardPost> boardPosts = new ArrayList<>();
 
 
 }

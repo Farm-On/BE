@@ -24,6 +24,11 @@ public class BoardRequestDto {
         @NotBlank
         private String postTitle; // 게시글 제목
 
+        @Schema(description = "게시글 제목", example = "농촌에서 살아남기")
+        @NotBlank
+        private String subTitle; // 게시글 제목
+
+
         @Schema(description = "게시글 내용", example = "쌀을 기르는 법")
         @NotBlank
         private String postContent; // 게시글 내용
@@ -81,8 +86,27 @@ public class BoardRequestDto {
     @Schema(description = "인기 게시판 게시글")
     public static class PopularPost extends BasePost {
         // 인기 게시판 전용 필드가 필요하다면 여기에 추가
+        @Schema(description = "상위 분야 카테고리", example = "옥수수")
+        private String   categoryTitle;
+
+        @Schema(description = "하위 분야 카테고리", example = "쌀")
+        private String crop;
     }
 
+
+    @Data
+    @EqualsAndHashCode(callSuper = true)
+    @Schema(description = "전체 게시판 게시글")
+    public static class AllPost extends BasePost {
+        // 자유 게시판 전용 필드가 필요하다면 여기에 추가
+        @Schema(description = "상위 분야 카테고리", example = "옥수수")
+        private String   categoryTitle;
+
+        @Schema(description = "하위 분야 카테고리", example = "쌀")
+        private String crop;
+    }
+
+    /**
     /**
      * 전문가 칼럼 DTO: `BasePost`를 확장하고, 카테고리 관련 필드를 추가합니다.
      */

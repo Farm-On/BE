@@ -19,6 +19,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.*;
+
 
 @Slf4j
 @RequiredArgsConstructor
@@ -27,123 +29,163 @@ public class CommentServiceImpl implements CommentService {
 
     private final CommentRepository commentRepository;
     private final PostRepository postRepository;
-    private final UserController userController;
     private final UserRepository userRepository;
-    private final BoardRepository boardRepository;
 
-    /**
-     * 댓글 저장 (최상위 댓글 / 대댓글)
-     */
     @Transactional
     @Override
     public CommentResponseDTO saveComment(Long postId, Long parentId, CommentRequestDTO.CommentSaveRequestDto dto) {
-
-        // 게시글 조회
-        Post post = postRepository.findById(postId)
+        // 1. 원본 게시글 조회
+        Post originalPost = postRepository.findById(postId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 게시글이 존재하지 않습니다."));
 
-        if (post.getBoard().getPostType() == PostType.QNA) {
-            throw new GeneralException(ErrorStatus.BOARD_TYPE_NOT_COMMENTED);
-        }
+        // 2. 같은 originalPostId를 가진 모든 게시글 가져오기
+        List<Post> linkedPosts = getAllLinkedPosts(originalPost);
 
-        // 사용자 조회
+        // 3. 사용자 정보 조회
         User user = userRepository.findById(dto.getUserId())
-                .orElseThrow(() -> new IllegalArgumentException("사용자의 아이디가 없습니다."));
+                .orElseThrow(() -> new IllegalArgumentException("해당 사용자가 존재하지 않습니다."));
 
-        // 부모 댓글 처리 (parentId가 null이면 최상위 댓글로 간주)
+        // 4. 부모 댓글 확인 및 groupId 설정
         Comment parent = null;
+        Long groupId;
         int depth = 0;
-        Long groupId = null;
-        int groupOrder = 0;
+        int groupOrder = 0; // 기본값으로 설정
+        Long originalCommentId = null;
 
-        if (parentId != null) { // 대댓글 처리
+        if (parentId != null) { // 대댓글인 경우
             parent = commentRepository.findById(parentId)
                     .orElseThrow(() -> new IllegalArgumentException("부모 댓글이 존재하지 않습니다."));
-            depth = parent.getDepth() + 1; // 부모 댓글의 깊이 + 1
-            groupId = parent.getGroupId(); // 부모 댓글의 그룹 ID 사용
+
+            groupId = parent.getGroupId(); // 부모 댓글의 groupId 상속
+            depth = parent.getDepth() + 1; // 부모 댓글의 depth + 1
+            groupOrder = 1; // 대댓글은 항상 groupOrder=1로 설정
+
+            if(depth>2){
+                throw new GeneralException(ErrorStatus.COMMENT_NOT_SAVED);
+            }
 
             // 삭제된 부모 댓글에는 대댓글 작성 불가
             if (parent.getIsDeleted()) {
                 throw new IllegalArgumentException("삭제된 댓글에는 대댓글을 작성할 수 없습니다.");
             }
 
-            // 부모 댓글에 이미 대댓글이 있는지 확인
+            // 부모 댓글에 이미 대댓글이 존재하는지 확인
             boolean hasChildComment = commentRepository.existsByParentId(parent.getId());
             if (hasChildComment) {
-                throw new IllegalArgumentException("부모 댓글에 이미 대댓글이 존재합니다. 대댓글은 하나만 작성할 수 있습니다.");
+                throw new IllegalArgumentException("부모 댓글에는 대댓글을 하나만 작성할 수 있습니다.");
             }
 
-            // 그룹 내에서 가장 큰 groupOrder 값을 가져와 +1
-            groupOrder = commentRepository.findMaxGroupOrderByGroupId(groupId)
-                    .orElse(0) + 1; // 값이 없으면 기본값 0으로 시작
+            // 모든 연결된 게시판에 대해 대댓글 저장
+            List<Comment> savedComments = new ArrayList<>();
+            Comment firstSavedChildComment = null;
+
+            for (Post post : linkedPosts) {
+                Comment childComment = Comment.builder()
+                        .content(dto.getCommentContent())
+                        .authorName(user.getUserName())
+                        .user(user)
+                        .post(post) // 현재 게시판(Post)에 저장
+                        .parent(parent) // 부모 댓글 설정
+                        .groupId(groupId) // 부모와 동일한 group ID 설정
+                        .depth(depth) // 깊이 설정 (대댓글: 1)
+                        .groupOrder(groupOrder) // 대댓글은 항상 groupOrder=1로 설정
+                        .originalCommentId(null) // 임시로 null로 설정, 저장 후 업데이트 예정
+                        .isDeleted(false) // 삭제되지 않은 상태로 저장
+                        .build();
+
+                log.info("대댓글 생성 시작: {}", childComment);
+                Comment savedChildComment = commentRepository.save(childComment);
+
+                if (firstSavedChildComment == null) {
+                    firstSavedChildComment = savedChildComment; // 첫 번째 저장된 대댓글 참조 저장
+                    firstSavedChildComment.setOriginalCommentId(firstSavedChildComment.getId()); // 자신의 ID를 originalCommentID로 설정
+                    commentRepository.save(firstSavedChildComment); // 업데이트 반영을 위해 다시 저장
+                    log.info("대댓글 originalCommentID 업데이트 완료: {}", firstSavedChildComment.getOriginalCommentId());
+                } else {
+                    savedChildComment.setOriginalCommentId(firstSavedChildComment.getOriginalCommentId()); // 동일한 original_comment_id 사용
+                    commentRepository.save(savedChildComment); // 업데이트 반영을 위해 다시 저장
+                    log.info("다른 게시판 대댓글 original_comment_id 업데이트 완료: {}", savedChildComment.getOriginalCommentId());
+                }
+
+                savedComments.add(savedChildComment);
+            }
+
+            return new CommentResponseDTO(savedComments.isEmpty() ? null : savedComments.get(0)); // 첫 번째 저장된 대댓글 반환
+        } else { // 최상위 댓글인 경우
+            groupId = commentRepository.findMaxGroupId().orElse(0L) + 1; // 새로운 그룹 ID 생성
+            depth = 0; // 최상위 댓글의 깊이는 0
+            groupOrder = 0; // 최상위 댓글은 항상 groupOrder=0으로 설정
+
+            // 최상위 댓글은 모든 연결된 게시판에 저장
+            List<Comment> savedComments = new ArrayList<>();
+            Comment firstSavedParentComment = null;
+
+            for (Post post : linkedPosts) {
+                Comment comment = Comment.builder()
+                        .content(dto.getCommentContent())
+                        .authorName(user.getUserName())
+                        .user(user)
+                        .post(post)
+                        .parent(null) // 최상위 댓글이므로 부모 없음
+                        .groupId(groupId) // 새로운 그룹 ID 설정
+                        .depth(depth) // 깊이 설정 (최상위 댓글: 0)
+                        .groupOrder(groupOrder) // 최상위 댓글은 항상 groupOrder=0으로 설정
+                        .originalCommentId(null) // 임시로 null로 설정, 첫 번째 저장 후 업데이트 예정
+                        .isDeleted(false) // 삭제되지 않은 상태로 저장
+                        .build();
+
+                log.info("최상위 댓글 생성 시작: {}", comment);
+                Comment savedParentComment = commentRepository.save(comment);
+
+                if (firstSavedParentComment == null) {
+                    firstSavedParentComment = savedParentComment; // 첫 번째 저장된 최상위 댓글 참조 저장
+                    firstSavedParentComment.setOriginalCommentId(firstSavedParentComment.getId()); // 자신의 ID를 original_comment_id로 설정
+                    commentRepository.save(firstSavedParentComment); // 업데이트 반영을 위해 다시 저장
+                    log.info("최상위 댓글 original_comment_id 업데이트 완료: {}", firstSavedParentComment.getOriginalCommentId());
+                } else {
+                    savedParentComment.setOriginalCommentId(firstSavedParentComment.getOriginalCommentId()); // 동일한 original_comment_id 사용
+                    commentRepository.save(savedParentComment); // 업데이트 반영을 위해 다시 저장
+                    log.info("다른 게시판 최상위 댓글 original_comment_id 업데이트 완료: {}", savedParentComment.getOriginalCommentId());
+                }
+
+                savedComments.add(savedParentComment);
+            }
+
+            return new CommentResponseDTO(savedComments.get(0)); // 첫 번째 저장된 최상위 댓글 반환
         }
+    }
 
-        // 댓글 생성
-        Comment comment = Comment.builder()
-                .content(dto.getCommentContent())
-                .authorName(user.getUserName())  // User 엔티티에서 이름 추출
-                .user(user)
-                .post(post)
-                .parent(parent)
-                .depth(depth)
-                .groupId(groupId) // 최상위 댓글은 null, 대댓글은 부모의 groupId 사용
-                .groupOrder(groupOrder)
-                .isDeleted(false)
-                .build();
+    // 관련된 모든 게시글 가져오기 (Free, ALL, POPULAR)
+    private List<Post> getAllLinkedPosts(Post originalPost) {
+        Long baseId = originalPost.getOriginalPostId(); // originalPostId가 현재 게시글에 설정된 값 사용
 
-        log.info("댓글 생성 시작");
-        Comment savedComment = commentRepository.save(comment);
-        log.info("댓글 저장 완료: {}", savedComment);
-
-        // 최상위 댓글인 경우 자기 자신의 ID를 groupId로 설정하고 저장
-        if (savedComment.getParent() == null) {
-            savedComment.setGroupId(savedComment.getId());
-            commentRepository.save(savedComment); // groupId 업데이트를 반영하기 위해 다시 저장
-            log.info("최상위 댓글 groupId 설정 완료: {}", savedComment.getGroupId());
-        }
-
-        return new CommentResponseDTO(savedComment);
+        return postRepository.findAllByOriginalPostId(baseId); // 같은 originalPostId를 가진 게시글 조회
     }
 
 
 
-    /**
-     * 댓글 수정 (내용만 수정 가능)
-     */
-    @Transactional
-    @Override
-    public CommentResponseDTO updateComment(Long commentId, CommentRequestDTO.CommentUpdateRequestDto dto) {
-        Comment comment = commentRepository.findById(commentId)
-                .orElseThrow(() -> new IllegalStateException("삭제된 댓글은 수정할 수 없습니다."));
-
-        if (!comment.getIsDeleted()) {
-            comment.setContent(dto.getCommentContent());
-        } else {
-            throw new IllegalStateException("삭제된 댓글은 수정할 수 없습니다.");
-        }
-
-        // CommentResponseDTO로 변환하여 반환
-        return new CommentResponseDTO(comment);
-    }
-
-
-    /**
-     * 댓글 삭제 (부모 댓글은 isDeleted = true 처리)
-     * 대댓글은 직접 삭제
-     */
     @Transactional
     @Override
     public void deleteComment(Long commentId) {
         Comment comment = commentRepository.findById(commentId)
-                .orElseThrow(() -> new IllegalArgumentException("해당 댓글이 존재하지 않습니다."));
+                .orElseThrow(() -> new GeneralException(ErrorStatus.COMMENT_NOT_DELETED));
+
+        List<Comment> relatedComments = commentRepository.findAllByOriginalCommentId(comment.getOriginalCommentId());
 
         if (comment.getParent() == null) {
-            // 부모 댓글 삭제 시, 자식 댓글이 있으면 논리 삭제 처리
-            comment.setIsDeleted(true);
-            // comment.getChildren().forEach(child -> child.setIsDeleted(true));
+            // 부모 댓글이면 논리 삭제
+            for (Comment relatedComment : relatedComments) {
+                relatedComment.setIsDeleted(true);
+            }
+            commentRepository.saveAll(relatedComments);
         } else {
-            // 대댓글(답글)은 직접 삭제
-            commentRepository.delete(comment);
+            // 자식 댓글이면 실제 삭제
+            commentRepository.deleteAll(relatedComments);
         }
     }
+
+
+
+
+
 }

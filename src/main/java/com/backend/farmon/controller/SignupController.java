@@ -46,11 +46,12 @@ public class SignupController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200",description = "OK, 성공")
     })
     @Parameters({
-            @Parameter(name = "phoneNum", description = "휴대폰 번호. -없이 숫자만 입력해주세요 ex)01012345678")
+            @Parameter(name = "phoneNum", description = "휴대폰 번호. -없이 숫자만 입력해주세요 ex) 01012345678"),
+            @Parameter(name = "isSignup", description = "회원가입 로직인지 여부. true이면 회원가입, false이면 아이디/비밀번호 찾기")
     })
-    public ApiResponse<String> sendSms(@RequestParam String phoneNum) {
+    public ApiResponse<String> sendSms(@RequestParam String phoneNum, @RequestParam boolean isSignup) {
         try {
-            boolean result = smsService.sendSms(phoneNum);
+            boolean result = smsService.sendSms(phoneNum, isSignup);
             if(!result) return ApiResponse.onFailure("ERR_SMS_SEND", "인증 코드 전송에 실패했습니다. 다시 시도해주세요.", null);
         } catch (Exception e) {
             return ApiResponse.onFailure("ERR_SMS_SEND", "인증 코드 전송에 실패했습니다. 다시 시도해주세요.", null);

@@ -52,16 +52,8 @@ public class CommentController {
         commentService.deleteComment(commentId);
         return ApiResponse.onSuccess(null); // 성공 응답만 반환
     }
-    /**
-     * 댓글 수정
-     */
-    @Operation(summary = "댓글 수정", description = "댓글 내용을 수정합니다.")
-    @PatchMapping("/{postId}/comments/{commentId}")
-    public ApiResponse<CommentResponseDTO> updateComment(
-            @PathVariable Long postId,
-            @PathVariable Long commentId,
-            @RequestBody CommentRequestDTO.CommentUpdateRequestDto requestDto) {
-        CommentResponseDTO updatedComment = commentService.updateComment(commentId, requestDto);
-        return ApiResponse.onSuccess(updatedComment);
-    }
+
+
+
+
 }
