@@ -259,9 +259,7 @@ BoardServiceImpl implements BoardService {
         Post post = postRepository.findById(dto.getPostId())
                 .orElseThrow(() -> new IllegalArgumentException("게시글을 찾을 수 없습니다."));
 
-        if (post.getOriginalPostId() != 1) {
-            throw new GeneralException(ErrorStatus.BOARD_TYPE_NOT_FOUND);
-        }
+   
 
         if(dto.getBoardId()!=1){
             throw new GeneralException(ErrorStatus.BOARD_TYPE_NOT_FOUND);
