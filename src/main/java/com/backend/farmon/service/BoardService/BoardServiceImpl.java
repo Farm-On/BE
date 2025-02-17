@@ -181,11 +181,7 @@ BoardServiceImpl implements BoardService {
                 SaveImgFile(imageFile, imageUrl, allPost, null, originalPostId);
                 SaveImgFile(imageFile, imageUrl, popularPost, null, originalPostId);
                 // PostImg 객체 생성
-<<<<<<< HEAD
-                //  SaveImgFile(imageFile, imageUrl, post, user, imgUrls);
-=======
-              //  SaveImgFile(imageFile, imageUrl, post, user, imgUrls);
->>>>>>> origin/develop
+
             }
         }
 
