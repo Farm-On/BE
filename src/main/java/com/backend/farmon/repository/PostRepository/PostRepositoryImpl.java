@@ -25,7 +25,8 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
     QPost post = QPost.post;
     QBoard board = QBoard.board;
     QCrop crop = QCrop.crop;
-
+    QBoardPost boardPost= QBoardPost.boardPost;
+    
     @Override
     public List<Post> findTopPosts(Integer limit) {
         return queryFactory.selectFrom(post)
