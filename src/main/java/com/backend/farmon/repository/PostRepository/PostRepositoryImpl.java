@@ -119,26 +119,27 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
         return new PageImpl<>(posts, pageable, total);
     }
 
-
     @Override
     public Page<Post> findPostsByBoardIdAndCrops(Long boardId, List<String> cropNames, Pageable pageable) {
-
-        // 게시판 ID와 subCategory에 cropNames 중 하나라도 포함된 게시글 조회
+        // 게시판 ID와 Crop names에 해당하는 게시글을 조회
         List<Post> posts = queryFactory.selectFrom(post)
-                .leftJoin(post.postImgs, postImg).fetchJoin()
-                .where(post.board.id.eq(boardId)
-                        .and(post.subCategories.in(cropNames))) // subCategory가 일치하는 게시글 필터링
-                .groupBy(post.id)
+                .leftJoin(post.boardPosts, boardPost)  // 게시글과 BoardPost 관계
+                .leftJoin(post.postImgs, postImg).fetchJoin()  // 게시글 이미지
+                .leftJoin(post.crop, crop)  // Post와 Crop 관계를 직접 조인
+                .where(post.board.id.eq(boardId)  // 게시판 ID 조건
+                        .and(crop.name.in(cropNames)))  // Crop의 name이 cropNames에 포함된 게시글 필터링
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .fetch();
 
+        // 게시글의 총 개수를 카운트
         long totalCount = queryFactory.selectFrom(post)
-                .where(post.board.id.eq(boardId)
-                        .and(post.subCategories.in(cropNames)))
-                .groupBy(post.id)
-                .fetchCount();
+                .leftJoin(post.crop, crop)  // Post와 Crop 관계를 직접 조인
+                .where(post.board.id.eq(boardId)  // 게시판 ID 조건
+                        .and(crop.name.in(cropNames)))  // Crop의 name이 cropNames에 포함된 게시글 필터링
+                .fetchCount();  // 총 게시글 개수 카운트
 
+        // Page 객체 반환
         return new PageImpl<>(posts, pageable, totalCount);
     }
 
