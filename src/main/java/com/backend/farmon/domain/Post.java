@@ -42,30 +42,12 @@ public class Post extends BaseEntity {
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<BoardPost> boardPosts = new ArrayList<>();
 
-//    private PostType postType;
+    // 편의 메서드
+    @Setter
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "crop_id")
+    private Crop crop;
 
-    // 상위 분야 이름
-    @JsonProperty("categorytitle")
-    private String Category;
-
-    // 하위분야 이름 저장
-    @CollectionTable(name = "post_sub_categories", joinColumns = @JoinColumn(name = "post_id"))
-    @Column(name = "sub_category")
-    private String subCategories;
-
-
-    // 하위 카테고리
-    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<PostCrop> postCrops = new ArrayList<>();
-
-    // 편의 메서드: Crop 추가
-    public void addCrop(Crop crop) {
-        PostCrop postCrop = new PostCrop();
-        postCrop.setPost(this);
-        postCrop.setCrop(crop);
-        this.postCrops.add(postCrop);
-        crop.getPostCrops().add(postCrop);
-    }
 
 
     // 댓글 추가 메서드
@@ -77,10 +59,6 @@ public class Post extends BaseEntity {
         comment.setPost(this);
     }
 
-//    @ElementCollection
-//    @CollectionTable(name = "post_subcategories", joinColumns = @JoinColumn(name = "post_id"))
-//    @Column(name = "sub_category_name")
-//    private List<String> selectedSubCategories; // 선택된 하위 카테고리 리스트
 
     @ManyToOne
     @JoinColumn(name = "board_id")
