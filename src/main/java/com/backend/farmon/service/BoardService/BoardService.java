@@ -20,13 +20,11 @@ public interface BoardService {
     PostResponseDTO save_ExperCol(BoardRequestDto.ExpertColumn postDto, List<MultipartFile> multipartFiles) throws Exception;
 
     AnswerResponseDTO saveQnAAnswer(AnswerRequestDTO dto, List<MultipartFile> multipartFiles)throws Exception;
-<<<<<<< HEAD
 
     PostResponseDTO deleteFreePost(Long postId);
 
     PostResponseDTO deleteQnaPost(Long postId);
 
     PostResponseDTO deleteExpertColumnPost(Long postId);
-=======
->>>>>>> origin/develop
+
 }
