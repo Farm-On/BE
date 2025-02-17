@@ -1,0 +1,15 @@
+package com.backend.farmon.repository.UserRepository;
+
+import com.backend.farmon.domain.User;
+import org.jetbrains.annotations.NotNull;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+import java.util.Optional;
+
+public interface UserRepository extends JpaRepository<User, Long>, UserRepositoryCustom {
+    Boolean existsByEmail(String email);
+    Optional<User> findByEmail(String email);
+    boolean existsByPhoneNum(String phoneNum);
+    Optional<User> findById(Long id);
+    Optional<User> findByPhoneNum(String phoneNumber);
+}
