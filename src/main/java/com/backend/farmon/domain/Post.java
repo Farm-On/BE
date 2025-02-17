@@ -48,7 +48,12 @@ public class Post extends BaseEntity {
     @JoinColumn(name = "crop_id")
     private Crop crop;
 
-
+    public void setBoardPosts(List<BoardPost> boardPosts) {
+        this.boardPosts = (boardPosts != null) ? boardPosts : new ArrayList<>();
+        for (BoardPost bp : this.boardPosts) {
+            bp.setPost(this);
+        }
+    }
 
     // 댓글 추가 메서드
     public void addComment(Comment comment) {
