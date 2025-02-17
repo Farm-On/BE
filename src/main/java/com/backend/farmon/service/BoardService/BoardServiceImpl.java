@@ -15,13 +15,9 @@ import com.backend.farmon.repository.AnswerRepository.AnswerImgRepository;
 import com.backend.farmon.repository.AnswerRepository.AnswerRepository;
 import com.backend.farmon.repository.BoardRepository.BoardPostRepository;
 import com.backend.farmon.repository.BoardRepository.BoardRepository;
-<<<<<<< HEAD
 import com.backend.farmon.repository.CommentRepository.CommentRepository;
 import com.backend.farmon.repository.CropRepository.CropRepository;
 import com.backend.farmon.repository.LikeCountRepository.LikeCountRepository;
-=======
-import com.backend.farmon.repository.CropRepository.CropRepository;
->>>>>>> origin/develop
 import com.backend.farmon.repository.PostRepository.PostImgRepository;
 import com.backend.farmon.repository.PostRepository.PostRepository;
 import com.backend.farmon.repository.UserRepository.UserRepository;
@@ -29,16 +25,12 @@ import com.backend.farmon.service.AWS.S3Service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-<<<<<<< HEAD
 import org.springframework.transaction.annotation.Transactional;
-=======
->>>>>>> origin/develop
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -55,19 +47,13 @@ BoardServiceImpl implements BoardService {
     private final S3Service s3Service; // 파일 업로드를 위한 S3 서비스
     private final CropRepository cropRepository;
     private final AmazonS3Manager amazonS3Manager;
-<<<<<<< HEAD
     private final CommentRepository commentRepository;
-=======
->>>>>>> origin/develop
     private final PostImgRepository postImgRepository;
     private final AnswerConverter answerConverter;
     private final AnswerImgRepository answerImgRepository;
     private final AnswerRepository answerRepository;
     private final BoardPostRepository boardPostRepository;
-<<<<<<< HEAD
     private final LikeCountRepository likeCountRepository;
-=======
->>>>>>> origin/develop
 
     @Override
     public PostResponseDTO save_FreePost(BoardRequestDto.FreePost postDto, List<MultipartFile> multipartFiles) throws Exception {
@@ -281,11 +267,6 @@ BoardServiceImpl implements BoardService {
         Post post = postRepository.findById(dto.getPostId())
                 .orElseThrow(() -> new IllegalArgumentException("게시글을 찾을 수 없습니다."));
 
-<<<<<<< HEAD
-
-=======
-   
->>>>>>> origin/develop
 
         if(dto.getBoardId()!=1){
             throw new GeneralException(ErrorStatus.BOARD_TYPE_NOT_FOUND);
@@ -444,7 +425,7 @@ BoardServiceImpl implements BoardService {
         }
     }
 
-<<<<<<< HEAD
+
     // 삭제 매커니즘
 
     // 자유게시판
@@ -559,9 +540,6 @@ BoardServiceImpl implements BoardService {
         return new PostResponseDTO(post, null, null); // 삭제된 게시글 정보 반환
     }
 
-
-=======
->>>>>>> origin/develop
 
 
     // 새로운 Post 객체를 생성하여 다른 게시판과 연관
