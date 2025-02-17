@@ -180,7 +180,6 @@ BoardServiceImpl implements BoardService {
                 SaveImgFile(imageFile, imageUrl, post, imgUrls, originalPostId);
                 SaveImgFile(imageFile, imageUrl, allPost, null, originalPostId);
                 SaveImgFile(imageFile, imageUrl, popularPost, null, originalPostId);
-                // PostImg 객체 생성
 
             }
         }
@@ -597,55 +596,95 @@ BoardServiceImpl implements BoardService {
                 .build();
     }
 
-    // 전체게시판 분야 지정 O
     private Post createPostAllByBoardType(BoardRequestDto.AllPost postDTO, User user, Board board) {
-        return Post.builder()
+        // Crop을 찾고 Post에 연결
+        Crop crop = cropRepository.findByName(postDTO.getCrop())
+                .orElseThrow(() -> new IllegalArgumentException("작물이 존재하지 않습니다."));
+
+        // Board와 Post를 연결 (다대다 관계 설정)
+        BoardPost boardPost = new BoardPost();
+        boardPost.setBoard(board);
+
+        // Post 생성
+        Post post = Post.builder()
                 .postTitle(postDTO.getPostTitle())
                 .subTitle(postDTO.getSubTitle())
                 .postContent(postDTO.getPostContent())
-                .Category(postDTO.getCategoryTitle()) // ✅ 상위 카테고리 저장
-                .subCategories(postDTO.getCrop()) // ✅ 하위 카테고리 리스트 저장
                 .user(user)
-                .board(board)
+                .crop(crop) // Crop을 바로 설정
+                .boardPosts(List.of(boardPost)) // BoardPost 추가
                 .build();
+
+        return post;
     }
+
 
     // 인기 게시판 분야 지정 O
     private Post createPostPopularByBoardType(BoardRequestDto.PopularPost postDTO, User user, Board board) {
-        return Post.builder()
+        // Crop을 찾고 Post에 연결
+        Crop crop = cropRepository.findByName(postDTO.getCrop())
+                .orElseThrow(() -> new IllegalArgumentException("작물이 존재하지 않습니다."));
+
+        // Board와 Post를 연결 (다대다 관계 설정)
+        BoardPost boardPost = new BoardPost();
+        boardPost.setBoard(board);
+
+        // Post 생성
+        Post post = Post.builder()
                 .postTitle(postDTO.getPostTitle())
                 .subTitle(postDTO.getSubTitle())
                 .postContent(postDTO.getPostContent())
-                .Category(postDTO.getCategoryTitle()) // ✅ 상위 카테고리 저장
-                .subCategories(postDTO.getCrop()) // ✅ 하위 카테고리 리스트 저장
                 .user(user)
-                .board(board)
+                .crop(crop) // Crop을 바로 설정
+                .boardPosts(List.of(boardPost)) // BoardPost 추가
                 .build();
+
+        return post;
     }
 
 
     // Qna,Expert 분야 지정 (상위 분야,하위분야 지정으로 저장)
     private Post createPostByBoardType(BoardRequestDto.QnaPost postDTO, User user, Board board) {
-        return Post.builder()
+        // Crop을 찾고 Post에 연결
+        Crop crop = cropRepository.findByName(postDTO.getCrop())
+                .orElseThrow(() -> new IllegalArgumentException("작물이 존재하지 않습니다."));
+
+        // Board와 Post를 연결 (다대다 관계 설정)
+        BoardPost boardPost = new BoardPost();
+        boardPost.setBoard(board);
+
+        // Post 생성
+        Post post = Post.builder()
                 .postTitle(postDTO.getPostTitle())
                 .subTitle(postDTO.getSubTitle())
                 .postContent(postDTO.getPostContent())
-                .Category(postDTO.getCategoryTitle()) // ✅ 상위 카테고리 저장
-                .subCategories(postDTO.getCrop()) // ✅ 하위 카테고리 리스트 저장
                 .user(user)
-                .board(board)
+                .crop(crop) // Crop을 바로 설정
+                .boardPosts(List.of(boardPost)) // BoardPost 추가
                 .build();
+
+        return post;
     }
 
     private Post createPostByBoardType(BoardRequestDto.ExpertColumn postDTO, User user, Board board) {
-        return Post.builder()
+        // Crop을 찾고 Post에 연결
+        Crop crop = cropRepository.findByName(postDTO.getCrop())
+                .orElseThrow(() -> new IllegalArgumentException("작물이 존재하지 않습니다."));
+
+        // Board와 Post를 연결 (다대다 관계 설정)
+        BoardPost boardPost = new BoardPost();
+        boardPost.setBoard(board);
+
+        // Post 생성
+        Post post = Post.builder()
                 .postTitle(postDTO.getPostTitle())
                 .subTitle(postDTO.getSubTitle())
                 .postContent(postDTO.getPostContent())
-                .Category(postDTO.getCategoryTitle()) // ✅ 상위 카테고리 저장
-                .subCategories(postDTO.getCrop()) // ✅ 하위 카테고리 리스트 저장
                 .user(user)
-                .board(board)
+                .crop(crop) // Crop을 바로 설정
+                .boardPosts(List.of(boardPost)) // BoardPost 추가
                 .build();
+
+        return post;
     }
 }
