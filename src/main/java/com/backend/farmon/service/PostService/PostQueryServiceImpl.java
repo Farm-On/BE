@@ -216,7 +216,6 @@ public class PostQueryServiceImpl implements PostQueryService {
 
 
 
-    // Qna 게시판용 상세 조회
     @Transactional(readOnly = true)
     public PostWithAnswersResponseDTO getBoardIdAndQnAPostById(Long boardId, Long postId) {
         // 1. Board 조회
@@ -232,10 +231,14 @@ public class PostQueryServiceImpl implements PostQueryService {
             throw new GeneralException(ErrorStatus.BOARD_TYPE_NOT_FOUND);
         }
 
-        // 4. Post에 연결된 Answer 리스트 가져오기
+        // 4. Post에 연결된 Crop 가져오기
+        Crop crop = post.getCrop();
+        String cropName = (crop != null) ? crop.getName() : null;
+
+        // 5. Post에 연결된 Answer 리스트 가져오기
         List<Answer> answers = post.getAnswers();
 
-        // 5. Answer 리스트를 AnswerResponseDTO로 변환
+        // 6. Answer 리스트를 AnswerResponseDTO로 변환
         List<AnswerResponseDTO> answerResponseDTOs = answers.stream()
                 .map(answer -> {
                     // 이미지 URL 리스트 생성
@@ -251,23 +254,23 @@ public class PostQueryServiceImpl implements PostQueryService {
                 })
                 .collect(Collectors.toList());
 
-        // 6. Post 정보 DTO 변환
+        // 7. Post 정보 DTO 변환 (Crop 정보 포함)
         PostResponseDTO postResponseDTO = PostResponseDTO.builder()
                 .postId(post.getId())
                 .postTitle(post.getPostTitle())
+                .subTitle(post.getSubTitle())
                 .postContent(post.getPostContent())
-                .Category(post.getCategory())
-                .subCategory(post.getSubCategories())
+                .Category(post.getCrop().getName())
+                .subCategory(post.getCrop().getCategory())
                 .createdAt(String.valueOf(post.getCreatedAt()))
                 .build();
 
-        // 7. 최종 DTO 반환
+        // 8. 최종 DTO 반환
         return PostWithAnswersResponseDTO.builder()
                 .post(postResponseDTO)
                 .answers(answerResponseDTOs)
                 .build();
     }
-
 
 
 }
