@@ -458,7 +458,7 @@ public class PostController {
     })
     @Parameters({
             @Parameter(name = "boardId", description = "게시판 번호", required = true),
-            @Parameter(name = "postId", description = "게시글 작성한 사람 Id", required = true)
+            @Parameter(name = "postId", description = "게시글 번호", required = true)
     })
     @GetMapping("free/list/{postId}/detail")
     public ApiResponse<PostResponseDTO>   getFreePostById( Long boardId,@PathVariable Long postId) {
@@ -479,7 +479,7 @@ public class PostController {
     })
     @Parameters({
             @Parameter(name = "boardId", description = "게시판 번호", required = true),
-            @Parameter(name = "postId", description = "게시글 작성한 사람 Id", required = true)
+            @Parameter(name = "postId", description = "게시글 번호", required = true)
     })
     @GetMapping("qna/list/{postId}/detail")
     public ApiResponse<PostWithAnswersResponseDTO>   getQnaPostById(Long boardId,@PathVariable  Long postId) {
@@ -502,7 +502,7 @@ public class PostController {
     })
     @Parameters({
             @Parameter(name = "boardId", description = "게시판 번호", required = true),
-            @Parameter(name = "postId", description = "게시글 작성한 사람 Id", required = true)
+            @Parameter(name = "postId", description = "게시글 번호", required = true)
     })
     @GetMapping("expertCol/list/{postId}/detail")
     public ApiResponse<PostResponseDTO>  getExpertColumnPostById( Long boardId,@PathVariable Long postId) {
