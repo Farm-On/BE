@@ -41,7 +41,7 @@ public class Post extends BaseEntity {
     // 게시판과 다대다 관계 (중간 테이블 사용)
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<BoardPost> boardPosts = new ArrayList<>();
-//
+
 //    private PostType postType;
 
     // 상위 분야 이름
@@ -53,8 +53,7 @@ public class Post extends BaseEntity {
     @Column(name = "sub_category")
     private String subCategories;
 
-<<<<<<< HEAD
-=======
+
     // 하위 카테고리
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<PostCrop> postCrops = new ArrayList<>();
@@ -68,7 +67,7 @@ public class Post extends BaseEntity {
         crop.getPostCrops().add(postCrop);
     }
 
->>>>>>> origin/develop
+
     // 댓글 추가 메서드
     public void addComment(Comment comment) {
         if (comments == null) {
