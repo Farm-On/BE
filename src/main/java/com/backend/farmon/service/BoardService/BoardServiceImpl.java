@@ -549,16 +549,20 @@ BoardServiceImpl implements BoardService {
 
 
     private void saveToBoard(Board board, Post post) {
-        if (post.getBoardPosts() == null) {
-            post.setBoardPosts(new ArrayList<>());
+        if (post.getBoardPosts() == null || post.getBoardPosts().isEmpty()) {
+            post.setBoardPosts(new ArrayList<>());  // ✅ 컬렉션이 비어 있으면 초기화
         }
+
         BoardPost boardPost = new BoardPost();
         boardPost.setBoard(board);
         boardPost.setPost(post);
+
         board.getBoardPosts().add(boardPost);
-        post.getBoardPosts().add(boardPost);
+        post.getBoardPosts().add(boardPost);  // ✅ 이제 문제 없이 추가 가능
+
         boardPostRepository.save(boardPost);
     }
+
 
     private static void validationExpert(BoardRequestDto.ExpertColumn postDto, List<MultipartFile> multipartFiles, Board board) {
         if (board.getPostType() != PostType.EXPERT_COLUMN) {
@@ -595,15 +599,11 @@ BoardServiceImpl implements BoardService {
                 .board(board)
                 .build();
     }
-
+    // 전체 게시판 분야 지정 O
     private Post createPostAllByBoardType(BoardRequestDto.AllPost postDTO, User user, Board board) {
         // Crop을 찾고 Post에 연결
         Crop crop = cropRepository.findByName(postDTO.getCrop())
                 .orElseThrow(() -> new IllegalArgumentException("작물이 존재하지 않습니다."));
-
-        // Board와 Post를 연결 (다대다 관계 설정)
-        BoardPost boardPost = new BoardPost();
-        boardPost.setBoard(board);
 
         // Post 생성
         Post post = Post.builder()
@@ -611,8 +611,8 @@ BoardServiceImpl implements BoardService {
                 .subTitle(postDTO.getSubTitle())
                 .postContent(postDTO.getPostContent())
                 .user(user)
-                .crop(crop) // Crop을 바로 설정
-                .boardPosts(List.of(boardPost)) // BoardPost 추가
+                .board(board)
+                .crop(crop)
                 .build();
 
         return post;
@@ -625,19 +625,16 @@ BoardServiceImpl implements BoardService {
         Crop crop = cropRepository.findByName(postDTO.getCrop())
                 .orElseThrow(() -> new IllegalArgumentException("작물이 존재하지 않습니다."));
 
-        // Board와 Post를 연결 (다대다 관계 설정)
-        BoardPost boardPost = new BoardPost();
-        boardPost.setBoard(board);
-
         // Post 생성
         Post post = Post.builder()
                 .postTitle(postDTO.getPostTitle())
                 .subTitle(postDTO.getSubTitle())
                 .postContent(postDTO.getPostContent())
                 .user(user)
-                .crop(crop) // Crop을 바로 설정
-                .boardPosts(List.of(boardPost)) // BoardPost 추가
+                .board(board)
+                .crop(crop)
                 .build();
+
 
         return post;
     }
@@ -649,19 +646,16 @@ BoardServiceImpl implements BoardService {
         Crop crop = cropRepository.findByName(postDTO.getCrop())
                 .orElseThrow(() -> new IllegalArgumentException("작물이 존재하지 않습니다."));
 
-        // Board와 Post를 연결 (다대다 관계 설정)
-        BoardPost boardPost = new BoardPost();
-        boardPost.setBoard(board);
-
         // Post 생성
         Post post = Post.builder()
                 .postTitle(postDTO.getPostTitle())
                 .subTitle(postDTO.getSubTitle())
                 .postContent(postDTO.getPostContent())
                 .user(user)
-                .crop(crop) // Crop을 바로 설정
-                .boardPosts(List.of(boardPost)) // BoardPost 추가
+                .board(board)
+                .crop(crop)
                 .build();
+
 
         return post;
     }
@@ -671,19 +665,16 @@ BoardServiceImpl implements BoardService {
         Crop crop = cropRepository.findByName(postDTO.getCrop())
                 .orElseThrow(() -> new IllegalArgumentException("작물이 존재하지 않습니다."));
 
-        // Board와 Post를 연결 (다대다 관계 설정)
-        BoardPost boardPost = new BoardPost();
-        boardPost.setBoard(board);
-
         // Post 생성
         Post post = Post.builder()
                 .postTitle(postDTO.getPostTitle())
                 .subTitle(postDTO.getSubTitle())
                 .postContent(postDTO.getPostContent())
                 .user(user)
-                .crop(crop) // Crop을 바로 설정
-                .boardPosts(List.of(boardPost)) // BoardPost 추가
+                .board(board)
+                .crop(crop)
                 .build();
+
 
         return post;
     }
