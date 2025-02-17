@@ -53,6 +53,22 @@ public class Post extends BaseEntity {
     @Column(name = "sub_category")
     private String subCategories;
 
+<<<<<<< HEAD
+=======
+    // 하위 카테고리
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<PostCrop> postCrops = new ArrayList<>();
+
+    // 편의 메서드: Crop 추가
+    public void addCrop(Crop crop) {
+        PostCrop postCrop = new PostCrop();
+        postCrop.setPost(this);
+        postCrop.setCrop(crop);
+        this.postCrops.add(postCrop);
+        crop.getPostCrops().add(postCrop);
+    }
+
+>>>>>>> origin/develop
     // 댓글 추가 메서드
     public void addComment(Comment comment) {
         if (comments == null) {

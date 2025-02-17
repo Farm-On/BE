@@ -5,15 +5,21 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+<<<<<<< HEAD
 import java.util.List;
 
+=======
+>>>>>>> origin/develop
 public interface LikeCountRepository extends JpaRepository<LikeCount, Long> {
 
     // 게시글과 연관된 좋아요 개수 조회
     @Query("SELECT COUNT(lc) FROM LikeCount lc WHERE lc.post.id = :postId")
     Integer countLikeCountsByPostId(@Param("postId") Long postId);
 
+<<<<<<< HEAD
     List<LikeCount> findAllByPostId(Long postId);
+=======
+>>>>>>> origin/develop
     // LikeCount 유저 조회
     LikeCount findByUserId(Long userid);
 

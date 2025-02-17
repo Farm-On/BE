@@ -13,17 +13,27 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
+<<<<<<< HEAD
 import static com.backend.farmon.domain.QPost.post;
 import static com.backend.farmon.domain.QPostImg.postImg;
 
+=======
+>>>>>>> origin/develop
 @Slf4j
 @Repository
 @RequiredArgsConstructor
 public class PostRepositoryImpl implements PostRepositoryCustom {
     private final JPAQueryFactory queryFactory;
+<<<<<<< HEAD
     QLikeCount likeCount = QLikeCount.likeCount;
     QPost post = QPost.post;
     QBoard board = QBoard.board;
+=======
+    QPost post = QPost.post;
+    QLikeCount likeCount = QLikeCount.likeCount;
+    QBoard board = QBoard.board;
+    QPostCrop postCrop = QPostCrop.postCrop;
+>>>>>>> origin/develop
     QCrop crop = QCrop.crop;
 
     @Override
@@ -122,20 +132,41 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
 
     @Override
     public Page<Post> findPostsByBoardIdAndCrops(Long boardId, List<String> cropNames, Pageable pageable) {
+<<<<<<< HEAD
 
         // 게시판 ID와 subCategory에 cropNames 중 하나라도 포함된 게시글 조회
         List<Post> posts = queryFactory.selectFrom(post)
                 .leftJoin(post.postImgs, postImg).fetchJoin()
                 .where(post.board.id.eq(boardId)
                         .and(post.subCategories.in(cropNames))) // subCategory가 일치하는 게시글 필터링
+=======
+        QPost post = QPost.post;
+        QPostImg postImg = QPostImg.postImg;
+        QCrop crop = QCrop.crop;
+
+        // 게시판 ID와 Crop 이름으로 게시글 및 관련 이미지 조회
+        List<Post> posts = queryFactory.selectFrom(post)
+                .leftJoin(post.postImgs, postImg).fetchJoin()
+                .join(post.postCrops, QPostCrop.postCrop)
+                .join(QPostCrop.postCrop.crop, crop)
+                .where(post.board.id.eq(boardId)
+                        .and(crop.name.in(cropNames))) // Crop 이름 필터링
+>>>>>>> origin/develop
                 .groupBy(post.id)
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .fetch();
 
         long totalCount = queryFactory.selectFrom(post)
+<<<<<<< HEAD
                 .where(post.board.id.eq(boardId)
                         .and(post.subCategories.in(cropNames)))
+=======
+                .join(post.postCrops, QPostCrop.postCrop)
+                .join(QPostCrop.postCrop.crop, crop)
+                .where(post.board.id.eq(boardId)
+                        .and(crop.name.in(cropNames)))
+>>>>>>> origin/develop
                 .groupBy(post.id)
                 .fetchCount();
 
@@ -144,8 +175,11 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
 
 
 
+<<<<<<< HEAD
 
 
+=======
+>>>>>>> origin/develop
     @Override
     public Page<Post> findPopularPosts(Long boardId, Pageable pageable) {
         QPost post = QPost.post;

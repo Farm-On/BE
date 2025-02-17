@@ -1,6 +1,9 @@
 package com.backend.farmon.repository.CommentRepository;
 
+<<<<<<< HEAD
 import com.backend.farmon.domain.Answer;
+=======
+>>>>>>> origin/develop
 import com.backend.farmon.domain.Comment;
 import com.backend.farmon.domain.Post;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -31,8 +34,11 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
     List<Comment> findAllByOriginalCommentId(Long originalCommentId);
 
 
+<<<<<<< HEAD
     List<Comment> findAllByPostId(Long postId);
 
+=======
+>>>>>>> origin/develop
     List<Comment>findAllByGroupId(Long groupId);
 
     // 부모댓글이 있는 찾기

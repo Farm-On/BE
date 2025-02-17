@@ -12,7 +12,11 @@ import java.util.Optional;
 
 public interface PostRepository extends JpaRepository<Post, Long>, PostRepositoryCustom {
 
+<<<<<<< HEAD
     void deleteByOriginalPostId(Long originalPostId);
+=======
+
+>>>>>>> origin/develop
 
     Page<Post> findAllByUserId(Long userId, Pageable pageable);
 
