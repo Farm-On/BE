@@ -133,15 +133,9 @@ public class PostController {
                     content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
                             schema = @Schema(implementation = AnswerRequestDTO.class)))  AnswerRequestDTO answer ,// 답변 데이터
             @RequestPart(value = "imgList", required = false) @Parameter(
-<<<<<<< HEAD
                     description = "업로드할 이미지 파일들",
                     content = @Content(mediaType = MediaType.MULTIPART_FORM_DATA_VALUE,
                             array = @ArraySchema(schema = @Schema(type = "string", format = "binary"))))List<MultipartFile> imgList
-=======
-                  description = "업로드할 이미지 파일들",
-                  content = @Content(mediaType = MediaType.MULTIPART_FORM_DATA_VALUE,
-                          array = @ArraySchema(schema = @Schema(type = "string", format = "binary"))))List<MultipartFile> imgList
->>>>>>> origin/develop
     ) throws Exception {
 
         AnswerResponseDTO responseDTO = boardServiceImpl.saveQnAAnswer(answer,imgList);
@@ -185,7 +179,6 @@ public class PostController {
         return ApiResponse.onSuccess(postResponseDTO);
     }
 
-<<<<<<< HEAD
     // 게시글 삭제
     @Operation(
             summary = "자유 게시판 게시글 삭제",
@@ -243,8 +236,6 @@ public class PostController {
 
 
 
-=======
->>>>>>> origin/develop
 
 
 ///// 게시글 목록 그냥 조회 (상세조회X) 리스트 형식으로 돌아옴
