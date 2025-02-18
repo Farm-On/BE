@@ -33,10 +33,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.backend.farmon.dto.post.PostType.QNA;
@@ -97,9 +94,10 @@ public class PostQueryServiceImpl implements PostQueryService {
         return HomeConverter.toPopularPostListDTO(expertColumnPostList);
     }
 
-   //전체 게시판 좋아요 순
+   //자유,전체 게시판 생성순
     @Transactional(readOnly = true)
     public Page<PostPagingResponseDTO> findAllPostsByBoardPK(Long boardId, int page, int size, String sortStr, List<String> crops) {
+
         // 인증된 사용자가 FARMER나  EXPERT  이 아니면 바로 에러
         String currentUserRole = userAuthorizationUtil.getCurrentUserRole();
         if (!"FARMER".equals(currentUserRole) && !"EXPERT".equals(currentUserRole)) {
@@ -167,7 +165,7 @@ public class PostQueryServiceImpl implements PostQueryService {
             throw new GeneralException(ErrorStatus.UNAUTHORIZED_ACCESS);
         }
 
-
+        log.info("boardId :"+boardId);
 
         // 정렬 방향 설정: 'ASC' 또는 'DESC' 기준으로 생성일(createdAt)로 정렬 기본이 DESC
         Sort sort = Sort.by(Sort.Direction.fromString(sortStr), "createdAt");
@@ -180,7 +178,7 @@ public class PostQueryServiceImpl implements PostQueryService {
         return posts.map(post -> new PostPagingResponseDTO(post, s3Service.getFullPath(post.getPostImgs())));
     }
 
-
+    // 이미지랑 글 같이 조회 일반 상세 조회( 인기,전체,자유)
     @Transactional(readOnly = true)
     public PostResponseDTO getBoardIdAndPostById(Long boardId, Long postId) {
         // 인증된 사용자가 FARMER나  EXPERT  이 아니면 바로 에러
@@ -258,6 +256,7 @@ public class PostQueryServiceImpl implements PostQueryService {
         if (!"FARMER".equals(currentUserRole) && !"EXPERT".equals(currentUserRole)) {
             throw new GeneralException(ErrorStatus.UNAUTHORIZED_ACCESS);
         }
+        log.info("boardId :"+boardId);
 
 
         // 1. Board 조회

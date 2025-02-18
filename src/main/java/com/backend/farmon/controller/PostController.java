@@ -278,7 +278,7 @@ public class PostController {
             @Parameter(description = "페이지 번호", required = true) @RequestParam(value = "page") int pageNum,
             @Parameter(description = "페이지 크기", required = false) @RequestParam(defaultValue = "10") int size,
             @Parameter(description = "정렬 방식 (ASC 또는 DESC)", required = false) @RequestParam(defaultValue = "DESC") String sort,
-            @Parameter(description = "필터링조건",required = false) String [] crops
+            @Parameter(description = "필터링조건",required = false) @RequestParam(required = false)  String [] crops
     ) {
         List<String> cropsList = (crops != null) ? Arrays.asList(crops) : Collections.emptyList();
         try {
@@ -309,10 +309,11 @@ public class PostController {
             @Parameter(description = "페이지 번호", required = true) @RequestParam(value = "page") int pageNum,
             @Parameter(description = "페이지 크기", required = false) @RequestParam(defaultValue = "10") int size,
             @Parameter(description = "정렬 방식 (ASC 또는 DESC)", required = false) @RequestParam(defaultValue = "DESC") String sort,
-            @Parameter(description = "필터링조건",required = false) String [] crops
+            @Parameter(description = "필터링조건",required = false)  @RequestParam(required = false) String [] crops
     )
     {
         List<String> cropsList = (crops != null) ? Arrays.asList(crops) : Collections.emptyList();
+
         try{
             // 게시판 ID에 해당하는 게시글을 생성일 순으로 정렬하여 페이징 처리
             Page<PostPagingResponseDTO> posts =  postQueryServiceImpl.findAllPostsByBoardPK(boardId, pageNum,size,sort,cropsList);
@@ -342,7 +343,7 @@ public class PostController {
             @Parameter(description = "페이지 번호", required = true) @RequestParam(value = "page") int pageNum,
             @Parameter(description = "페이지 크기", required = false) @RequestParam(defaultValue = "10") int size,
             @Parameter(description = "정렬 방식 (ASC 또는 DESC)", required = false) @RequestParam(defaultValue = "DESC") String sort,
-            @Parameter(description = "필터링조건",required =false) String [] crops
+            @Parameter(description = "필터링조건",required =false)  @RequestParam(required = false)String [] crops
     ) {
         log.info("Crops: " + crops);
         List<String> cropsList = (crops != null) ? Arrays.asList(crops) : Collections.emptyList();
@@ -374,7 +375,7 @@ public class PostController {
             @Parameter(description = "페이지 번호", required = true) @RequestParam(value = "page") int pageNum,
             @Parameter(description = "페이지 크기", required = false) @RequestParam(defaultValue = "10") int size,
             @Parameter(description = "정렬 방식 (ASC 또는 DESC)", required = false) @RequestParam(defaultValue = "DESC") String sort,
-            @Parameter(description = "필터링조건",required =false) String [] crops
+            @Parameter(description = "필터링조건",required =false)  @RequestParam(required = false) String [] crops
     ) {
         List<String> cropsList = (crops != null) ? Arrays.asList(crops) : Collections.emptyList();
         try {
@@ -406,7 +407,7 @@ public class PostController {
             @RequestParam(defaultValue = "1") int pageNum,
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(defaultValue = "DESC") String sort,
-            @Parameter(description = "필터링조건",required = false) String [] crops
+            @Parameter(description = "필터링조건",required = false) @RequestParam(required = false) String [] crops
     ) {
         // 여기는 무조건 작물 정보를 String으로 받아서 처리하거나 boolean으로 처리할수 있는데 일단 해보고 말씀드려보겠습니다.
         List<String> cropsList = (crops != null) ? Arrays.asList(crops) : Collections.emptyList();
