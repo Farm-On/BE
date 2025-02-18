@@ -21,6 +21,10 @@ public class PostRequestDTO {
         @Schema(description = "게시글 제목", required = true)
         @NotEmpty(message = "제목을 입력해주세요.")
         private String postTitle;
+        
+        @Schema(description = "게시글 소제목", example = "게시글 제목 예시")
+        private String subTitle;
+
 
         @Schema(description = "게시글 내용", required = true)
         @NotEmpty(message = "내용을 입력해주세요.")

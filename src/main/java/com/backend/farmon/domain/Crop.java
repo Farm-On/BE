@@ -24,10 +24,11 @@ public class Crop extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    // 상위 작물
     @Column(nullable = false)
     private String name;
 
-    //    @Enumerated(EnumType.STRING)
+    //    @Enumerated(EnumType.STRING) 하위 작물
     @Column(nullable = false, columnDefinition = "VARCHAR(55)")
     private String category;
 
@@ -37,6 +38,6 @@ public class Crop extends BaseEntity {
     @OneToMany(mappedBy = "crop", cascade = CascadeType.ALL)
     private List<Expert> expertList = new ArrayList<>();
 
-    @OneToMany(mappedBy = "crop", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<PostCrop> postCrops = new ArrayList<>();
+    @OneToMany(mappedBy = "crop")
+    private List<Post> posts = new ArrayList<>();
 }

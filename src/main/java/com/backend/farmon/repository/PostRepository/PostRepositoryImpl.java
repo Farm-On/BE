@@ -13,17 +13,20 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
+import static com.backend.farmon.domain.QPost.post;
+import static com.backend.farmon.domain.QPostImg.postImg;
+
 @Slf4j
 @Repository
 @RequiredArgsConstructor
 public class PostRepositoryImpl implements PostRepositoryCustom {
     private final JPAQueryFactory queryFactory;
-    QPost post = QPost.post;
     QLikeCount likeCount = QLikeCount.likeCount;
+    QPost post = QPost.post;
     QBoard board = QBoard.board;
-    QPostCrop postCrop = QPostCrop.postCrop;
     QCrop crop = QCrop.crop;
-
+    QBoardPost boardPost= QBoardPost.boardPost;
+    
     @Override
     public List<Post> findTopPosts(Integer limit) {
         return queryFactory.selectFrom(post)
@@ -117,35 +120,31 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
         return new PageImpl<>(posts, pageable, total);
     }
 
-
     @Override
     public Page<Post> findPostsByBoardIdAndCrops(Long boardId, List<String> cropNames, Pageable pageable) {
-        QPost post = QPost.post;
-        QPostImg postImg = QPostImg.postImg;
-        QCrop crop = QCrop.crop;
-
-        // 게시판 ID와 Crop 이름으로 게시글 및 관련 이미지 조회
+        // 게시판 ID와 Crop names에 해당하는 게시글을 조회
         List<Post> posts = queryFactory.selectFrom(post)
-                .leftJoin(post.postImgs, postImg).fetchJoin()
-                .join(post.postCrops, QPostCrop.postCrop)
-                .join(QPostCrop.postCrop.crop, crop)
-                .where(post.board.id.eq(boardId)
-                        .and(crop.name.in(cropNames))) // Crop 이름 필터링
-                .groupBy(post.id)
+                .leftJoin(post.boardPosts, boardPost)  // 게시글과 BoardPost 관계
+                .leftJoin(post.postImgs, postImg).fetchJoin()  // 게시글 이미지
+                .leftJoin(post.crop, crop)  // Post와 Crop 관계를 직접 조인
+                .where(post.board.id.eq(boardId)  // 게시판 ID 조건
+                        .and(crop.name.in(cropNames)))  // Crop의 name이 cropNames에 포함된 게시글 필터링
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .fetch();
 
+        // 게시글의 총 개수를 카운트
         long totalCount = queryFactory.selectFrom(post)
-                .join(post.postCrops, QPostCrop.postCrop)
-                .join(QPostCrop.postCrop.crop, crop)
-                .where(post.board.id.eq(boardId)
-                        .and(crop.name.in(cropNames)))
-                .groupBy(post.id)
-                .fetchCount();
+                .leftJoin(post.crop, crop)  // Post와 Crop 관계를 직접 조인
+                .where(post.board.id.eq(boardId)  // 게시판 ID 조건
+                        .and(crop.name.in(cropNames)))  // Crop의 name이 cropNames에 포함된 게시글 필터링
+                .fetchCount();  // 총 게시글 개수 카운트
 
+        // Page 객체 반환
         return new PageImpl<>(posts, pageable, totalCount);
     }
+
+
 
 
 

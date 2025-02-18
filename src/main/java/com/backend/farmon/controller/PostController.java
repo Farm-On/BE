@@ -133,9 +133,9 @@ public class PostController {
                     content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
                             schema = @Schema(implementation = AnswerRequestDTO.class)))  AnswerRequestDTO answer ,// 답변 데이터
             @RequestPart(value = "imgList", required = false) @Parameter(
-                  description = "업로드할 이미지 파일들",
-                  content = @Content(mediaType = MediaType.MULTIPART_FORM_DATA_VALUE,
-                          array = @ArraySchema(schema = @Schema(type = "string", format = "binary"))))List<MultipartFile> imgList
+                    description = "업로드할 이미지 파일들",
+                    content = @Content(mediaType = MediaType.MULTIPART_FORM_DATA_VALUE,
+                            array = @ArraySchema(schema = @Schema(type = "string", format = "binary"))))List<MultipartFile> imgList
     ) throws Exception {
 
         AnswerResponseDTO responseDTO = boardServiceImpl.saveQnAAnswer(answer,imgList);
@@ -178,6 +178,63 @@ public class PostController {
 
         return ApiResponse.onSuccess(postResponseDTO);
     }
+
+    // 게시글 삭제
+    @Operation(
+            summary = "자유 게시판 게시글 삭제",
+            description = "자유 게시판의 특정 게시글을 삭제합니다."
+    )
+    @ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200", description = "OK, 성공"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "POST4001", description = "게시글을 찾을 수 없습니다.", content = @Content(schema = @Schema(implementation = ApiResponse.class))),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON400", description = "잘못된 요청입니다.", content = @Content(schema = @Schema(implementation = ApiResponse.class)))
+    })
+    @DeleteMapping("/free/{postId}")
+    public ApiResponse<PostResponseDTO> deleteFreePost(
+            @PathVariable Long postId
+    ) {
+        PostResponseDTO postResponseDTO = boardServiceImpl.deleteFreePost(postId);
+        return ApiResponse.onSuccess(postResponseDTO);
+    }
+
+
+    @Operation(
+            summary = "QnA 게시판 게시글 삭제",
+            description = "QnA 게시판의 특정 게시글과 답변을 삭제합니다."
+    )
+    @ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200", description = "OK, 성공"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "POST4001", description = "게시글을 찾을 수 없습니다.", content = @Content(schema = @Schema(implementation = ApiResponse.class))),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON400", description = "잘못된 요청입니다.", content = @Content(schema = @Schema(implementation = ApiResponse.class)))
+    })
+    @DeleteMapping("/qna/{postId}")
+    public ApiResponse<PostResponseDTO> deleteQnaPost(
+            @PathVariable Long postId
+    ) {
+        PostResponseDTO postResponseDTO = boardServiceImpl.deleteQnaPost(postId);
+        return ApiResponse.onSuccess(postResponseDTO);
+    }
+
+
+
+    @Operation(
+            summary = "전문가 칼럼 게시글 삭제",
+            description = "전문가 칼럼 게시판의 특정 게시글을 삭제합니다."
+    )
+    @ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200", description = "OK, 성공"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "POST4001", description = "게시글을 찾을 수 없습니다.", content = @Content(schema = @Schema(implementation = ApiResponse.class))),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON400", description = "잘못된 요청입니다.", content = @Content(schema = @Schema(implementation = ApiResponse.class)))
+    })
+    @DeleteMapping("/expertColumn/{postId}")
+    public ApiResponse<PostResponseDTO> deleteExpertColumnPost(
+            @PathVariable Long postId
+    ) {
+        PostResponseDTO postResponseDTO = boardServiceImpl.deleteExpertColumnPost(postId);
+        return ApiResponse.onSuccess(postResponseDTO);
+    }
+
+
 
 
 
@@ -401,7 +458,7 @@ public class PostController {
     })
     @Parameters({
             @Parameter(name = "boardId", description = "게시판 번호", required = true),
-            @Parameter(name = "postId", description = "게시글 작성한 사람 Id", required = true)
+            @Parameter(name = "postId", description = "게시글 번호", required = true)
     })
     @GetMapping("free/list/{postId}/detail")
     public ApiResponse<PostResponseDTO>   getFreePostById( Long boardId,@PathVariable Long postId) {
@@ -422,7 +479,7 @@ public class PostController {
     })
     @Parameters({
             @Parameter(name = "boardId", description = "게시판 번호", required = true),
-            @Parameter(name = "postId", description = "게시글 작성한 사람 Id", required = true)
+            @Parameter(name = "postId", description = "게시글 번호", required = true)
     })
     @GetMapping("qna/list/{postId}/detail")
     public ApiResponse<PostWithAnswersResponseDTO>   getQnaPostById(Long boardId,@PathVariable  Long postId) {
@@ -445,7 +502,7 @@ public class PostController {
     })
     @Parameters({
             @Parameter(name = "boardId", description = "게시판 번호", required = true),
-            @Parameter(name = "postId", description = "게시글 작성한 사람 Id", required = true)
+            @Parameter(name = "postId", description = "게시글 번호", required = true)
     })
     @GetMapping("expertCol/list/{postId}/detail")
     public ApiResponse<PostResponseDTO>  getExpertColumnPostById( Long boardId,@PathVariable Long postId) {
