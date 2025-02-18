@@ -2,22 +2,17 @@ package com.backend.farmon.controller;
 
 import com.backend.farmon.apiPayload.ApiResponse;
 import com.backend.farmon.apiPayload.code.status.ErrorStatus;
-import com.backend.farmon.apiPayload.exception.handler.ExpertHandler;
 import com.backend.farmon.apiPayload.exception.handler.UserHandler;
 import com.backend.farmon.config.security.JWTUtil;
 import com.backend.farmon.config.security.UserAuthorizationUtil;
-import com.backend.farmon.converter.ExpertConverter;
-import com.backend.farmon.converter.SignupConverter;
 import com.backend.farmon.converter.UserConverter;
-import com.backend.farmon.domain.Expert;
 import com.backend.farmon.domain.User;
 import com.backend.farmon.domain.enums.Role;
 import com.backend.farmon.dto.user.ExchangeResponse;
 import com.backend.farmon.dto.user.MypageRequest;
 import com.backend.farmon.dto.user.MypageResponse;
-import com.backend.farmon.dto.user.SignupRequest;
 import com.backend.farmon.repository.UserRepository.UserRepository;
-import com.backend.farmon.service.UserService.UserQueryService;
+import com.backend.farmon.service.UserService.UserCommandService;
 import com.backend.farmon.validaton.annotation.EqualsUserId;
 import com.backend.farmon.validaton.annotation.ExistUser;
 import io.swagger.v3.oas.annotations.Operation;
@@ -31,7 +26,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -42,7 +36,7 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class UserController {
 
-    private final UserQueryService userQueryService;
+    private final UserCommandService userCommandService;
     private final JWTUtil jwtUtil;
     private final UserAuthorizationUtil userAuthorizationUtil;
     private final UserRepository userRepository;
@@ -111,12 +105,12 @@ public class UserController {
             @Parameter(name = "userId", description = "로그인한 유저의 아이디(pk)", example = "1"),
             @Parameter(name = "role", description = "전환하고자 하는 사용자 유형(ADMIN 제외), 전문가 전환 시 EXPERT, 농업인 전환 시 FARMER", example = "EXPERT")
     })
-    public ApiResponse<ExchangeResponse> getExchangeRole(@RequestParam(name="userId") @EqualsUserId @ExistUser Long userId,
+    public ApiResponse<ExchangeResponse> getExchangeRole(@RequestParam(name="userId") @EqualsUserId Long userId,
                                                          @RequestParam(name="role", defaultValue = "EXPERT") Role role,
                                                          HttpServletRequest request) {
         // JWTUtil을 통해 토큰 추출
         String token = jwtUtil.extractTokenFromRequest(request);
-        ExchangeResponse response = userQueryService.exchangeRole(userId, role, token);
+        ExchangeResponse response = userCommandService.exchangeRole(userId, role, token);
 
         return ApiResponse.onSuccess(response);
     }
