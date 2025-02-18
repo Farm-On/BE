@@ -21,8 +21,7 @@ public enum ErrorStatus implements BaseErrorCode {
     NICKNAME_NOT_EXIST(HttpStatus.BAD_REQUEST, "USER4002", "닉네임은 필수 입니다."),
     EXCHANGE_ROLE_SAME(HttpStatus.BAD_REQUEST, "USER4003", "전환하려는 역할과 현재 로그인한 역할이 일치합니다."),
     WITHDRAW_USER_LOGIN(HttpStatus.BAD_REQUEST, "USER4004", "회원탈퇴한 유저입니다."),
-
-    // 전문가 관련 에러
+            // 전문가 관련 에러
     EXPERT_NOT_FOUND(HttpStatus.BAD_REQUEST, "EXPERT4001", "아이디와 일치하는 전문가가 없습니다."),
     EXPERT_NOT_REGISTER(HttpStatus.BAD_REQUEST, "EXPERT4002", "전문가로 등록되어 있지 않은 농업인 입니다."),
     EXPERT_ALREADY_EXISTS(HttpStatus.BAD_REQUEST, "EXPERT4003", "이미 전문가로 등록된 농업인 입니다."),
@@ -46,6 +45,9 @@ public enum ErrorStatus implements BaseErrorCode {
     PHONENUM_NOT_EXIST(HttpStatus.BAD_REQUEST, "SMS4002", "해당 전화번호로 발급된 인증번호가 존재하지 않습니다."),
     AUTHCODE_INVALID(HttpStatus.BAD_REQUEST, "SMS4003", "인증문자가 만료되었습니다."),
 
+    // 질문 관련 삭제
+    ANSWER_NOT_FOUND(HttpStatus.BAD_REQUEST, "ANSWER4001", "답변글을 찾을 수 없습니다."),
+    ANSWER_ALREADY_EXISTS(HttpStatus.BAD_REQUEST, "ANSWER4001", "QnA에 답변은 하나만 달 수 있습니다."),
     // 커뮤니티 게시판
     POST_TYPE_NOT_FOUND(HttpStatus.BAD_REQUEST, "POST_TYPE4001", "지원되지 않는 게시판 타입 입니다."),
     POST_NOT_SAVED(HttpStatus.BAD_REQUEST, "POST_TYPE4002", "게시글이 저장되지 않았습니다."),
@@ -55,8 +57,10 @@ public enum ErrorStatus implements BaseErrorCode {
     POST_SUBTITLE_NOT_FOUND(HttpStatus.BAD_REQUEST, "POST_TYPE4006", "소제목을 입력하지 않았습니다."),
     POST_BOTH_NOT_FOUND(HttpStatus.BAD_REQUEST, "POST_TYPE4007", "제목과 소제목을 입력하지 않았습니다."),
     POST_CONTENT_NOT_FOUND(HttpStatus.BAD_REQUEST, "POST_TYPE4008", "본문을 입력하지 않았습니다."),
-
-
+    UNAUTHORIZED_ACCESS(HttpStatus.BAD_REQUEST, "USER4001","농업인 또는 전문가만 자유게시판에 글을 작성할 수 있습니다."),
+    FARMER_ONLY_ACCESS(HttpStatus.BAD_REQUEST, "USER4002","농업인만 자유게시판에 글을 작성할 수 있습니다."),
+    EXPERT_ONLY_ACCESS(HttpStatus.BAD_REQUEST, "USER4003","전문가만 자유게시판에 글을 작성할 수 있습니다."),
+    DELETE_ONLY_ACCESS(HttpStatus.BAD_REQUEST, "USER4004","사용자가 작성한 글만 삭제할 수 있습니다."),
     //댓글
     COMMENT_TYPE_NOT_FOUND(HttpStatus.BAD_REQUEST, "COMMENT_TYPE4001", "댓글을 찾을 수 없습니다."),
     COMMENT_NOT_SAVED(HttpStatus.BAD_REQUEST, "COMMENT_TYPE4002", "댓글(대댓글)이 저장되지 않았습니다.(대댓글은 하나만 저장됩니다.)"),
@@ -92,7 +96,7 @@ public enum ErrorStatus implements BaseErrorCode {
     BOARD_TYPE_NOT_COMMENTED(HttpStatus.BAD_REQUEST, "BOARD_TYPE4002", "게시판에 댓글을 달 수 없습니다."),
 
     //좋아요 관련 에러
-    LIKE_TYPE_NOT_SAVED(HttpStatus.BAD_REQUEST, "LIKE_TYPE4002", "좋아요를 누를 수 없습니다."),
+    LIKE_TYPE_NOT_SAVED(HttpStatus.BAD_REQUEST, "LIKE_TYPE4002", "본인이 쓴 글에는 좋아요를 누를 수 없습니다."),
 
 
     // QnA 게시판 조회 에러
