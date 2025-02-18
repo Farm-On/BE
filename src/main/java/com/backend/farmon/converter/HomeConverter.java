@@ -1,9 +1,13 @@
 package com.backend.farmon.converter;
 
+import com.backend.farmon.domain.Expert;
 import com.backend.farmon.domain.Post;
+import com.backend.farmon.domain.PostImg;
+import com.backend.farmon.domain.User;
 import com.backend.farmon.dto.home.HomeResponse;
 
 import java.util.List;
+import java.util.Optional;
 
 public class HomeConverter {
     public static HomeResponse.PostListDTO toPostListDTO(List<Post> postList, List<Integer> likeCountList, List<Integer> commentCountList) {
@@ -46,12 +50,16 @@ public class HomeConverter {
                 .popularPostTitle(post.getPostTitle())
                 .popularPostContent(post.getPostContent())
                 .writer(post.getUser().getUserName())
-                .profileImage(post.getUser().getExpert().getProfileImageUrl())
-                // 게시글 이미지 가져오기
+                .profileImage(Optional.ofNullable(post.getUser())
+                        .map(User::getExpert)
+                        .map(Expert::getProfileImageUrl)
+                        .orElse(null))
                 .popularPostImage(
-                        (post.getPostImgs() != null && !post.getPostImgs().isEmpty())
-                                ? post.getPostImgs().get(0).getStoredFileName()
-                                : null
+                        Optional.ofNullable(post.getPostImgs())
+                                .filter(list -> !list.isEmpty()) // 리스트가 비어 있지 않은 경우만 처리
+                                .map(list -> list.get(0)) // 첫 번째 이미지 가져오기
+                                .map(PostImg::getStoredFileName) // 파일명 가져오기
+                                .orElse(null) // 없으면 null 반환
                 )
                 .build();
     }
