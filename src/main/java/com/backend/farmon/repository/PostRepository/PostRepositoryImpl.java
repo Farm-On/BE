@@ -171,7 +171,7 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
     public Page<Post> findPopularPosts(Long boardId, Pageable pageable) {
         QPost post = QPost.post;
         QPostImg postImg = QPostImg.postImg;
-
+        log.info("boardId"+boardId);
         // 게시판별 인기 게시글 및 관련 이미지 조회 (좋아요 수 기준 정렬)
         List<Post> posts = queryFactory
                 .selectFrom(post)
@@ -181,6 +181,8 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .fetch();
+
+
 
         // 전체 게시글 수 조회 (countQuery로 분리하여 성능 최적화)
         long total = queryFactory
