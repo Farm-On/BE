@@ -24,9 +24,11 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
     QPostCrop postCrop = QPostCrop.postCrop;
     QCrop crop = QCrop.crop;
 
+    // 전체 게시글 3개 조회
     @Override
     public List<Post> findTopPosts(Integer limit) {
         return queryFactory.selectFrom(post)
+                .where(post.board.postType.eq(PostType.ALL))
                 .orderBy(post.createdAt.desc())
                 .limit(limit)
                 .fetch();
@@ -37,12 +39,14 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
     public List<Post> findTopPostsByLikes(Integer limit) {
         return queryFactory.selectFrom(post)
                 .leftJoin(post.postlikes, likeCount).fetchJoin()
+                .where(post.board.postType.eq(PostType.POPULAR))
                 .groupBy(post)
                 .orderBy(likeCount.count().desc(), post.createdAt.desc())
                 .limit(limit)
                 .fetch();
     }
 
+    // 게시판 타입별로 조회
     @Override
     public List<Post> findTopPostsByPostTYpe(PostType postType, Integer limit) {
         return queryFactory.select(post)
