@@ -3,6 +3,7 @@ package com.backend.farmon.service.LikeService;
 
 import com.backend.farmon.apiPayload.code.status.ErrorStatus;
 import com.backend.farmon.apiPayload.exception.GeneralException;
+import com.backend.farmon.config.security.UserAuthorizationUtil;
 import com.backend.farmon.domain.LikeCount;
 import com.backend.farmon.domain.Post;
 import com.backend.farmon.domain.User;
@@ -22,18 +23,25 @@ public class LikeServiceImpl {
     private final UserRepository userRepository;
     private final PostRepository postRepository;
     private final LikeCountRepository likeCountRepository;
-
+    private final UserAuthorizationUtil userAuthorizationUtil;
 
 
     // 좋아요 추가
     @Transactional
     public void postLikeUp(Long userId, Long postId) throws IllegalAccessException {
-        User user = userRepository.findById(userId)
+        Long currentUserId = userAuthorizationUtil.getCurrentUserId(); // 로그인한 유저 ID 가져오기
+
+        User user = userRepository.findById(currentUserId)
                 .orElseThrow(() -> new GeneralException(ErrorStatus.USER_NOT_FOUND));
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new GeneralException(ErrorStatus.POST_NOT_FOUND));
 
-        // 원본 게시물 찾기 (originalPostId가 null인 게시물)
+        // 본인 글인지 체크
+        if (user.equals(post.getUser())) {
+            throw new GeneralException(ErrorStatus.LIKE_TYPE_NOT_SAVED);
+        }
+
+        // 원본 게시물 찾기
         Post originalPost = post.getOriginalPostId() == null ? post
                 : postRepository.findById(post.getOriginalPostId())
                 .orElseThrow(() -> new GeneralException(ErrorStatus.POST_NOT_FOUND));
@@ -41,21 +49,12 @@ public class LikeServiceImpl {
         // originalPostId가 같은 모든 게시물 가져오기
         List<Post> relatedPosts = postRepository.findAllByOriginalPostId(originalPost.getId());
 
-        if (user.equals(post.getUser())) {
-            throw new GeneralException(ErrorStatus.LIKE_TYPE_NOT_SAVED);
-        }
 
-        // 중복 좋아요 방지 (originalPostId가 같은 모든 게시물 체크)
-        for (Post relatedPost : relatedPosts) {
-            if (likeCountRepository.findByUserIdAndPostId(userId, relatedPost.getId()) != null) {
-                throw new IllegalAccessException("이미 좋아요를 눌렀습니다!");
-            }
-        }
 
-        // 원본 게시물 기준으로 좋아요 저장
+        // 좋아요 저장
         LikeCount likeCount = LikeCount.builder()
                 .user(user)
-                .post(originalPost) // 원본 게시물로 저장
+                .post(originalPost)
                 .build();
         likeCountRepository.save(likeCount);
 
@@ -71,10 +70,19 @@ public class LikeServiceImpl {
     // 좋아요 감소
     @Transactional
     public void postLikeDown(Long userId, Long postId) throws IllegalAccessException {
-        User user = userRepository.findById(userId)
+
+        Long currentUserId = userAuthorizationUtil.getCurrentUserId(); // 로그인한 유저 ID 가져오기
+
+
+        User user = userRepository.findById(currentUserId)
                 .orElseThrow(() -> new GeneralException(ErrorStatus.USER_NOT_FOUND));
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new GeneralException(ErrorStatus.POST_NOT_FOUND));
+
+        // 본인 글인지 체크
+        if (user.equals(post.getUser())) {
+            throw new GeneralException(ErrorStatus.LIKE_TYPE_NOT_SAVED);
+        }
 
         // 원본 게시물 찾기
         Post originalPost = post.getOriginalPostId() == null ? post
