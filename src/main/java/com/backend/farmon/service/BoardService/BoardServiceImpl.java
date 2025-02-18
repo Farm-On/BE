@@ -3,6 +3,7 @@ package com.backend.farmon.service.BoardService;
 import com.backend.farmon.apiPayload.code.status.ErrorStatus;
 import com.backend.farmon.apiPayload.exception.GeneralException;
 import com.backend.farmon.aws.s3.AmazonS3Manager;
+import com.backend.farmon.config.security.UserAuthorizationUtil;
 import com.backend.farmon.converter.AnswerConverter;
 import com.backend.farmon.domain.*;
 import com.backend.farmon.domain.commons.TimeDifferenceUtil;
@@ -28,10 +29,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 
@@ -54,9 +52,16 @@ BoardServiceImpl implements BoardService {
     private final AnswerRepository answerRepository;
     private final BoardPostRepository boardPostRepository;
     private final LikeCountRepository likeCountRepository;
+    private final UserAuthorizationUtil userAuthorizationUtil;
 
     @Override
     public PostResponseDTO save_FreePost(BoardRequestDto.FreePost postDto, List<MultipartFile> multipartFiles) throws Exception {
+        String currentUserRole = userAuthorizationUtil.getCurrentUserRole();
+
+        if (!"FARMER".equals(currentUserRole) && !"EXPERT".equals(currentUserRole)) {
+            throw new GeneralException(ErrorStatus.UNAUTHORIZED_ACCESS);
+        }
+        // 자유게시판에서 사용자 역할은 전문가와 농업인만 글을 쓸 수 있다.
 
         // 사용자 정보 확인
         User user = userRepository.findById(postDto.getUserId())
@@ -127,6 +132,13 @@ BoardServiceImpl implements BoardService {
     // 분야 선택 안 할 시 에러가 일어나게 에러 전문가 칼럼 과 qna 게시판에 추가
     @Override
     public PostResponseDTO save_QnaPost(BoardRequestDto.QnaPost postDto, List<MultipartFile> multipartFiles) throws Exception {
+
+        String currentUserRole = userAuthorizationUtil.getCurrentUserRole();
+
+        if (!"FARMER".equals(currentUserRole)) {
+            throw new GeneralException(ErrorStatus.FARMER_ONLY_ACCESS);
+        }
+
         validateFieldCategory(postDto.getCrop());
 
         User user = userRepository.findById(postDto.getUserId())
@@ -191,6 +203,13 @@ BoardServiceImpl implements BoardService {
 
     @Override
     public PostResponseDTO save_ExperCol(BoardRequestDto.ExpertColumn postDto, List<MultipartFile> multipartFiles) throws Exception {
+        String currentUserRole = userAuthorizationUtil.getCurrentUserRole();
+
+        log.info(currentUserRole+"역할은 입니다.");
+        if (!"FARMER".equals(currentUserRole)) {
+            throw new GeneralException(ErrorStatus.EXPERT_ONLY_ACCESS);
+        }
+
         validateFieldCategory(postDto.getCrop());
 
         User user = userRepository.findById(postDto.getUserId())
@@ -253,30 +272,39 @@ BoardServiceImpl implements BoardService {
 
     @Override
     public AnswerResponseDTO saveQnAAnswer(AnswerRequestDTO dto, List<MultipartFile> multipartFiles) throws Exception {
+        String currentUserRole = userAuthorizationUtil.getCurrentUserRole();
+
+        if (!"FARMER".equals(currentUserRole)) {
+            throw new GeneralException(ErrorStatus.EXPERT_ONLY_ACCESS);
+        }
+
         // 글쓴 사람 확인
-        log.info("User의 Id는 " + dto.getUserId());
         User user = userRepository.findById(dto.getUserId())
                 .orElseThrow(() -> new GeneralException(ErrorStatus.USER_NOT_FOUND));
 
         // 답변을 달 글이 실제로 존재하는가
         Post post = postRepository.findById(dto.getPostId())
-                .orElseThrow(() -> new IllegalArgumentException("게시글을 찾을 수 없습니다."));
+                .orElseThrow(() -> new GeneralException(ErrorStatus.POST_NOT_FOUND));
 
-
-        if(dto.getBoardId()!=1){
+        if(dto.getBoardId() != 1){
             throw new GeneralException(ErrorStatus.BOARD_TYPE_NOT_FOUND);
         }
 
         // 원본 게시물 찾기 (원본 게시글은 originalPostId가 자기자신의 id여야 함)
         Post originalPost = postRepository.findById(post.getOriginalPostId())
                 .orElseThrow(() -> new GeneralException(ErrorStatus.POST_NOT_FOUND));
-
-        // originalPostId가 같은 모든 게시물 찾기
         List<Post> relatedPosts = postRepository.findAllByOriginalPostId(originalPost.getId());
         // 원본 게시글이 중복으로 저장되지 않도록 제외
         relatedPosts = relatedPosts.stream()
                 .filter(p -> !p.getId().equals(originalPost.getId()))
                 .collect(Collectors.toList());
+
+        // 원본 게시물에 이미 답변이 존재하는지 확인 (중복 방지)
+        Optional<Answer> existingAnswer = answerRepository.findByPostAndUser(originalPost, user);
+        if (existingAnswer.isPresent()) {
+            // 이미 답변이 존재하면 예외 처리 또는 기존 답변 반환
+            throw new GeneralException(ErrorStatus.ANSWER_ALREADY_EXISTS);
+        }
 
         // DTO -> 엔티티 변환 (답변)
         Answer answer = answerConverter.toEntity(dto);
@@ -341,6 +369,86 @@ BoardServiceImpl implements BoardService {
 
         return new AnswerResponseDTO(answer, imgUrls);
     }
+    @Transactional
+    public AnswerResponseDTO deleteQnAAnswer(Long answerId, Long userId) {
+        // 답변 존재 여부 확인
+        log.info("여기1");
+        log.info(answerId.toString());
+        Answer answer = answerRepository.findById(answerId)
+                .orElseThrow(() -> new GeneralException(ErrorStatus.ANSWER_NOT_FOUND));
+
+        // 해당 답변의 작성자가 userId와 일치하는지 확인
+        if (!answer.getUser().getId().equals(userId)) {
+            throw new GeneralException(ErrorStatus.DELETE_ONLY_ACCESS);
+        }
+
+        // 해당 답변에 대한 이미지 리스트 찾기
+        List<AnswerImg> answerImgs = answerImgRepository.findAllByAnswerId(answerId);
+
+        // 해당 답변이 속한 게시글 (Post) 찾기
+        Post post = answer.getPost();  // 이미 Answer 엔티티에 연관된 Post가 있으므로, 추가로 찾을 필요 없음
+        Post originalPost = postRepository.findById(post.getOriginalPostId())
+                .orElseThrow(() -> new GeneralException(ErrorStatus.POST_NOT_FOUND));
+
+        // 원본 게시물의 ID (originalPostId)를 이용해 관련된 모든 게시물 찾기
+        List<Post> relatedPosts = postRepository.findAllByOriginalPostId(originalPost.getId());
+
+        // S3에서 이미지 삭제
+        for (AnswerImg img : answerImgs) {
+            // S3에서 이미지 삭제: 파일 위치를 "AnswerImg/"로 수정
+            String s3Key = "AnswerImg/" + img.getStoredFileName();
+            amazonS3Manager.deleteFile(s3Key);
+        }
+
+        // DB에서 이미지 삭제
+        answerImgRepository.deleteAllByAnswerId(answerId);
+
+        // 해당 답변 삭제
+        answerRepository.delete(answer);
+
+        // 원본 게시글에 속한 모든 답변 삭제
+        for (Post relatedPost : relatedPosts) {
+            List<Answer> relatedAnswers = answerRepository.findAllByPostId(relatedPost.getId());
+
+            for (Answer relatedAnswer : relatedAnswers) {
+                // 답변 작성자 확인
+                if (!relatedAnswer.getUser().getId().equals(userId)) {
+                    continue; // 본인 답변이 아니면 삭제하지 않음
+                }
+
+                List<AnswerImg> relatedAnswerImgs = answerImgRepository.findAllByAnswerId(relatedAnswer.getId());
+
+                // 관련된 답변 이미지 삭제
+                for (AnswerImg img : relatedAnswerImgs) {
+                    String s3Key = "AnswerImg/" + img.getStoredFileName();
+                    amazonS3Manager.deleteFile(s3Key);
+                }
+
+                // DB에서 이미지 삭제
+                answerImgRepository.deleteAllByAnswerId(relatedAnswer.getId());
+
+                // 관련 답변 삭제
+                answerRepository.delete(relatedAnswer);
+            }
+        }
+
+        // 삭제된 답변 정보를 DTO로 변환하여 반환
+        return new AnswerResponseDTO(answer, extractImgUrls(answerImgs));
+    }
+
+
+
+
+    private List<String> extractImgUrls(List<AnswerImg> answerImgs) {
+        // 이미지 URL을 추출하여 리스트로 반환하는 메서드
+        return answerImgs.stream()
+                .map(AnswerImg::getStoredFileName)
+                .collect(Collectors.toList());
+    }
+
+
+
+
 
 
 
@@ -454,6 +562,12 @@ BoardServiceImpl implements BoardService {
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new GeneralException(ErrorStatus.POST_NOT_FOUND));
 
+        Long currentUserId = userAuthorizationUtil.getCurrentUserId();
+        if (!post.getUser().getId().equals(currentUserId)) {
+            throw new GeneralException(ErrorStatus.DELETE_ONLY_ACCESS);
+        }
+
+
         // 2) 관련 댓글을 isDeleted = true로 설정
         List<Comment> comments = commentRepository.findAllByPostId(postId);
         for (Comment comment : comments) {
@@ -488,6 +602,11 @@ BoardServiceImpl implements BoardService {
         // 1) 게시글 조회
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new GeneralException(ErrorStatus.POST_NOT_FOUND));
+
+        Long currentUserId = userAuthorizationUtil.getCurrentUserId();
+        if (!post.getUser().getId().equals(currentUserId)) {
+            throw new GeneralException(ErrorStatus.DELETE_ONLY_ACCESS);
+        }
 
         // 게시글 타입 확인
         if (post.getBoard().getPostType() != postType) {
