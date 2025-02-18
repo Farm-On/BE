@@ -33,6 +33,8 @@ public class EstimateConverter {
         return EstimateResponseDTO.CreateDTO.builder()
                 .estimateId(estimate.getId())
                 .userId(estimate.getUser().getId())
+                .imageUrls(estimate.getEstimateImageList().stream()
+                        .map(EstimateImage::getImageUrl).toList())
                 .build();
     }
 
