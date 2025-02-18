@@ -82,11 +82,17 @@ public class LikeServiceImpl {
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new GeneralException(ErrorStatus.POST_NOT_FOUND));
 
-    
+
         // 원본 게시물 찾기
         Post originalPost = post.getOriginalPostId() == null ? post
                 : postRepository.findById(post.getOriginalPostId())
                 .orElseThrow(() -> new GeneralException(ErrorStatus.POST_NOT_FOUND));
+
+        boolean alreadyLiked = likeCountRepository.findByUserIdAndPostId(userId, originalPost.getId()) != null;
+
+        if (alreadyLiked) {
+            throw new GeneralException(ErrorStatus.Like_TYPE_NOT_SAVED);  // 이미 좋아요를 눌렀다면 예외 발생
+        }
 
         // 좋아요 찾기 (원본 게시물 기준)
         LikeCount like = likeCountRepository.findByUserIdAndPostId(userId, originalPost.getId());
