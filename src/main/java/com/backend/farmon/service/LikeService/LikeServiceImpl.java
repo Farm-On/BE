@@ -29,18 +29,18 @@ public class LikeServiceImpl {
     // 좋아요 추가
     @Transactional
     public void postLikeUp(Long userId, Long postId) throws IllegalAccessException {
-        Long currentUserId = userAuthorizationUtil.getCurrentUserId(); // 로그인한 유저 ID 가져오기
+        String currentUserRole = userAuthorizationUtil.getCurrentUserRole();
 
-        User user = userRepository.findById(currentUserId)
+        if (!"FARMER".equals(currentUserRole) && !"EXPERT".equals(currentUserRole)) {
+            throw new GeneralException(ErrorStatus.UNAUTHORIZED_ACCESS);
+        }
+        
+        User user = userRepository.findById(userId)
                 .orElseThrow(() -> new GeneralException(ErrorStatus.USER_NOT_FOUND));
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new GeneralException(ErrorStatus.POST_NOT_FOUND));
 
-        // 본인 글인지 체크
-        if (user.equals(post.getUser())) {
-            throw new GeneralException(ErrorStatus.LIKE_TYPE_NOT_SAVED);
-        }
-
+       
         // 원본 게시물 찾기
         Post originalPost = post.getOriginalPostId() == null ? post
                 : postRepository.findById(post.getOriginalPostId())
@@ -71,19 +71,18 @@ public class LikeServiceImpl {
     @Transactional
     public void postLikeDown(Long userId, Long postId) throws IllegalAccessException {
 
-        Long currentUserId = userAuthorizationUtil.getCurrentUserId(); // 로그인한 유저 ID 가져오기
+        String currentUserRole = userAuthorizationUtil.getCurrentUserRole();
 
+        if (!"FARMER".equals(currentUserRole) && !"EXPERT".equals(currentUserRole)) {
+            throw new GeneralException(ErrorStatus.UNAUTHORIZED_ACCESS);
+        }
 
-        User user = userRepository.findById(currentUserId)
+        User user = userRepository.findById(userId)
                 .orElseThrow(() -> new GeneralException(ErrorStatus.USER_NOT_FOUND));
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new GeneralException(ErrorStatus.POST_NOT_FOUND));
 
-        // 본인 글인지 체크
-        if (user.equals(post.getUser())) {
-            throw new GeneralException(ErrorStatus.LIKE_TYPE_NOT_SAVED);
-        }
-
+    
         // 원본 게시물 찾기
         Post originalPost = post.getOriginalPostId() == null ? post
                 : postRepository.findById(post.getOriginalPostId())
