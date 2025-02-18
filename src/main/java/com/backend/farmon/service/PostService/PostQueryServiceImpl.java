@@ -2,6 +2,7 @@ package com.backend.farmon.service.PostService;
 
 import com.backend.farmon.apiPayload.code.status.ErrorStatus;
 import com.backend.farmon.apiPayload.exception.GeneralException;
+import com.backend.farmon.config.security.UserAuthorizationUtil;
 import com.backend.farmon.converter.HomeConverter;
 import com.backend.farmon.converter.PostConverter;
 import com.backend.farmon.domain.*;
@@ -48,6 +49,7 @@ import static com.backend.farmon.dto.post.PostType.QNA;
 public class PostQueryServiceImpl implements PostQueryService {
 
     private final PostFetchStrategyFactory strategyFactory;
+    private final UserAuthorizationUtil userAuthorizationUtil;
     private final CommentRepository commentRepository;
     private final LikeCountRepository likeCountRepository;
     private final PostRepository postRepository;
@@ -98,6 +100,12 @@ public class PostQueryServiceImpl implements PostQueryService {
    //전체 게시판 좋아요 순
     @Transactional(readOnly = true)
     public Page<PostPagingResponseDTO> findAllPostsByBoardPK(Long boardId, int page, int size, String sortStr, List<String> crops) {
+        // 인증된 사용자가 FARMER나  EXPERT  이 아니면 바로 에러
+        String currentUserRole = userAuthorizationUtil.getCurrentUserRole();
+        if (!"FARMER".equals(currentUserRole) && !"EXPERT".equals(currentUserRole)) {
+            throw new GeneralException(ErrorStatus.UNAUTHORIZED_ACCESS);
+        }
+
         Sort sort = Sort.by(Sort.Direction.fromString(sortStr), "createdAt");
         Pageable pageable = PageRequest.of(page - 1, size, sort);
 
@@ -112,6 +120,11 @@ public class PostQueryServiceImpl implements PostQueryService {
     // 인기 게시판 좋아요 순
     @Transactional(readOnly = true)
     public Page<PostPagingResponseDTO> findPopularPosts(Long boardId, int pageNum, int size, String sort, List<String> crops) {
+        String currentUserRole = userAuthorizationUtil.getCurrentUserRole();
+        if (!"FARMER".equals(currentUserRole) && !"EXPERT".equals(currentUserRole)) {
+            throw new GeneralException(ErrorStatus.UNAUTHORIZED_ACCESS);
+        }
+
         Sort.Direction direction = Sort.Direction.fromString(sort);
         Pageable pageable = PageRequest.of(pageNum - 1, size, Sort.by(direction, "postLikes"));
 
@@ -125,6 +138,13 @@ public class PostQueryServiceImpl implements PostQueryService {
     // Qna 글 조회
     @Transactional(readOnly = true)
     public Page<PostPagingResponseDTO> findQnaPostsByBoardPK(Long boardId, int page, int size, String sortStr, List<String> crops) {
+        // 인증된 사용자가 FARMER나  EXPERT  이 아니면 바로 에러
+        String currentUserRole = userAuthorizationUtil.getCurrentUserRole();
+        if (!"FARMER".equals(currentUserRole) && !"EXPERT".equals(currentUserRole)) {
+            throw new GeneralException(ErrorStatus.UNAUTHORIZED_ACCESS);
+        }
+
+
         // 정렬 방향 설정: 'ASC' 또는 'DESC' 기준으로 생성일(createdAt)로 정렬 기본이 DESC
         Sort sort = Sort.by(Sort.Direction.fromString(sortStr), "createdAt");
         Pageable pageable = PageRequest.of(page - 1, size, sort);
@@ -141,6 +161,14 @@ public class PostQueryServiceImpl implements PostQueryService {
     // 전문가 글 조회
     @Transactional(readOnly = true)
     public Page<PostPagingResponseDTO> findExpertsPostsByBoardPK(Long boardId, int page, int size, String sortStr, List<String> crops) {
+        // 인증된 사용자가 FARMER나  EXPERT  이 아니면 바로 에러
+        String currentUserRole = userAuthorizationUtil.getCurrentUserRole();
+        if (!"FARMER".equals(currentUserRole) && !"EXPERT".equals(currentUserRole)) {
+            throw new GeneralException(ErrorStatus.UNAUTHORIZED_ACCESS);
+        }
+
+
+
         // 정렬 방향 설정: 'ASC' 또는 'DESC' 기준으로 생성일(createdAt)로 정렬 기본이 DESC
         Sort sort = Sort.by(Sort.Direction.fromString(sortStr), "createdAt");
         Pageable pageable = PageRequest.of(page - 1, size, sort);
@@ -155,6 +183,13 @@ public class PostQueryServiceImpl implements PostQueryService {
 
     @Transactional(readOnly = true)
     public PostResponseDTO getBoardIdAndPostById(Long boardId, Long postId) {
+        // 인증된 사용자가 FARMER나  EXPERT  이 아니면 바로 에러
+        String currentUserRole = userAuthorizationUtil.getCurrentUserRole();
+        if (!"FARMER".equals(currentUserRole) && !"EXPERT".equals(currentUserRole)) {
+            throw new GeneralException(ErrorStatus.UNAUTHORIZED_ACCESS);
+        }
+
+
         // 1. 게시판 존재 여부 확인
         Board board = boardRepository.findById(boardId)
                 .orElseThrow(() -> new GeneralException(ErrorStatus.BOARD_TYPE_NOT_FOUND));
@@ -215,9 +250,16 @@ public class PostQueryServiceImpl implements PostQueryService {
     }
 
 
-
+    //QnA게시글과 답변 함께 조회
     @Transactional(readOnly = true)
     public PostWithAnswersResponseDTO getBoardIdAndQnAPostById(Long boardId, Long postId) {
+        // 인증된 사용자가 FARMER나  EXPERT  이 아니면 바로 에러
+        String currentUserRole = userAuthorizationUtil.getCurrentUserRole();
+        if (!"FARMER".equals(currentUserRole) && !"EXPERT".equals(currentUserRole)) {
+            throw new GeneralException(ErrorStatus.UNAUTHORIZED_ACCESS);
+        }
+
+
         // 1. Board 조회
         Board board = boardRepository.findById(boardId)
                 .orElseThrow(() -> new GeneralException(ErrorStatus.BOARD_TYPE_NOT_FOUND));
