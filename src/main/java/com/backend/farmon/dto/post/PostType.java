@@ -2,8 +2,10 @@ package com.backend.farmon.dto.post;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
+@Getter
 @Schema(name = "게시판 타입")
 public enum PostType {
     ALL("전체"),
@@ -18,7 +20,4 @@ public enum PostType {
         this.label = label;
     }
 
-    public String getLabel() {
-        return label;
-    }
 }
