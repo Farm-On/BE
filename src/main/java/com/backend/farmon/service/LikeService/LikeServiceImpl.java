@@ -3,6 +3,7 @@ package com.backend.farmon.service.LikeService;
 
 import com.backend.farmon.apiPayload.code.status.ErrorStatus;
 import com.backend.farmon.apiPayload.exception.GeneralException;
+import com.backend.farmon.config.security.UserAuthorizationUtil;
 import com.backend.farmon.domain.LikeCount;
 import com.backend.farmon.domain.Post;
 import com.backend.farmon.domain.User;
@@ -22,18 +23,24 @@ public class LikeServiceImpl {
     private final UserRepository userRepository;
     private final PostRepository postRepository;
     private final LikeCountRepository likeCountRepository;
-
+    private final UserAuthorizationUtil userAuthorizationUtil;
 
 
     // 좋아요 추가
     @Transactional
     public void postLikeUp(Long userId, Long postId) throws IllegalAccessException {
+        String currentUserRole = userAuthorizationUtil.getCurrentUserRole();
+
+        if (!"FARMER".equals(currentUserRole) && !"EXPERT".equals(currentUserRole)) {
+            throw new GeneralException(ErrorStatus.UNAUTHORIZED_ACCESS);
+        }
+        
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new GeneralException(ErrorStatus.USER_NOT_FOUND));
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new GeneralException(ErrorStatus.POST_NOT_FOUND));
-
         // 원본 게시물 찾기 (originalPostId가 null인 게시물)
+
         Post originalPost = post.getOriginalPostId() == null ? post
                 : postRepository.findById(post.getOriginalPostId())
                 .orElseThrow(() -> new GeneralException(ErrorStatus.POST_NOT_FOUND));
@@ -71,10 +78,18 @@ public class LikeServiceImpl {
     // 좋아요 감소
     @Transactional
     public void postLikeDown(Long userId, Long postId) throws IllegalAccessException {
+
+        String currentUserRole = userAuthorizationUtil.getCurrentUserRole();
+
+        if (!"FARMER".equals(currentUserRole) && !"EXPERT".equals(currentUserRole)) {
+            throw new GeneralException(ErrorStatus.UNAUTHORIZED_ACCESS);
+        }
+
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new GeneralException(ErrorStatus.USER_NOT_FOUND));
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new GeneralException(ErrorStatus.POST_NOT_FOUND));
+
 
         // 원본 게시물 찾기
         Post originalPost = post.getOriginalPostId() == null ? post
@@ -100,6 +115,7 @@ public class LikeServiceImpl {
 
         postRepository.saveAll(relatedPosts);
         postRepository.flush();
+
     }
 
 

@@ -2,6 +2,7 @@ package com.backend.farmon.service.CommentService;
 
 import com.backend.farmon.apiPayload.code.status.ErrorStatus;
 import com.backend.farmon.apiPayload.exception.GeneralException;
+import com.backend.farmon.config.security.UserAuthorizationUtil;
 import com.backend.farmon.controller.UserController;
 import com.backend.farmon.domain.Comment;
 import com.backend.farmon.domain.Post;
@@ -30,10 +31,18 @@ public class CommentServiceImpl implements CommentService {
     private final CommentRepository commentRepository;
     private final PostRepository postRepository;
     private final UserRepository userRepository;
+    private final UserAuthorizationUtil userAuthorizationUtil;
 
     @Transactional
     @Override
     public CommentResponseDTO saveComment(Long postId, Long parentId, CommentRequestDTO.CommentSaveRequestDto dto) {
+
+        String currentUserRole = userAuthorizationUtil.getCurrentUserRole();
+
+        if (!"FARMER".equals(currentUserRole) && !"EXPERT".equals(currentUserRole)) {
+            throw new GeneralException(ErrorStatus.UNAUTHORIZED_ACCESS);
+        }
+
         // 1. 원본 게시글 조회
         Post originalPost = postRepository.findById(postId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 게시글이 존재하지 않습니다."));
@@ -167,8 +176,14 @@ public class CommentServiceImpl implements CommentService {
     @Transactional
     @Override
     public void deleteComment(Long commentId) {
+
         Comment comment = commentRepository.findById(commentId)
                 .orElseThrow(() -> new GeneralException(ErrorStatus.COMMENT_NOT_DELETED));
+
+        Long currentUserId = userAuthorizationUtil.getCurrentUserId();
+        if (!comment.getUser().getId().equals(currentUserId)) {
+            throw new GeneralException(ErrorStatus.DELETE_ONLY_ACCESS);
+        }
 
         List<Comment> relatedComments = commentRepository.findAllByOriginalCommentId(comment.getOriginalCommentId());
 

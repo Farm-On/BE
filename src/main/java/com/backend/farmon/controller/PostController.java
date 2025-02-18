@@ -236,6 +236,27 @@ public class PostController {
 
 
 
+    @Operation(
+            summary = "QnA 게시글 답변 삭제",
+            description = "QnA 게시판에서 특정 답변을 삭제합니다."
+    )
+    @ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200", description = "OK, 성공"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "ANSWER4001", description = "답변을 찾을 수 없습니다.", content = @Content(schema = @Schema(implementation = ApiResponse.class))),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON400", description = "잘못된 요청입니다.", content = @Content(schema = @Schema(implementation = ApiResponse.class)))
+    })
+    @DeleteMapping("/qna/answer/{answerId}")
+    public ApiResponse<AnswerResponseDTO> deleteQnAAnswer(
+            @Parameter(description = "유저 아이디", required = true) @RequestParam(value = "userId")  Long userId,
+            @Parameter(description = "답변 아이디", required = true) @PathVariable Long answerId
+    ) {
+            AnswerResponseDTO answerResponseDTO = boardServiceImpl.deleteQnAAnswer(answerId,userId);
+            return ApiResponse.onSuccess(answerResponseDTO);
+
+    }
+
+
+
 
 
 ///// 게시글 목록 그냥 조회 (상세조회X) 리스트 형식으로 돌아옴
