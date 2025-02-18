@@ -26,7 +26,6 @@ public class Answer extends BaseEntity {
     private Long originalPostId;
 
 
-
     @Column(nullable = false)
     private String title;
 
