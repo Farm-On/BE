@@ -19,6 +19,9 @@ public class EstimateResponseDTO {
     public static class CreateDTO {
         Long estimateId;
         Long userId;
+
+        // 이미지 URL 목록 추가
+        List<String> imageUrls;
     }
 
     // 2) Read DetailDTO
