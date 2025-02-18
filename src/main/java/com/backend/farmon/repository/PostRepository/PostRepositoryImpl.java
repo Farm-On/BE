@@ -3,6 +3,7 @@ package com.backend.farmon.repository.PostRepository;
 import com.backend.farmon.domain.*;
 import com.backend.farmon.dto.post.PostType;
 import com.querydsl.core.types.dsl.Expressions;
+import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -26,26 +27,44 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
     QBoard board = QBoard.board;
     QCrop crop = QCrop.crop;
     QBoardPost boardPost= QBoardPost.boardPost;
-    
+
+    // 전체 게시글 3개 조회
     @Override
     public List<Post> findTopPosts(Integer limit) {
-        return queryFactory.selectFrom(post)
-                .orderBy(post.createdAt.desc())
+        QPost originalPost = new QPost("originalPost");
+
+        return queryFactory.selectFrom(originalPost)
+                .where(originalPost.id.in(
+                        JPAExpressions.select(post.originalPostId) // 현재 게시글의 원본 ID를 가져옴
+                                .from(post)
+                                .where(post.board.postType.eq(PostType.ALL)
+                                        .and(post.originalPostId.isNotNull())) // original_post_id가 있는 경우만 조회
+                ))
+                .orderBy(originalPost.createdAt.desc()) // 원본 게시글을 기준으로 정렬
                 .limit(limit)
                 .fetch();
     }
 
-    // 커뮤니티 인기 게시글 3개 조회
+    // 인기 게시글 3개 조회
     @Override
     public List<Post> findTopPostsByLikes(Integer limit) {
-        return queryFactory.selectFrom(post)
-                .leftJoin(post.postlikes, likeCount).fetchJoin()
-                .groupBy(post)
-                .orderBy(likeCount.count().desc(), post.createdAt.desc())
+        QPost originalPost = new QPost("originalPost");
+
+        return queryFactory.selectFrom(originalPost)
+                .leftJoin(originalPost.postlikes, likeCount).fetchJoin()
+                .where(originalPost.id.in(
+                        JPAExpressions.select(post.originalPostId) // 현재 게시글의 원본 ID를 가져옴
+                                .from(post)
+                                .where(post.board.postType.eq(PostType.POPULAR)
+                                        .and(post.originalPostId.isNotNull())) // original_post_id가 있는 경우만 조회
+                ))
+                .groupBy(originalPost)
+                .orderBy(likeCount.count().desc(), originalPost.createdAt.desc())
                 .limit(limit)
                 .fetch();
     }
 
+    // 게시판 타입별로 조회 (전문가 칼럼, Q&A)
     @Override
     public List<Post> findTopPostsByPostTYpe(PostType postType, Integer limit) {
         return queryFactory.select(post)

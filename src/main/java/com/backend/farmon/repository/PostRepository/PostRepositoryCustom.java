@@ -15,10 +15,8 @@ public interface PostRepositoryCustom {
     // 커뮤니티 인기 게시글 3개 조회
     List<Post> findTopPostsByLikes(Integer limit);
 
-    // 커뮤니티 카테고리별 게시글 3개 조회
+    // 커뮤니티 카테고리별(QNA, 전문가, 자유게시판) 게시글 3개 조회
     List<Post> findTopPostsByPostTYpe(PostType postType, Integer limit);
-
-
 
     // 인기 전문가 칼럼 6개 조회
     List<Post> findTop6ExpertColumnPostsByPostId(List<Long> popularPostsIdList);

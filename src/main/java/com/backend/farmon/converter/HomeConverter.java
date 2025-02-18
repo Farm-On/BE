@@ -24,6 +24,7 @@ public class HomeConverter {
                 .postId(post.getId())
                 .postTitle(post.getPostTitle())
                 .postContent(post.getPostContent())
+                .postType(post.getBoard().getPostType().getLabel())
                 .likeCount(likeCount)
                 .commentCount(commentCount)
                 .build();

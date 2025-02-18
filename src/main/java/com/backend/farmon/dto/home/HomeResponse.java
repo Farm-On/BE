@@ -35,6 +35,9 @@ public class HomeResponse {
         @Schema(description = "커뮤니티 게시글 내용")
         String postContent;
 
+        @Schema(description = "게시판 타입", example = "전문가 칼럼")
+        String postType;
+
         @Schema(description = "게시글 좋아요 횟수", example = "5")
         Integer likeCount;
 
