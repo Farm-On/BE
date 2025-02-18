@@ -34,6 +34,7 @@ public class AnswerConverter {
         return Answer.builder()
                 .title(dto.getTitle())
                 .content(dto.getContent())
+                .originalPostId(post.getOriginalPostId())
                 .user(user)
                 .post(post)
                 .build();
