@@ -205,8 +205,7 @@ BoardServiceImpl implements BoardService {
     public PostResponseDTO save_ExperCol(BoardRequestDto.ExpertColumn postDto, List<MultipartFile> multipartFiles) throws Exception {
         String currentUserRole = userAuthorizationUtil.getCurrentUserRole();
 
-        log.info(currentUserRole+"역할은 입니다.");
-        if (!"FARMER".equals(currentUserRole)) {
+        if (!"EXPERT".equals(currentUserRole)) {
             throw new GeneralException(ErrorStatus.EXPERT_ONLY_ACCESS);
         }
 
