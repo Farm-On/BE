@@ -372,16 +372,14 @@ BoardServiceImpl implements BoardService {
     public AnswerResponseDTO deleteQnAAnswer(Long answerId, Long userId) {
         Long currentUserId = userAuthorizationUtil.getCurrentUserId(); // 로그인한 유저 ID 가져오기
 
+
+
         User user = userRepository.findById(currentUserId)
                 .orElseThrow(() -> new GeneralException(ErrorStatus.USER_NOT_FOUND));
         
         Answer answer = answerRepository.findById(answerId)
                 .orElseThrow(() -> new GeneralException(ErrorStatus.ANSWER_NOT_FOUND));
 
-        // 본인 글인지 체크
-        if (user.equals(answer.getUser())) {
-            throw new GeneralException(ErrorStatus.DELETE_ONLY_ACCESS);
-        }
 
         // 해당 답변의 작성자가 userId와 일치하는지 확인
         if (!answer.getUser().getId().equals(userId)) {
