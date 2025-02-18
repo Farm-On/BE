@@ -11,6 +11,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -20,7 +21,6 @@ import java.util.concurrent.Executors;
 @Service
 public class SearchCommandServiceImpl implements SearchCommandService {
 
-    private final UserRepository userRepository;
     private final CropRepository cropRepository;
     private final RedisTemplate<String, String> recentSearchLogRedisTemplate;
     private final RedisTemplate<String, String> recommendSearchLogRedisTemplate;
@@ -35,13 +35,20 @@ public class SearchCommandServiceImpl implements SearchCommandService {
     // service Bean이 생성된 이후에 검색어 자동 완성 기능을 위한 데이터들을 Redis에 저장
     @PostConstruct
     public void init() {
+        Long count = Optional.ofNullable(
+                recommendSearchLogRedisTemplate.opsForZSet().zCard(recentSearchKey)
+        ).orElse(0L);
+
+        // 데이터가 없으면 Redis에 저장
         // db에 저장된 모든 작물 카테고리, 이름을 음절 단위로 잘라 모든 Substring을 Redis에 저장해주는 로직
-        saveAllSubstring(cropRepository.findAllCropName());
-        saveAllSubstring(cropRepository.findAllCropCategory());
-
-        log.info("Redis에 작물 이름, 카테고리 저장 완료");
+        if (count == 0) {
+            saveAllSubstring(cropRepository.findAllCropName());
+            saveAllSubstring(cropRepository.findAllCropCategory());
+            log.info("Redis에 작물 이름, 카테고리 저장 완료");
+        } else {
+            log.info("Redis에 recentSearchKey 데이터가 이미 존재하여 초기화하지 않음");
+        }
     }
-
 
     // 사용자 최근 검색어 저장
     @Override
