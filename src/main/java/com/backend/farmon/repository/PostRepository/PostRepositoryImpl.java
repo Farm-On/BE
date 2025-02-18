@@ -28,7 +28,8 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
     @Override
     public List<Post> findTopPosts(Integer limit) {
         return queryFactory.selectFrom(post)
-                .where(post.board.postType.eq(PostType.ALL))
+                .where(post.board.postType.eq(PostType.ALL)
+                        .and(post.originalPostId.eq(post.id))) // original_post_id와 일치하는 게시글만 조회
                 .orderBy(post.createdAt.desc())
                 .limit(limit)
                 .fetch();
@@ -39,7 +40,8 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
     public List<Post> findTopPostsByLikes(Integer limit) {
         return queryFactory.selectFrom(post)
                 .leftJoin(post.postlikes, likeCount).fetchJoin()
-                .where(post.board.postType.eq(PostType.POPULAR))
+                .where(post.board.postType.eq(PostType.POPULAR)
+                        .and(post.originalPostId.eq(post.id))) // original_post_id와 일치하는 게시글만 조회
                 .groupBy(post)
                 .orderBy(likeCount.count().desc(), post.createdAt.desc())
                 .limit(limit)
