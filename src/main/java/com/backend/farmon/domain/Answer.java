@@ -23,6 +23,8 @@ public class Answer extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    private Long originalPostId;
+
 
 
     @Column(nullable = false)
