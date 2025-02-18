@@ -8,4 +8,6 @@ import java.util.List;
 
 public interface PostImgRepository extends JpaRepository<PostImg, Long> {
     List<PostImg> findAllByPostId(Long postId);
+
+    List<PostImg> findByPostId(Long postId);
 }

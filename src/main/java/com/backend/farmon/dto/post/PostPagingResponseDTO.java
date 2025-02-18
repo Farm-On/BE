@@ -28,7 +28,7 @@ public class PostPagingResponseDTO {
         this.id = post.getId();
         this.postTitle = post.getPostTitle();
         this.postContent = post.getPostContent();
-        this.category = post.getCategory();
+        this.category = post.getCrop().getCategory();
         this.postlike = post.getLikeCount();
         this.postcomment = post.getComments().size();
         this.imgUrls = imgUrls;

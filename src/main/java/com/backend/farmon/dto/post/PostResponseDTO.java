@@ -23,6 +23,9 @@ public class PostResponseDTO {
         @Schema(description = "게시글 제목", example = "게시글 제목 예시")
         private String postTitle;
 
+        @Schema(description = "게시글 소제목", example = "게시글 제목 예시")
+        private String subTitle;
+
         @Schema(description = "게시글 내용", example = "게시글 내용 예시")
         private String postContent;
 
