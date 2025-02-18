@@ -39,9 +39,8 @@ public class LikeServiceImpl {
                 .orElseThrow(() -> new GeneralException(ErrorStatus.USER_NOT_FOUND));
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new GeneralException(ErrorStatus.POST_NOT_FOUND));
+        // 원본 게시물 찾기 (originalPostId가 null인 게시물)
 
-       
-        // 원본 게시물 찾기
         Post originalPost = post.getOriginalPostId() == null ? post
                 : postRepository.findById(post.getOriginalPostId())
                 .orElseThrow(() -> new GeneralException(ErrorStatus.POST_NOT_FOUND));
@@ -49,12 +48,21 @@ public class LikeServiceImpl {
         // originalPostId가 같은 모든 게시물 가져오기
         List<Post> relatedPosts = postRepository.findAllByOriginalPostId(originalPost.getId());
 
+        if (user.equals(post.getUser())) {
+            throw new GeneralException(ErrorStatus.LIKE_TYPE_NOT_SAVED);
+        }
 
+        // 중복 좋아요 방지 (originalPostId가 같은 모든 게시물 체크)
+        for (Post relatedPost : relatedPosts) {
+            if (likeCountRepository.findByUserIdAndPostId(userId, relatedPost.getId()) != null) {
+                throw new IllegalAccessException("이미 좋아요를 눌렀습니다!");
+            }
+        }
 
-        // 좋아요 저장
+        // 원본 게시물 기준으로 좋아요 저장
         LikeCount likeCount = LikeCount.builder()
                 .user(user)
-                .post(originalPost)
+                .post(originalPost) // 원본 게시물로 저장
                 .build();
         likeCountRepository.save(likeCount);
 
@@ -88,12 +96,6 @@ public class LikeServiceImpl {
                 : postRepository.findById(post.getOriginalPostId())
                 .orElseThrow(() -> new GeneralException(ErrorStatus.POST_NOT_FOUND));
 
-        boolean alreadyLiked = likeCountRepository.findByUserIdAndPostId(userId, originalPost.getId()) != null;
-
-        if (alreadyLiked) {
-            throw new GeneralException(ErrorStatus.Like_TYPE_NOT_SAVED);  // 이미 좋아요를 눌렀다면 예외 발생
-        }
-
         // 좋아요 찾기 (원본 게시물 기준)
         LikeCount like = likeCountRepository.findByUserIdAndPostId(userId, originalPost.getId());
         if (like == null) {
@@ -113,6 +115,7 @@ public class LikeServiceImpl {
 
         postRepository.saveAll(relatedPosts);
         postRepository.flush();
+
     }
 
 
