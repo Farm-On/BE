@@ -167,7 +167,6 @@ public class ExpertConverter {
                 .name(expert.getIsNickNameOnly() ? null : expert.getUser().getUserName())
                 .nickName(expert.getNickName())
                 .isNickNameOnly(expert.getIsNickNameOnly())
-                // .rate(expert.getRating())
                 .career(career)
                 .expertDescription(expert.getExpertDescription())
                 .expertCropCategory(expert.getCrop().getCategory())
@@ -195,8 +194,6 @@ public class ExpertConverter {
                 .nickName(expert.getNickName())
                 .isNickNameOnly(expert.getIsNickNameOnly())
                 .expertDescription(expert.getExpertDescription())
-                // .rate(expert.getRating())
-                // .reviewCount() 리뷰 추가시 수정
                 .consultingCount(consultingCount)
                 .careers(expertCareerDTOList)
                 .additionalInformation(expert.getAdditionalInformation())

@@ -31,12 +31,6 @@ public class ExpertProfileResponse {
         @Schema(description = "전문가 한 줄 소개")
         String expertDescription;
 
-        @Schema(description = "평점")
-        Float rate;
-
-        @Schema(description = "리뷰 개수")
-        Integer reviewCount;
-
         @Schema(description = "진행했던 컨설팅 수")
         Long consultingCount;
 
