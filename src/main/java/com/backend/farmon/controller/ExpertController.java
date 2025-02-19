@@ -120,7 +120,6 @@ public class ExpertController {
 
         ExpertCareer updatedExpertCareer = ExpertConverter.updateExpertCareer(expertCareer, expertCareerPostDTO);
         expertCareerRepository.save(updatedExpertCareer);
-        expertCommandService.calculateTotalCareer(updatedExpertCareer.getExpert().getExpertCareerList()); // 경력 업데이트
         // 경력 업데이트
         Expert expert = updatedExpertCareer.getExpert();
         int updatedCareerYears = expertCommandService.calculateTotalCareer(expert.getExpertCareerList());
