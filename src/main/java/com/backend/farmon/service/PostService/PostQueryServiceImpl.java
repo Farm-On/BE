@@ -94,7 +94,20 @@ public class PostQueryServiceImpl implements PostQueryService {
         return HomeConverter.toPopularPostListDTO(expertColumnPostList);
     }
 
-   //자유,전체 게시판 생성순
+    @Override
+    public Page<PostPagingResponseDTO> findPostsBySearchQuery(String searchQuery, Long boardId, Pageable pageable) {
+
+        Page<Post> posts = postRepository.findPostsBySearchQuery(searchQuery, boardId, pageable);
+        // Post 객체를 PostPagingResponseDTO 객체로 변환하는 과정에서 NullPointerException이 발생
+        Page<PostPagingResponseDTO> dtoList = posts.map(post -> {
+            List<String> imgUrls = s3Service.getFullPath(post.getPostImgs());
+            return new PostPagingResponseDTO(post, imgUrls);
+        });
+        return dtoList;
+    }
+
+
+    //자유,전체 게시판 생성순
     @Transactional(readOnly = true)
     public Page<PostPagingResponseDTO> findAllPostsByBoardPK(Long boardId, int page, int size, String sortStr, List<String> crops) {
 
@@ -103,14 +116,15 @@ public class PostQueryServiceImpl implements PostQueryService {
         if (!"FARMER".equals(currentUserRole) && !"EXPERT".equals(currentUserRole)) {
             throw new GeneralException(ErrorStatus.UNAUTHORIZED_ACCESS);
         }
-
+        Board board = boardRepository.findById(boardId)
+                .orElseThrow(() -> new GeneralException(ErrorStatus.BOARD_TYPE_NOT_FOUND));
         Sort sort = Sort.by(Sort.Direction.fromString(sortStr), "createdAt");
         Pageable pageable = PageRequest.of(page - 1, size, sort);
 
         Page<Post> postPages = (crops == null || crops.isEmpty())
                 ? postRepository.findAllByBoardId(boardId, pageable)
                 :postRepository.findPostsByBoardIdAndCrops(boardId, crops, pageable);
-
+        log.info("에러1");
         // Post 객체를 PostPagingResponseDTO로 변환하고 S3 URL을 포함하여 반환
         return postPages.map(post -> new PostPagingResponseDTO(post, s3Service.getFullPath(post.getPostImgs())));
     }
@@ -122,13 +136,16 @@ public class PostQueryServiceImpl implements PostQueryService {
         if (!"FARMER".equals(currentUserRole) && !"EXPERT".equals(currentUserRole)) {
             throw new GeneralException(ErrorStatus.UNAUTHORIZED_ACCESS);
         }
-
+        Board board = boardRepository.findById(boardId)
+                .orElseThrow(() -> new GeneralException(ErrorStatus.BOARD_TYPE_NOT_FOUND));
         Sort.Direction direction = Sort.Direction.fromString(sort);
         Pageable pageable = PageRequest.of(pageNum - 1, size, Sort.by(direction, "postLikes"));
 
         Page<Post> posts = (crops == null || crops.isEmpty())
                 ? postRepository.findPopularPosts(boardId, pageable)
                 : postRepository.findPostsByBoardIdAndCrops(boardId, crops, pageable);
+
+        log.info(crops.toString());
 
         return posts.map(post -> new PostPagingResponseDTO(post, s3Service.getFullPath(post.getPostImgs())));
     }
@@ -141,7 +158,8 @@ public class PostQueryServiceImpl implements PostQueryService {
         if (!"FARMER".equals(currentUserRole) && !"EXPERT".equals(currentUserRole)) {
             throw new GeneralException(ErrorStatus.UNAUTHORIZED_ACCESS);
         }
-
+        Board board = boardRepository.findById(boardId)
+                .orElseThrow(() -> new GeneralException(ErrorStatus.BOARD_TYPE_NOT_FOUND));
 
         // 정렬 방향 설정: 'ASC' 또는 'DESC' 기준으로 생성일(createdAt)로 정렬 기본이 DESC
         Sort sort = Sort.by(Sort.Direction.fromString(sortStr), "createdAt");
@@ -164,8 +182,8 @@ public class PostQueryServiceImpl implements PostQueryService {
         if (!"FARMER".equals(currentUserRole) && !"EXPERT".equals(currentUserRole)) {
             throw new GeneralException(ErrorStatus.UNAUTHORIZED_ACCESS);
         }
-
-        log.info("boardId :"+boardId);
+        Board board = boardRepository.findById(boardId)
+                .orElseThrow(() -> new GeneralException(ErrorStatus.BOARD_TYPE_NOT_FOUND));
 
         // 정렬 방향 설정: 'ASC' 또는 'DESC' 기준으로 생성일(createdAt)로 정렬 기본이 DESC
         Sort sort = Sort.by(Sort.Direction.fromString(sortStr), "createdAt");
