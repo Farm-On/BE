@@ -1,7 +1,11 @@
 package com.backend.farmon.repository.PostRepository;
 
+import com.backend.farmon.apiPayload.code.status.ErrorStatus;
+import com.backend.farmon.apiPayload.exception.GeneralException;
 import com.backend.farmon.domain.*;
 import com.backend.farmon.dto.post.PostType;
+import com.backend.farmon.repository.BoardRepository.BoardRepository;
+import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -12,6 +16,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
+import java.util.Collections;
 import java.util.List;
 
 import static com.backend.farmon.domain.QPost.post;
@@ -21,6 +26,7 @@ import static com.backend.farmon.domain.QPostImg.postImg;
 @Repository
 @RequiredArgsConstructor
 public class PostRepositoryImpl implements PostRepositoryCustom {
+    private final BoardRepository boardRepository;
     private final JPAQueryFactory queryFactory;
     QLikeCount likeCount = QLikeCount.likeCount;
     QPost post = QPost.post;
@@ -118,6 +124,8 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
     public Page<Post> findAllByBoardId(Long boardId, Pageable pageable) {
         QPost post = QPost.post;
         QPostImg postImg = QPostImg.postImg;
+        Board board = boardRepository.findById(boardId)
+                .orElseThrow(() -> new GeneralException(ErrorStatus.POST_TYPE_NOT_FOUND));
 
         // 게시판 ID로 게시글 및 관련 이미지 조회
         List<Post> posts = queryFactory
@@ -139,29 +147,52 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
         return new PageImpl<>(posts, pageable, total);
     }
 
-    @Override
-    public Page<Post> findPostsByBoardIdAndCrops(Long boardId, List<String> cropNames, Pageable pageable) {
-        // 게시판 ID와 Crop names에 해당하는 게시글을 조회
-        List<Post> posts = queryFactory.selectFrom(post)
-                .leftJoin(post.boardPosts, boardPost)  // 게시글과 BoardPost 관계
-                .leftJoin(post.postImgs, postImg).fetchJoin()  // 게시글 이미지
-                .leftJoin(post.crop, crop)  // Post와 Crop 관계를 직접 조인
-                .where(post.board.id.eq(boardId)  // 게시판 ID 조건
-                        .and(crop.name.in(cropNames)))  // Crop의 name이 cropNames에 포함된 게시글 필터링
-                .offset(pageable.getOffset())
-                .limit(pageable.getPageSize())
+@Override
+public Page<Post> findPostsByBoardIdAndCrops(Long boardId, List<String> cropNames, Pageable pageable) {
+    Board board = boardRepository.findById(boardId)
+            .orElseThrow(() -> new GeneralException(ErrorStatus.POST_TYPE_NOT_FOUND));
+
+    BooleanBuilder whereClause = new BooleanBuilder();
+    whereClause.and(post.board.id.eq(boardId));
+
+    if (cropNames != null && !cropNames.isEmpty()) {
+        // 1️⃣ cropNames를 기준으로 Crop ID 목록 가져오기
+        List<Long> cropIds = queryFactory
+                .select(crop.id)
+                .from(crop)
+                .where(crop.name.in(cropNames)) // cropNames 리스트로 검색
                 .fetch();
 
-        // 게시글의 총 개수를 카운트
-        long totalCount = queryFactory.selectFrom(post)
-                .leftJoin(post.crop, crop)  // Post와 Crop 관계를 직접 조인
-                .where(post.board.id.eq(boardId)  // 게시판 ID 조건
-                        .and(crop.name.in(cropNames)))  // Crop의 name이 cropNames에 포함된 게시글 필터링
-                .fetchCount();  // 총 게시글 개수 카운트
+        log.info("필터링할 cropIds: " + cropIds);
 
-        // Page 객체 반환
-        return new PageImpl<>(posts, pageable, totalCount);
+        // 2️⃣ 가져온 Crop ID 목록으로 Post 필터링
+        if (!cropIds.isEmpty()) {
+            whereClause.and(post.crop.id.in(cropIds));
+        } else {
+            // 일치하는 Crop이 없으면 결과가 없음
+            return new PageImpl<>(Collections.emptyList(), pageable, 0);
+        }
     }
+
+    // 3️⃣ 필터링된 게시글 조회
+    List<Post> posts = queryFactory.selectFrom(post)
+            .leftJoin(post.postImgs, postImg).fetchJoin()  // 게시글 이미지
+            .leftJoin(post.crop, crop)  // Post와 Crop 관계 조인
+            .where(whereClause)
+            .offset(pageable.getOffset())
+            .limit(pageable.getPageSize())
+            .fetch();
+
+    log.info("필터링된 게시글 개수: " + posts.size());
+
+    // 4️⃣ 전체 게시글 개수 조회
+    long totalCount = queryFactory.selectFrom(post)
+            .leftJoin(post.crop, crop)
+            .where(whereClause)
+            .fetchCount();
+
+    return new PageImpl<>(posts, pageable, totalCount);
+}
 
 
 
@@ -171,7 +202,8 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
     public Page<Post> findPopularPosts(Long boardId, Pageable pageable) {
         QPost post = QPost.post;
         QPostImg postImg = QPostImg.postImg;
-        log.info("boardId"+boardId);
+        Board board = boardRepository.findById(boardId)
+                .orElseThrow(() -> new GeneralException(ErrorStatus.POST_TYPE_NOT_FOUND));
         // 게시판별 인기 게시글 및 관련 이미지 조회 (좋아요 수 기준 정렬)
         List<Post> posts = queryFactory
                 .selectFrom(post)
@@ -181,7 +213,6 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .fetch();
-
 
 
         // 전체 게시글 수 조회 (countQuery로 분리하여 성능 최적화)
