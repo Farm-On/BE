@@ -36,7 +36,9 @@ public class Expert extends BaseEntity {
     private String additionalInformation; // 전문가 추가정보
 
     private Float rating;
+    @Column(nullable = false, columnDefinition = "INT DEFAULT 0")
     private Integer careerYears;
+
 
     private String availableRange; //활동 가능 범위
 
