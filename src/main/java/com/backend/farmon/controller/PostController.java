@@ -32,6 +32,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -275,7 +276,7 @@ public class PostController {
     })
     public ApiResponse<Page<PostPagingResponseDTO>> getPopularPostByPaging(
             @Parameter(description = "게시판 번호", required = true) @PathVariable Long boardId,
-            @Parameter(description = "페이지 번호", required = true) @RequestParam(value = "page") int pageNum,
+            @Parameter(description = "페이지 번호", required = true) @RequestParam(value = "pageNum",defaultValue = "1") int pageNum,
             @Parameter(description = "페이지 크기", required = false) @RequestParam(defaultValue = "10") int size,
             @Parameter(description = "정렬 방식 (ASC 또는 DESC)", required = false) @RequestParam(defaultValue = "DESC") String sort,
             @Parameter(description = "필터링조건",required = false) @RequestParam(required = false)  String [] crops
@@ -306,7 +307,7 @@ public class PostController {
     })
     public ApiResponse<Page<PostPagingResponseDTO>> getAllPostByPaging(
             @Parameter(description = "게시판 번호", required = true) @PathVariable Long boardId,
-            @Parameter(description = "페이지 번호", required = true) @RequestParam(value = "page") int pageNum,
+            @Parameter(description = "페이지 번호", required = true) @RequestParam(value = "pageNum",defaultValue = "1") int pageNum,
             @Parameter(description = "페이지 크기", required = false) @RequestParam(defaultValue = "10") int size,
             @Parameter(description = "정렬 방식 (ASC 또는 DESC)", required = false) @RequestParam(defaultValue = "DESC") String sort,
             @Parameter(description = "필터링조건",required = false)  @RequestParam(required = false) String [] crops
@@ -340,16 +341,13 @@ public class PostController {
     })
     public ApiResponse<Page<PostPagingResponseDTO> > get_Free_ByPaging(
             @Parameter(description = "게시판 번호", required = true) @PathVariable Long boardId,
-            @Parameter(description = "페이지 번호", required = true) @RequestParam(value = "page") int pageNum,
+            @Parameter(description = "페이지 번호", required = true) @RequestParam(value = "pageNum",defaultValue = "1") int pageNum,
             @Parameter(description = "페이지 크기", required = false) @RequestParam(defaultValue = "10") int size,
-            @Parameter(description = "정렬 방식 (ASC 또는 DESC)", required = false) @RequestParam(defaultValue = "DESC") String sort,
-            @Parameter(description = "필터링조건",required =false)  @RequestParam(required = false)String [] crops
+            @Parameter(description = "정렬 방식 (ASC 또는 DESC)", required = false) @RequestParam(defaultValue = "DESC") String sort
     ) {
-        log.info("Crops: " + crops);
-        List<String> cropsList = (crops != null) ? Arrays.asList(crops) : Collections.emptyList();
         try{
             // 게시판 ID에 해당하는 게시글을 생성일 순으로 정렬하여 페이징 처리
-            Page<PostPagingResponseDTO> posts =  postQueryServiceImpl.findAllPostsByBoardPK(boardId, pageNum,size,sort,cropsList);
+            Page<PostPagingResponseDTO> posts =  postQueryServiceImpl.findAllPostsByBoardPK(boardId, pageNum,size,sort,null);
             return ApiResponse.onSuccess(posts);
         } catch (Exception e) {
             // 실패 응답 반환 (예: 게시판을 찾을 수 없음)
@@ -372,7 +370,7 @@ public class PostController {
     })
     public ApiResponse< Page<PostPagingResponseDTO>> getQnaPostByPaging(
             @Parameter(description = "게시판 번호", required = true) @PathVariable Long boardId,
-            @Parameter(description = "페이지 번호", required = true) @RequestParam(value = "page") int pageNum,
+            @Parameter(description = "페이지 번호", required = true) @RequestParam(value = "pageNum",defaultValue = "1") int pageNum,
             @Parameter(description = "페이지 크기", required = false) @RequestParam(defaultValue = "10") int size,
             @Parameter(description = "정렬 방식 (ASC 또는 DESC)", required = false) @RequestParam(defaultValue = "DESC") String sort,
             @Parameter(description = "필터링조건",required =false)  @RequestParam(required = false) String [] crops
@@ -404,7 +402,7 @@ public class PostController {
     })
     public ApiResponse< Page<PostPagingResponseDTO>> getExpertColPostByPaging(
             @PathVariable Long boardId,
-            @RequestParam(defaultValue = "1") int pageNum,
+            @RequestParam(value = "pageNum",defaultValue = "1") int pageNum,
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(defaultValue = "DESC") String sort,
             @Parameter(description = "필터링조건",required = false) @RequestParam(required = false) String [] crops
@@ -530,6 +528,22 @@ public class PostController {
     public ApiResponse<PostResponseDTO>  getExpertColumnPostById( Long boardId,@PathVariable Long postId) {
         PostResponseDTO postDetail = postQueryServiceImpl.getBoardIdAndPostById(boardId,postId);
         return ApiResponse.onSuccess(postDetail);
+    }
+
+    // 검색 기능 추가
+    @GetMapping("/search")
+    @Operation(summary = "게시글 검색", description = "제목 또는 부제목으로 게시글을 검색합니다.")
+    @ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "OK, 성공"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "400", description = "잘못된 요청입니다.", content = @Content(schema = @Schema(implementation = ApiResponse.class)))
+    })
+    public ApiResponse<Page<PostPagingResponseDTO>> searchPosts(
+            @Parameter(description = "검색어(제목이나 부제목)", required = true) @RequestParam(value = "검색어")  String searchQuery,
+            @Parameter(description = "게시판 ID", required = true) @RequestParam("boardId") Long boardId,
+            @Parameter(description = "페이지 정보", required = false) @PageableDefault(size = 10) Pageable pageable) {
+
+        Page<PostPagingResponseDTO> posts = postQueryServiceImpl.findPostsBySearchQuery(searchQuery, boardId, pageable);
+        return ApiResponse.onSuccess(posts);
     }
 
 }
