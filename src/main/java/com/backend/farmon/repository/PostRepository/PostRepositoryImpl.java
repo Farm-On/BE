@@ -19,7 +19,6 @@ import org.springframework.stereotype.Repository;
 import java.util.Collections;
 import java.util.List;
 
-import static com.backend.farmon.domain.QPost.post;
 import static com.backend.farmon.domain.QPostImg.postImg;
 
 @Slf4j
@@ -120,6 +119,7 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
                 .fetch();
     }
 
+    // 필터링 없이 조회
     @Override
     public Page<Post> findAllByBoardId(Long boardId, Pageable pageable) {
         QPost post = QPost.post;
@@ -147,32 +147,33 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
         return new PageImpl<>(posts, pageable, total);
     }
 
-@Override
-public Page<Post> findPostsByBoardIdAndCrops(Long boardId, List<String> cropNames, Pageable pageable) {
-    Board board = boardRepository.findById(boardId)
-            .orElseThrow(() -> new GeneralException(ErrorStatus.POST_TYPE_NOT_FOUND));
+    // 필터링을 이용한 조회
+    @Override
+    public Page<Post> findPostsByBoardIdAndCrops(Long boardId, List<String> cropNames, Pageable pageable) {
+        Board board = boardRepository.findById(boardId)
+                .orElseThrow(() -> new GeneralException(ErrorStatus.POST_TYPE_NOT_FOUND));
 
-    BooleanBuilder whereClause = new BooleanBuilder();
-    whereClause.and(post.board.id.eq(boardId));
+        BooleanBuilder whereClause = new BooleanBuilder();
+        whereClause.and(post.board.id.eq(boardId));
 
-    if (cropNames != null && !cropNames.isEmpty()) {
-        // 1️⃣ cropNames를 기준으로 Crop ID 목록 가져오기
-        List<Long> cropIds = queryFactory
-                .select(crop.id)
-                .from(crop)
-                .where(crop.name.in(cropNames)) // cropNames 리스트로 검색
-                .fetch();
+        if (cropNames != null && !cropNames.isEmpty()) {
+            // 1️⃣ cropNames를 기준으로 Crop ID 목록 가져오기
+            List<Long> cropIds = queryFactory
+                    .select(crop.id)
+                    .from(crop)
+                    .where(crop.name.in(cropNames)) // cropNames 리스트로 검색
+                    .fetch();
 
-        log.info("필터링할 cropIds: " + cropIds);
+            log.info("필터링할 cropIds: " + cropIds);
 
-        // 2️⃣ 가져온 Crop ID 목록으로 Post 필터링
-        if (!cropIds.isEmpty()) {
-            whereClause.and(post.crop.id.in(cropIds));
-        } else {
-            // 일치하는 Crop이 없으면 결과가 없음
-            return new PageImpl<>(Collections.emptyList(), pageable, 0);
+            // 2️⃣ 가져온 Crop ID 목록으로 Post 필터링
+            if (!cropIds.isEmpty()) {
+                whereClause.and(post.crop.id.in(cropIds));
+            } else {
+                // 일치하는 Crop이 없으면 결과가 없음
+                return new PageImpl<>(Collections.emptyList(), pageable, 0);
+            }
         }
-    }
 
     // 3️⃣ 필터링된 게시글 조회
     List<Post> posts = queryFactory.selectFrom(post)
@@ -197,9 +198,10 @@ public Page<Post> findPostsByBoardIdAndCrops(Long boardId, List<String> cropName
 
 
 
-
+    // 인기게시판 조회(상세조회X)
     @Override
     public Page<Post> findPopularPosts(Long boardId, Pageable pageable) {
+
         QPost post = QPost.post;
         QPostImg postImg = QPostImg.postImg;
         Board board = boardRepository.findById(boardId)
@@ -224,7 +226,46 @@ public Page<Post> findPostsByBoardIdAndCrops(Long boardId, List<String> cropName
 
         return new PageImpl<>(posts, pageable, total);
     }
+    
+    // 검색어(제목,소제목)에따라 검색
+    @Override
+    public Page<Post> findPostsBySearchQuery(String searchQuery, Long boardId, Pageable pageable) {
+        QPost post = QPost.post;
+        QPostImg postImg = QPostImg.postImg;
+        QBoard board = QBoard.board;
 
+        // 게시판 ID로 Board 객체 조회
+        Board boardExists = boardRepository.findById(boardId)
+                .orElseThrow(() -> new GeneralException(ErrorStatus.POST_TYPE_NOT_FOUND));
+
+        BooleanBuilder whereClause = new BooleanBuilder();
+        whereClause.and(post.board.id.eq(boardId));  // 게시판 ID로 필터링 1,4,5,6
+
+        // 검색어가 있을 경우
+        if (searchQuery != null && !searchQuery.trim().isEmpty()) {
+            whereClause.and(post.postTitle.containsIgnoreCase(searchQuery)  // 제목 검색
+                    .or(post.subTitle.containsIgnoreCase(searchQuery)));  // 부제목 검색
+        }
+
+        // 검색된 게시글 조회
+        List<Post> posts = queryFactory.selectFrom(post)
+                .leftJoin(post.postImgs, postImg).fetchJoin()  // 게시글 이미지와 조인
+                .leftJoin(post.board, board).fetchJoin()  // 게시글과 게시판 조인
+                .where(whereClause)
+                .offset(pageable.getOffset())  // 페이징 처리
+                .limit(pageable.getPageSize())
+                .orderBy(post.createdAt.desc())  // 최신순 정렬
+                .fetch();
+
+        // 전체 게시글 수 조회 (countQuery로 최적화)
+        long totalCount = queryFactory.selectFrom(post)
+                .leftJoin(post.board, board)
+                .where(whereClause)
+                .fetchCount();
+
+        // 페이징 처리된 결과 반환
+        return new PageImpl<>(posts, pageable, totalCount);
+    }
 
 
 }
