@@ -94,6 +94,7 @@ public class PostQueryServiceImpl implements PostQueryService {
         return HomeConverter.toPopularPostListDTO(expertColumnPostList);
     }
 
+    // 검색어 기능 추가
     @Override
     public Page<PostPagingResponseDTO> findPostsBySearchQuery(String searchQuery, Long boardId, Pageable pageable) {
 
