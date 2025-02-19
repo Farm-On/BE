@@ -21,12 +21,15 @@ public interface PostRepositoryCustom {
     // 인기 전문가 칼럼 6개 조회
     List<Post> findTop6ExpertColumnPostsByPostId(List<Long> popularPostsIdList);
 
+    // 필터링없이 조회 
     Page<Post> findAllByBoardId(Long boardId, Pageable pageable);
 
-
+    //작물로 필터링
     Page<Post> findPostsByBoardIdAndCrops(Long boardId, List<String> cropNames, Pageable pageable);
 
-
+    //인기게시판용 좋아요 순으로 정렬 
     Page<Post> findPopularPosts(@Param("boardId") Long boardId, Pageable pageable);
 
+    // 검색기능 
+    Page<Post> findPostsBySearchQuery(String searchQuery, Long boardId, Pageable pageable);
 }
