@@ -29,7 +29,7 @@ public class ExpertRepositoryImpl implements ExpertRepositoryCustom {
             crop = crop.replace(" ", "");  // 공백 제거
 
             // "분야전체"이면 필터링을 하지 않음
-            if ("분야전체".equals(crop)) {
+            if ("분야전체".equals(crop) || "공통".equals(crop)) {
                 // 필터링을 하지 않음 (모든 분야를 조회)
             } else if (crop.endsWith("전체")) {  // crop 값이 "전체"로 끝나는지 확인
                 String category = crop.replace("전체", "");  // "전체"를 제거하여 카테고리 이름만 추출 (ex. "곡물전체" -> "곡물")
