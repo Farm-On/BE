@@ -26,4 +26,6 @@ public interface ExpertCommandService {
                                                              List<MultipartFile> ImgList, MultipartFile thumbnailImg);
     String updateImageSrcWithS3(String text, List<PortfolioImg> newImageUrls);
     PortfolioResponse.DeletePortfolioResultDTO deletePortfolio(Long portfolioId);
+    int calculateTotalCareer(List<ExpertCareer> careers);
+    int mergePeriodsAndCalculateTotalYears(List<int[]> periods);
 }

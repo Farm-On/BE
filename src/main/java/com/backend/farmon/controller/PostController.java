@@ -32,6 +32,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -133,9 +134,9 @@ public class PostController {
                     content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
                             schema = @Schema(implementation = AnswerRequestDTO.class)))  AnswerRequestDTO answer ,// 답변 데이터
             @RequestPart(value = "imgList", required = false) @Parameter(
-                  description = "업로드할 이미지 파일들",
-                  content = @Content(mediaType = MediaType.MULTIPART_FORM_DATA_VALUE,
-                          array = @ArraySchema(schema = @Schema(type = "string", format = "binary"))))List<MultipartFile> imgList
+                    description = "업로드할 이미지 파일들",
+                    content = @Content(mediaType = MediaType.MULTIPART_FORM_DATA_VALUE,
+                            array = @ArraySchema(schema = @Schema(type = "string", format = "binary"))))List<MultipartFile> imgList
     ) throws Exception {
 
         AnswerResponseDTO responseDTO = boardServiceImpl.saveQnAAnswer(answer,imgList);
@@ -179,6 +180,84 @@ public class PostController {
         return ApiResponse.onSuccess(postResponseDTO);
     }
 
+    // 게시글 삭제
+    @Operation(
+            summary = "자유 게시판 게시글 삭제",
+            description = "자유 게시판의 특정 게시글을 삭제합니다."
+    )
+    @ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200", description = "OK, 성공"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "POST4001", description = "게시글을 찾을 수 없습니다.", content = @Content(schema = @Schema(implementation = ApiResponse.class))),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON400", description = "잘못된 요청입니다.", content = @Content(schema = @Schema(implementation = ApiResponse.class)))
+    })
+    @DeleteMapping("/free/{postId}")
+    public ApiResponse<PostResponseDTO> deleteFreePost(
+            @PathVariable Long postId
+    ) {
+        PostResponseDTO postResponseDTO = boardServiceImpl.deleteFreePost(postId);
+        return ApiResponse.onSuccess(postResponseDTO);
+    }
+
+
+    @Operation(
+            summary = "QnA 게시판 게시글 삭제",
+            description = "QnA 게시판의 특정 게시글과 답변을 삭제합니다."
+    )
+    @ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200", description = "OK, 성공"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "POST4001", description = "게시글을 찾을 수 없습니다.", content = @Content(schema = @Schema(implementation = ApiResponse.class))),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON400", description = "잘못된 요청입니다.", content = @Content(schema = @Schema(implementation = ApiResponse.class)))
+    })
+    @DeleteMapping("/qna/{postId}")
+    public ApiResponse<PostResponseDTO> deleteQnaPost(
+            @PathVariable Long postId
+    ) {
+        PostResponseDTO postResponseDTO = boardServiceImpl.deleteQnaPost(postId);
+        return ApiResponse.onSuccess(postResponseDTO);
+    }
+
+
+
+    @Operation(
+            summary = "전문가 칼럼 게시글 삭제",
+            description = "전문가 칼럼 게시판의 특정 게시글을 삭제합니다."
+    )
+    @ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200", description = "OK, 성공"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "POST4001", description = "게시글을 찾을 수 없습니다.", content = @Content(schema = @Schema(implementation = ApiResponse.class))),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON400", description = "잘못된 요청입니다.", content = @Content(schema = @Schema(implementation = ApiResponse.class)))
+    })
+    @DeleteMapping("/expertColumn/{postId}")
+    public ApiResponse<PostResponseDTO> deleteExpertColumnPost(
+            @PathVariable Long postId
+    ) {
+        PostResponseDTO postResponseDTO = boardServiceImpl.deleteExpertColumnPost(postId);
+        return ApiResponse.onSuccess(postResponseDTO);
+    }
+
+
+
+    @Operation(
+            summary = "QnA 게시글 답변 삭제",
+            description = "QnA 게시판에서 특정 답변을 삭제합니다."
+    )
+    @ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200", description = "OK, 성공"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "ANSWER4001", description = "답변을 찾을 수 없습니다.", content = @Content(schema = @Schema(implementation = ApiResponse.class))),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON400", description = "잘못된 요청입니다.", content = @Content(schema = @Schema(implementation = ApiResponse.class)))
+    })
+    @DeleteMapping("/qna/answer/{answerId}")
+    public ApiResponse<AnswerResponseDTO> deleteQnAAnswer(
+            @Parameter(description = "유저 아이디", required = true) @RequestParam(value = "userId")  Long userId,
+            @Parameter(description = "답변 아이디", required = true) @PathVariable Long answerId
+    ) {
+            AnswerResponseDTO answerResponseDTO = boardServiceImpl.deleteQnAAnswer(answerId,userId);
+            return ApiResponse.onSuccess(answerResponseDTO);
+
+    }
+
+
+
 
 
 ///// 게시글 목록 그냥 조회 (상세조회X) 리스트 형식으로 돌아옴
@@ -197,10 +276,10 @@ public class PostController {
     })
     public ApiResponse<Page<PostPagingResponseDTO>> getPopularPostByPaging(
             @Parameter(description = "게시판 번호", required = true) @PathVariable Long boardId,
-            @Parameter(description = "페이지 번호", required = true) @RequestParam(value = "page") int pageNum,
+            @Parameter(description = "페이지 번호", required = true) @RequestParam(value = "pageNum",defaultValue = "1") int pageNum,
             @Parameter(description = "페이지 크기", required = false) @RequestParam(defaultValue = "10") int size,
             @Parameter(description = "정렬 방식 (ASC 또는 DESC)", required = false) @RequestParam(defaultValue = "DESC") String sort,
-            @Parameter(description = "필터링조건",required = false) String [] crops
+            @Parameter(description = "필터링조건",required = false) @RequestParam(required = false)  String [] crops
     ) {
         List<String> cropsList = (crops != null) ? Arrays.asList(crops) : Collections.emptyList();
         try {
@@ -228,13 +307,14 @@ public class PostController {
     })
     public ApiResponse<Page<PostPagingResponseDTO>> getAllPostByPaging(
             @Parameter(description = "게시판 번호", required = true) @PathVariable Long boardId,
-            @Parameter(description = "페이지 번호", required = true) @RequestParam(value = "page") int pageNum,
+            @Parameter(description = "페이지 번호", required = true) @RequestParam(value = "pageNum",defaultValue = "1") int pageNum,
             @Parameter(description = "페이지 크기", required = false) @RequestParam(defaultValue = "10") int size,
             @Parameter(description = "정렬 방식 (ASC 또는 DESC)", required = false) @RequestParam(defaultValue = "DESC") String sort,
-            @Parameter(description = "필터링조건",required = false) String [] crops
+            @Parameter(description = "필터링조건",required = false)  @RequestParam(required = false) String [] crops
     )
     {
         List<String> cropsList = (crops != null) ? Arrays.asList(crops) : Collections.emptyList();
+
         try{
             // 게시판 ID에 해당하는 게시글을 생성일 순으로 정렬하여 페이징 처리
             Page<PostPagingResponseDTO> posts =  postQueryServiceImpl.findAllPostsByBoardPK(boardId, pageNum,size,sort,cropsList);
@@ -261,16 +341,13 @@ public class PostController {
     })
     public ApiResponse<Page<PostPagingResponseDTO> > get_Free_ByPaging(
             @Parameter(description = "게시판 번호", required = true) @PathVariable Long boardId,
-            @Parameter(description = "페이지 번호", required = true) @RequestParam(value = "page") int pageNum,
+            @Parameter(description = "페이지 번호", required = true) @RequestParam(value = "pageNum",defaultValue = "1") int pageNum,
             @Parameter(description = "페이지 크기", required = false) @RequestParam(defaultValue = "10") int size,
-            @Parameter(description = "정렬 방식 (ASC 또는 DESC)", required = false) @RequestParam(defaultValue = "DESC") String sort,
-            @Parameter(description = "필터링조건",required =false) String [] crops
+            @Parameter(description = "정렬 방식 (ASC 또는 DESC)", required = false) @RequestParam(defaultValue = "DESC") String sort
     ) {
-        log.info("Crops: " + crops);
-        List<String> cropsList = (crops != null) ? Arrays.asList(crops) : Collections.emptyList();
         try{
             // 게시판 ID에 해당하는 게시글을 생성일 순으로 정렬하여 페이징 처리
-            Page<PostPagingResponseDTO> posts =  postQueryServiceImpl.findAllPostsByBoardPK(boardId, pageNum,size,sort,cropsList);
+            Page<PostPagingResponseDTO> posts =  postQueryServiceImpl.findAllPostsByBoardPK(boardId, pageNum,size,sort,null);
             return ApiResponse.onSuccess(posts);
         } catch (Exception e) {
             // 실패 응답 반환 (예: 게시판을 찾을 수 없음)
@@ -293,10 +370,10 @@ public class PostController {
     })
     public ApiResponse< Page<PostPagingResponseDTO>> getQnaPostByPaging(
             @Parameter(description = "게시판 번호", required = true) @PathVariable Long boardId,
-            @Parameter(description = "페이지 번호", required = true) @RequestParam(value = "page") int pageNum,
+            @Parameter(description = "페이지 번호", required = true) @RequestParam(value = "pageNum",defaultValue = "1") int pageNum,
             @Parameter(description = "페이지 크기", required = false) @RequestParam(defaultValue = "10") int size,
             @Parameter(description = "정렬 방식 (ASC 또는 DESC)", required = false) @RequestParam(defaultValue = "DESC") String sort,
-            @Parameter(description = "필터링조건",required =false) String [] crops
+            @Parameter(description = "필터링조건",required =false)  @RequestParam(required = false) String [] crops
     ) {
         List<String> cropsList = (crops != null) ? Arrays.asList(crops) : Collections.emptyList();
         try {
@@ -325,10 +402,10 @@ public class PostController {
     })
     public ApiResponse< Page<PostPagingResponseDTO>> getExpertColPostByPaging(
             @PathVariable Long boardId,
-            @RequestParam(defaultValue = "1") int pageNum,
+            @RequestParam(value = "pageNum",defaultValue = "1") int pageNum,
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(defaultValue = "DESC") String sort,
-            @Parameter(description = "필터링조건",required = false) String [] crops
+            @Parameter(description = "필터링조건",required = false) @RequestParam(required = false) String [] crops
     ) {
         // 여기는 무조건 작물 정보를 String으로 받아서 처리하거나 boolean으로 처리할수 있는데 일단 해보고 말씀드려보겠습니다.
         List<String> cropsList = (crops != null) ? Arrays.asList(crops) : Collections.emptyList();
@@ -401,7 +478,7 @@ public class PostController {
     })
     @Parameters({
             @Parameter(name = "boardId", description = "게시판 번호", required = true),
-            @Parameter(name = "postId", description = "게시글 작성한 사람 Id", required = true)
+            @Parameter(name = "postId", description = "게시글 번호", required = true)
     })
     @GetMapping("free/list/{postId}/detail")
     public ApiResponse<PostResponseDTO>   getFreePostById( Long boardId,@PathVariable Long postId) {
@@ -422,7 +499,7 @@ public class PostController {
     })
     @Parameters({
             @Parameter(name = "boardId", description = "게시판 번호", required = true),
-            @Parameter(name = "postId", description = "게시글 작성한 사람 Id", required = true)
+            @Parameter(name = "postId", description = "게시글 번호", required = true)
     })
     @GetMapping("qna/list/{postId}/detail")
     public ApiResponse<PostWithAnswersResponseDTO>   getQnaPostById(Long boardId,@PathVariable  Long postId) {
@@ -445,12 +522,28 @@ public class PostController {
     })
     @Parameters({
             @Parameter(name = "boardId", description = "게시판 번호", required = true),
-            @Parameter(name = "postId", description = "게시글 작성한 사람 Id", required = true)
+            @Parameter(name = "postId", description = "게시글 번호", required = true)
     })
     @GetMapping("expertCol/list/{postId}/detail")
     public ApiResponse<PostResponseDTO>  getExpertColumnPostById( Long boardId,@PathVariable Long postId) {
         PostResponseDTO postDetail = postQueryServiceImpl.getBoardIdAndPostById(boardId,postId);
         return ApiResponse.onSuccess(postDetail);
+    }
+
+    // 검색 기능 추가
+    @GetMapping("/search")
+    @Operation(summary = "게시글 검색", description = "제목 또는 부제목으로 게시글을 검색합니다.")
+    @ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "OK, 성공"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "400", description = "잘못된 요청입니다.", content = @Content(schema = @Schema(implementation = ApiResponse.class)))
+    })
+    public ApiResponse<Page<PostPagingResponseDTO>> searchPosts(
+            @Parameter(description = "검색어(제목이나 부제목)", required = true) @RequestParam(value = "검색어")  String searchQuery,
+            @Parameter(description = "게시판 ID", required = true) @RequestParam("boardId") Long boardId,
+            @Parameter(description = "페이지 정보", required = false) @PageableDefault(size = 10) Pageable pageable) {
+
+        Page<PostPagingResponseDTO> posts = postQueryServiceImpl.findPostsBySearchQuery(searchQuery, boardId, pageable);
+        return ApiResponse.onSuccess(posts);
     }
 
 }

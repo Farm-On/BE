@@ -78,6 +78,11 @@ public class ExpertController {
             @RequestBody @Valid ExpertCareerRequest.ExpertCareerPostDTO expertCareerPostDTO,
             @PathVariable(name = "expert-id") Long expertId) {
         ExpertCareer expertCareer = expertCommandService.postExpertCareer(expertId, expertCareerPostDTO);
+        // 경력 업데이트
+        Expert expert = expertRepository.findById(expertId).get();
+        int updatedCareerYears = expertCommandService.calculateTotalCareer(expert.getExpertCareerList());
+        expert.setCareerYears(updatedCareerYears);
+        expertRepository.save(expert);
         return ApiResponse.onSuccess(ExpertConverter.toExpertCareerPostResultDTO(expertCareer));
     }
 
@@ -115,6 +120,11 @@ public class ExpertController {
 
         ExpertCareer updatedExpertCareer = ExpertConverter.updateExpertCareer(expertCareer, expertCareerPostDTO);
         expertCareerRepository.save(updatedExpertCareer);
+        // 경력 업데이트
+        Expert expert = updatedExpertCareer.getExpert();
+        int updatedCareerYears = expertCommandService.calculateTotalCareer(expert.getExpertCareerList());
+        expert.setCareerYears(updatedCareerYears);
+        expertRepository.save(expert);
         return ApiResponse.onSuccess(ExpertConverter.toExpertCareerGetResultDTO(updatedExpertCareer));
     }
 
@@ -132,6 +142,11 @@ public class ExpertController {
                 .orElseThrow(() -> new ExpertCareerHandler(ErrorStatus.EXPERT_CAREER_NOT_FOUND));
         try {
             expertCareerRepository.delete(expertCareer);
+            // 경력 업데이트
+            Expert expert = expertCareer.getExpert();
+            int updatedCareerYears = expertCommandService.calculateTotalCareer(expert.getExpertCareerList());
+            expert.setCareerYears(updatedCareerYears);
+            expertRepository.save(expert);
             return ApiResponse.onSuccess("전문가 경력이 성공적으로 삭제되었습니다.");
         } catch (Exception e) {
             return ApiResponse.onFailure("ERROR_DELETE_EXPERT_CAREER","전문가 경력 삭제에 실패했습니다.",null);

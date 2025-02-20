@@ -31,6 +31,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -319,5 +320,66 @@ public class ExpertCommandServiceImpl implements ExpertCommandService {
         } catch (Exception e) {
             throw new PortfolioHandler(ErrorStatus.PORTFOLIO_DELETE_FAILED);
         }
+    }
+
+    // 경력 기간 계산 함수
+    @Override
+    @Transactional
+    public int calculateTotalCareer(List<ExpertCareer> careers) {
+        // 현재 날짜 구하기
+        LocalDate now = LocalDate.now();
+        List<int[]> periods = new ArrayList<>();
+
+        // 각 경력에 대해 기간을 계산하여 periods 리스트에 저장
+        for (ExpertCareer career : careers) {
+            int startYear = career.getStartYear();
+            int endYear = career.getIsOngoing() ? now.getYear() : career.getEndYear();
+
+            // 경력 기간이 1년 이하인 경우 1년으로 처리
+            if (endYear - startYear <= 0) {
+                endYear = startYear + 1;
+            }
+
+            periods.add(new int[]{startYear, endYear});
+        }
+
+        // 경력 기간 병합 및 총합 계산
+        return mergePeriodsAndCalculateTotalYears(periods);
+    }
+
+    // 기간이 겹치는 부분을 제외하고 경력 총합 계산
+    @Override
+    @Transactional
+    public int mergePeriodsAndCalculateTotalYears(List<int[]> periods) {
+        // 기간을 시작 연도를 기준으로 오름차순 정렬
+        periods.sort((a, b) -> Integer.compare(a[0], b[0]));
+
+        int totalYears = 0;
+        int currentStart = -1;
+        int currentEnd = -1;
+
+        for (int[] period : periods) {
+            int startYear = period[0];
+            int endYear = period[1];
+
+            // 겹치는 기간이 없으면 경력 추가
+            if (startYear > currentEnd) {
+                if (currentStart != -1) {
+                    totalYears += currentEnd - currentStart;
+                }
+                currentStart = startYear;
+                currentEnd = endYear;
+            } else {
+                // 겹치는 기간이 있으면 합쳐서 끝 연도를 갱신
+                currentEnd = Math.max(currentEnd, endYear);
+            }
+        }
+
+        // 마지막 기간 추가
+        if (currentStart != -1) {
+            totalYears += currentEnd - currentStart;
+        }
+
+        return totalYears;
     }
 }

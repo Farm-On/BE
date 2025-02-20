@@ -2,6 +2,7 @@ package com.backend.farmon.service.PostService;
 
 import com.backend.farmon.apiPayload.code.status.ErrorStatus;
 import com.backend.farmon.apiPayload.exception.GeneralException;
+import com.backend.farmon.config.security.UserAuthorizationUtil;
 import com.backend.farmon.converter.HomeConverter;
 import com.backend.farmon.converter.PostConverter;
 import com.backend.farmon.domain.*;
@@ -32,10 +33,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.backend.farmon.dto.post.PostType.QNA;
@@ -48,6 +46,7 @@ import static com.backend.farmon.dto.post.PostType.QNA;
 public class PostQueryServiceImpl implements PostQueryService {
 
     private final PostFetchStrategyFactory strategyFactory;
+    private final UserAuthorizationUtil userAuthorizationUtil;
     private final CommentRepository commentRepository;
     private final LikeCountRepository likeCountRepository;
     private final PostRepository postRepository;
@@ -95,16 +94,38 @@ public class PostQueryServiceImpl implements PostQueryService {
         return HomeConverter.toPopularPostListDTO(expertColumnPostList);
     }
 
-   //전체 게시판 좋아요 순
+    // 검색어 기능 추가
+    @Override
+    public Page<PostPagingResponseDTO> findPostsBySearchQuery(String searchQuery, Long boardId, Pageable pageable) {
+
+        Page<Post> posts = postRepository.findPostsBySearchQuery(searchQuery, boardId, pageable);
+        // Post 객체를 PostPagingResponseDTO 객체로 변환하는 과정에서 NullPointerException이 발생
+        Page<PostPagingResponseDTO> dtoList = posts.map(post -> {
+            List<String> imgUrls = s3Service.getFullPath(post.getPostImgs());
+            return new PostPagingResponseDTO(post, imgUrls);
+        });
+        return dtoList;
+    }
+
+
+    //자유,전체 게시판 생성순
     @Transactional(readOnly = true)
     public Page<PostPagingResponseDTO> findAllPostsByBoardPK(Long boardId, int page, int size, String sortStr, List<String> crops) {
+
+        // 인증된 사용자가 FARMER나  EXPERT  이 아니면 바로 에러
+        String currentUserRole = userAuthorizationUtil.getCurrentUserRole();
+        if (!"FARMER".equals(currentUserRole) && !"EXPERT".equals(currentUserRole)) {
+            throw new GeneralException(ErrorStatus.UNAUTHORIZED_ACCESS);
+        }
+        Board board = boardRepository.findById(boardId)
+                .orElseThrow(() -> new GeneralException(ErrorStatus.BOARD_TYPE_NOT_FOUND));
         Sort sort = Sort.by(Sort.Direction.fromString(sortStr), "createdAt");
         Pageable pageable = PageRequest.of(page - 1, size, sort);
 
         Page<Post> postPages = (crops == null || crops.isEmpty())
                 ? postRepository.findAllByBoardId(boardId, pageable)
                 :postRepository.findPostsByBoardIdAndCrops(boardId, crops, pageable);
-
+        log.info("에러1");
         // Post 객체를 PostPagingResponseDTO로 변환하고 S3 URL을 포함하여 반환
         return postPages.map(post -> new PostPagingResponseDTO(post, s3Service.getFullPath(post.getPostImgs())));
     }
@@ -112,6 +133,12 @@ public class PostQueryServiceImpl implements PostQueryService {
     // 인기 게시판 좋아요 순
     @Transactional(readOnly = true)
     public Page<PostPagingResponseDTO> findPopularPosts(Long boardId, int pageNum, int size, String sort, List<String> crops) {
+        String currentUserRole = userAuthorizationUtil.getCurrentUserRole();
+        if (!"FARMER".equals(currentUserRole) && !"EXPERT".equals(currentUserRole)) {
+            throw new GeneralException(ErrorStatus.UNAUTHORIZED_ACCESS);
+        }
+        Board board = boardRepository.findById(boardId)
+                .orElseThrow(() -> new GeneralException(ErrorStatus.BOARD_TYPE_NOT_FOUND));
         Sort.Direction direction = Sort.Direction.fromString(sort);
         Pageable pageable = PageRequest.of(pageNum - 1, size, Sort.by(direction, "postLikes"));
 
@@ -119,12 +146,22 @@ public class PostQueryServiceImpl implements PostQueryService {
                 ? postRepository.findPopularPosts(boardId, pageable)
                 : postRepository.findPostsByBoardIdAndCrops(boardId, crops, pageable);
 
+        log.info(crops.toString());
+
         return posts.map(post -> new PostPagingResponseDTO(post, s3Service.getFullPath(post.getPostImgs())));
     }
 
     // Qna 글 조회
     @Transactional(readOnly = true)
     public Page<PostPagingResponseDTO> findQnaPostsByBoardPK(Long boardId, int page, int size, String sortStr, List<String> crops) {
+        // 인증된 사용자가 FARMER나  EXPERT  이 아니면 바로 에러
+        String currentUserRole = userAuthorizationUtil.getCurrentUserRole();
+        if (!"FARMER".equals(currentUserRole) && !"EXPERT".equals(currentUserRole)) {
+            throw new GeneralException(ErrorStatus.UNAUTHORIZED_ACCESS);
+        }
+        Board board = boardRepository.findById(boardId)
+                .orElseThrow(() -> new GeneralException(ErrorStatus.BOARD_TYPE_NOT_FOUND));
+
         // 정렬 방향 설정: 'ASC' 또는 'DESC' 기준으로 생성일(createdAt)로 정렬 기본이 DESC
         Sort sort = Sort.by(Sort.Direction.fromString(sortStr), "createdAt");
         Pageable pageable = PageRequest.of(page - 1, size, sort);
@@ -141,6 +178,14 @@ public class PostQueryServiceImpl implements PostQueryService {
     // 전문가 글 조회
     @Transactional(readOnly = true)
     public Page<PostPagingResponseDTO> findExpertsPostsByBoardPK(Long boardId, int page, int size, String sortStr, List<String> crops) {
+        // 인증된 사용자가 FARMER나  EXPERT  이 아니면 바로 에러
+        String currentUserRole = userAuthorizationUtil.getCurrentUserRole();
+        if (!"FARMER".equals(currentUserRole) && !"EXPERT".equals(currentUserRole)) {
+            throw new GeneralException(ErrorStatus.UNAUTHORIZED_ACCESS);
+        }
+        Board board = boardRepository.findById(boardId)
+                .orElseThrow(() -> new GeneralException(ErrorStatus.BOARD_TYPE_NOT_FOUND));
+
         // 정렬 방향 설정: 'ASC' 또는 'DESC' 기준으로 생성일(createdAt)로 정렬 기본이 DESC
         Sort sort = Sort.by(Sort.Direction.fromString(sortStr), "createdAt");
         Pageable pageable = PageRequest.of(page - 1, size, sort);
@@ -152,9 +197,16 @@ public class PostQueryServiceImpl implements PostQueryService {
         return posts.map(post -> new PostPagingResponseDTO(post, s3Service.getFullPath(post.getPostImgs())));
     }
 
-
+    // 이미지랑 글 같이 조회 일반 상세 조회( 인기,전체,자유)
     @Transactional(readOnly = true)
     public PostResponseDTO getBoardIdAndPostById(Long boardId, Long postId) {
+        // 인증된 사용자가 FARMER나  EXPERT  이 아니면 바로 에러
+        String currentUserRole = userAuthorizationUtil.getCurrentUserRole();
+        if (!"FARMER".equals(currentUserRole) && !"EXPERT".equals(currentUserRole)) {
+            throw new GeneralException(ErrorStatus.UNAUTHORIZED_ACCESS);
+        }
+
+
         // 1. 게시판 존재 여부 확인
         Board board = boardRepository.findById(boardId)
                 .orElseThrow(() -> new GeneralException(ErrorStatus.BOARD_TYPE_NOT_FOUND));
@@ -215,10 +267,17 @@ public class PostQueryServiceImpl implements PostQueryService {
     }
 
 
-
-    // Qna 게시판용 상세 조회
+    //QnA게시글과 답변 함께 조회
     @Transactional(readOnly = true)
     public PostWithAnswersResponseDTO getBoardIdAndQnAPostById(Long boardId, Long postId) {
+        // 인증된 사용자가 FARMER나  EXPERT  이 아니면 바로 에러
+        String currentUserRole = userAuthorizationUtil.getCurrentUserRole();
+        if (!"FARMER".equals(currentUserRole) && !"EXPERT".equals(currentUserRole)) {
+            throw new GeneralException(ErrorStatus.UNAUTHORIZED_ACCESS);
+        }
+        log.info("boardId :"+boardId);
+
+
         // 1. Board 조회
         Board board = boardRepository.findById(boardId)
                 .orElseThrow(() -> new GeneralException(ErrorStatus.BOARD_TYPE_NOT_FOUND));
@@ -232,10 +291,14 @@ public class PostQueryServiceImpl implements PostQueryService {
             throw new GeneralException(ErrorStatus.BOARD_TYPE_NOT_FOUND);
         }
 
-        // 4. Post에 연결된 Answer 리스트 가져오기
+        // 4. Post에 연결된 Crop 가져오기
+        Crop crop = post.getCrop();
+        String cropName = (crop != null) ? crop.getName() : null;
+
+        // 5. Post에 연결된 Answer 리스트 가져오기
         List<Answer> answers = post.getAnswers();
 
-        // 5. Answer 리스트를 AnswerResponseDTO로 변환
+        // 6. Answer 리스트를 AnswerResponseDTO로 변환
         List<AnswerResponseDTO> answerResponseDTOs = answers.stream()
                 .map(answer -> {
                     // 이미지 URL 리스트 생성
@@ -251,23 +314,23 @@ public class PostQueryServiceImpl implements PostQueryService {
                 })
                 .collect(Collectors.toList());
 
-        // 6. Post 정보 DTO 변환
+        // 7. Post 정보 DTO 변환 (Crop 정보 포함)
         PostResponseDTO postResponseDTO = PostResponseDTO.builder()
                 .postId(post.getId())
                 .postTitle(post.getPostTitle())
+                .subTitle(post.getSubTitle())
                 .postContent(post.getPostContent())
-                .Category(post.getCategory())
-                .subCategory(post.getSubCategories())
+                .Category(post.getCrop().getName())
+                .subCategory(post.getCrop().getCategory())
                 .createdAt(String.valueOf(post.getCreatedAt()))
                 .build();
 
-        // 7. 최종 DTO 반환
+        // 8. 최종 DTO 반환
         return PostWithAnswersResponseDTO.builder()
                 .post(postResponseDTO)
                 .answers(answerResponseDTOs)
                 .build();
     }
-
 
 
 }

@@ -9,6 +9,7 @@ import org.springframework.data.domain.Slice;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 public class ChatConverter {
 
@@ -16,7 +17,7 @@ public class ChatConverter {
         return ChatMessage.builder()
                 .senderId(dto.getSenderId())
                 .type(ChatMessageType.valueOf(dto.getMessageType()))
-                .content(dto.getMessageContent()!=null ? dto.getMessageContent() : null)
+                .content(Optional.ofNullable(dto.getMessageContent()).orElse(null))
                 .isRead(false) // 일단 읽음 여부 false로 리턴, 추후에 다시 구현
                 .chatRoom(chatRoom)
                 .build();
@@ -61,13 +62,13 @@ public class ChatConverter {
 
         return ChatResponse.ChatRoomDataDTO.builder()
                 .name(chatRoom.getExpert().getUser().getUserName())
-                .nickName(chatRoom.getExpert().getNickName() != null
-                        ? chatRoom.getExpert().getNickName()
-                        : null)
+                .nickName(Optional.ofNullable(chatRoom.getExpert())
+                        .map(Expert::getNickName)
+                        .orElse(null))
+                .profileImage(Optional.ofNullable(chatRoom.getExpert())
+                        .map(Expert::getProfileImageUrl)
+                        .orElse(null))
                 .isExpertNickNameOnly(chatRoom.getExpert().getIsNickNameOnly())
-                .profileImage(chatRoom.getExpert().getProfileImageUrl() != null
-                        ? chatRoom.getExpert().getProfileImageUrl()
-                        : null)
                 .type("전문가")
                 .lastEnterTime(ConvertTime.convertLocalDatetimeToTime(chatRoom.getExpertLastEnter()))
                 .isComplete(chatRoom.getIsFarmerComplete())
@@ -123,19 +124,28 @@ public class ChatConverter {
         return ChatResponse.ChatRoomDetailDTO.builder()
                 .chatRoomId(chatRoom.getId())
                 .name(user.getUserName())
-                .nickName(!isExpert ? user.getExpert().getNickName() : null) // 내가 전문가가 아니면(내가 농업인) 상대는 전문가
+                .nickName(!isExpert
+                        ? Optional.ofNullable(user.getExpert()).map(Expert::getNickName).orElse(null)
+                        : null) // 내가 전문가가 아니면(내가 농업인) 상대는 전문가
                 .isExpertNickNameOnly(!isExpert ? user.getExpert().getIsNickNameOnly() : null)
                 .type(isExpert ? "농업인" : "전문가") // 내가 전문가이면 상대 타입은 농업인
-                .profileImage(!isExpert && user.getExpert() != null && user.getExpert().getProfileImageUrl() != null
-                        ? user.getExpert().getProfileImageUrl()
+                .profileImage(!isExpert
+                        ? Optional.ofNullable(user.getExpert())
+                        .map(Expert::getProfileImageUrl)
+                        .orElse(null)
                         : null)
                 .estimateBudget(chatRoom.getEstimate().getBudget())
                 .estimateCategory(chatRoom.getEstimate().getCategory())
                 .estimateAreaName(area.getAreaName())
                 .estimateAreaDetail(area.getAreaNameDetail())
                 .unreadMessageCount(unReadMessageCount.intValue())
-                .lastMessageContent(chatMessage != null ? chatMessage.getContent() : null) // null-safe 처리
-                .lastMessageDate(chatMessage != null ? ConvertTime.convertToYearMonthDay(chatMessage.getCreatedAt()) : null) // null-safe 처리
+                .lastMessageContent(Optional.ofNullable(chatMessage)
+                        .map(ChatMessage::getContent)
+                        .orElse(null))
+                .lastMessageDate(Optional.ofNullable(chatMessage)
+                        .map(ChatMessage::getCreatedAt)
+                        .map(ConvertTime::convertToYearMonthDay)
+                        .orElse(null))
                 .build();
     }
 
