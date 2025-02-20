@@ -21,16 +21,16 @@ public class BoardRequestDto {
     @Schema(description = "게시글의 기본 정보")
     public static class BasePost {
         @Schema(description = "게시글 제목", example = "농촌에서 살아남기")
-        @NotBlank
+        @Size(min = 1, max = 50, message = "게시글 제목은 1자 이상 50자 이하여야 합니다.")
         private String postTitle; // 게시글 제목
 
         @Schema(description = "게시글 제목", example = "농촌에서 살아남기")
-        @NotBlank
+        @Size(min = 1, max = 50, message = "게시글 내용은 1자 이상 50자 이하여야 합니다.")
         private String subTitle; // 게시글 제목
 
 
         @Schema(description = "게시글 내용", example = "쌀을 기르는 법")
-        @NotBlank
+        @Size(min = 1, max = 40000, message = "게시글 내용은 1자 이상 40000자 이하여야 합니다.")
         private String postContent; // 게시글 내용
 
         @Schema(description = "사용자 ID", example = "1")
