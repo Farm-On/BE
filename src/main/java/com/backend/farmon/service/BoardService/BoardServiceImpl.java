@@ -503,9 +503,7 @@ BoardServiceImpl implements BoardService {
         if (postDto.getSubTitle() == null) {
             throw new GeneralException(ErrorStatus.POST_SUBTITLE_NOT_FOUND);
         }
-        if (multipartFiles == null) {
-            throw new GeneralException(ErrorStatus.POST_PICTURES_NOT_FOUND);
-        }
+
         if (postDto.getPostContent() == null) {
             throw new GeneralException(ErrorStatus.POST_CONTENT_NOT_FOUND);
         }
@@ -524,9 +522,7 @@ BoardServiceImpl implements BoardService {
         if(postDto.getCategoryTitle()==null) {
             throw new GeneralException(ErrorStatus.FIELD_CATEGORY_REQUIRED);
         }
-        if (multipartFiles == null) {
-            throw new GeneralException(ErrorStatus.POST_PICTURES_NOT_FOUND);
-        }
+
         if (postDto.getPostContent() == null) {
             throw new GeneralException(ErrorStatus.POST_CONTENT_NOT_FOUND);
         }
