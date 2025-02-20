@@ -20,7 +20,7 @@ public class LoginController {
     private final UserAuthorizationUtil userAuthorizationUtil;
 
     @PostMapping("/api/login")
-    @Operation(summary = "공동로그인 API", description = " userId와 토큰을 반환합니다.")
+    @Operation(summary = "공동로그인 API", description = " userId와 토큰을 반환합니다. 토큰은 24시간동안 유효합니다.")
     @ApiResponses({
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200", description = "OK, 성공")
     })
