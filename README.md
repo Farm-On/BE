@@ -1,6 +1,7 @@
 # 🌱 UMC 7th FarmON BackEnd
 
 ## 🌾 Introduce
+![Image](https://github.com/user-attachments/assets/95c2519f-7e02-4cec-83e2-6064737ba3e9)
 **농업의 연결 고리** **FarmON**은 UMC 7기에서 진행된 프로젝트 및 농업의 혁신을 이끄는 디지털 솔루션으로, <br>
 **디지털 커뮤니티**를 통해 소규모 영세농업의 **공동농업을 활성화**하고, 플랫폼을 활용하여 **전국의 농업 전문가를 연결**하며, **농업 데이터**를 기반으로 **체계적인 농업 농업 서비스**를 제공합니다.
 
@@ -27,43 +28,27 @@
 
 &nbsp;
 ## ✨ Main Feature
-### 🔹 농업인 - 전문가 매칭 시스템
-- **전문가 매칭 시스템**
-- **전문가 추천 기능**
-- **전문가 프로필 열람 및 상세 정보 확인**
-- **농업인 - 전문가 견적서 매칭 시스템**
+![Image](https://github.com/user-attachments/assets/0e433d31-6ec9-40b4-a366-5ca014dcb1ee)
 
-### 🔹 농업인 & 전문가 등록
-- 농업인 회원가입
-- 전문가 등록을 통해 **전문 분야 및 컨설팅 가능 지역 설정**
-- 농업인 - 전문가 역할 전환
+![Image](https://github.com/user-attachments/assets/294d445a-4d2a-4ffb-a95d-2c7aa1b66440)
 
-### 🔹 전문가 프로필 등록
-- 자유 형식의 **포트폴리오 등록 기능**
-- 전문가의 **경력 관리**
+![Image](https://github.com/user-attachments/assets/d7390577-bd6b-4358-b273-fcb0b344febb)
 
-### 🔹 농업 견적서
-- **지역, 작물, 예산 기반 견적 등록 기능**
-- 작물 카테고리, 지역, 예산별 견적 검색 및 필터링
-- 상세 견적 확인
+![Image](https://github.com/user-attachments/assets/c5a11562-41f7-4a39-ac73-72c05ed5a046)
 
-### 🔹 실시간 채팅
-- **실시간 채팅**을 통한 신뢰 기반의 견적 거래 시스템 제공
+![Image](https://github.com/user-attachments/assets/141ed065-8cc9-4514-9791-dbc9b4b45836)
 
-### 🔹 작물 검색 최적화
-- **견적 데이터**를 활용한 **작물 검색어 추천** 기능
-- **작물 카테고리 기반 자동 완성 검색** 기능 제공
+![Image](https://github.com/user-attachments/assets/6ccf7111-461e-412e-abce-06362a5780ae)
 
-### 🔹 커뮤니티
-- 인기, 전체 게시판 / 전문가 칼럼 / Q&A / 자유 게시판
-- 게시글 좋아요 및 댓글
+![Image](https://github.com/user-attachments/assets/78d15f3f-728b-41db-b7c6-d2422a81bfec)
 
-### 🔹 데이터 관리
-- 사용자 인적사항 데이터
-- 사용자 행동 데이터
-- 사용자 이동 데이터
-- 커뮤니티 참여 데이터
-- 작물별 견적 신청 관리 데이터
+![Image](https://github.com/user-attachments/assets/8bf1ba58-6f22-4ef8-95fc-6326b6177220)
+
+![Image](https://github.com/user-attachments/assets/71f7422f-86c1-49d4-bb4b-58bc2209b4c5)
+
+![Image](https://github.com/user-attachments/assets/56db86f1-55c8-43c7-9f9d-256bea93f440)
+
+![Image](https://github.com/user-attachments/assets/d0772f82-fee4-473d-8592-c15d7261f398)
 
 &nbsp;
 ## 👩‍💻👨‍💻 Backend Developers
