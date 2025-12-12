@@ -92,7 +92,7 @@
 
 &nbsp;
 ## 🛠 Backend Architecture
-<img width="3002" height="2376" alt="image" src="https://github.com/user-attachments/assets/a01e504f-d8fa-4dd8-94fc-f3be2626bf2e" />
+<img width="3002" height="2376" alt="image" src="https://github.com/user-attachments/assets/0faefea2-ad94-4a9c-b423-4f8fa49fbf27" />
 
 
 &nbsp;
